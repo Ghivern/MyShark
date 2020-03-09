@@ -15,9 +15,9 @@ Capturer:public QThread
 
 libpcap::pcap_next_ex():非阻塞，循环
 
-   若获取包成功，则将抓到的原始数据添加到RawList_t(README.RawList_t)列表中
+   <1>若获取包成功，则将抓到的原始数据添加到RawList_t(README.RawList_t)列表中
 
-   emit onePacketCaptured(qint64 index) : 发射信号，用于驱动解析器
+   <2>emit onePacketCaptured(qint64 index) : 发射信号，用于驱动解析器
 	
 ## 四、解析器模块
 
@@ -98,9 +98,9 @@ Dissector
    
    接收Capturer的信号(onePacketCaptured(qint64 index))
 
-       进行简单解析：loader->GetDissector(datalink)->Dissect();
+       <1>进行简单解析：loader->GetDissector(datalink)->Dissect();
    
-       emit onePacketDissected(qint64 index):用于GUI接收信号，并将简单解析结果显示到GUI
+       <2>emit onePacketDissected(qint64 index):用于GUI接收信号，并将简单解析结果显示到GUI
    
    详细解析响应GUI事件，并返回协议树，用于进一步将协议树显示到GUI
 
