@@ -29,8 +29,9 @@ void Capturer::run(){
     struct pcap_pkthdr *pkthdr;
     raw_t *rawAndPkthdr;
     qint64 index = 0;
+    qint32 res;
     while(!this->stop){
-        if(pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw) == 1){
+        if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
             struct pcap_pkthdr *newPkthdr = new struct pcap_pkthdr;
             memcpy(newPkthdr,pkthdr,sizeof (struct pcap_pkthdr));
             uchar *newRaw = new uchar[pkthdr->caplen];
@@ -44,8 +45,14 @@ void Capturer::run(){
             qDebug() << "Capturer : capture one packet successfully";
             this->mutex->unlock();
             index++;
+        }else if(res == 0){
+            qDebug() << "Capturer : timeout";
+        }else if(res == -1){
+            qDebug() << "Capturer : error";
+        }else if(res == -2){
+            qDebug() << "Capturer : come to file end";
         }else{
-            qDebug() << "Capturer : capture one packet failed";
+            qDebug() << "Other error";
         }
     }
 }
