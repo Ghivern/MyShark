@@ -4,6 +4,7 @@
 
 quint32 DissectorEth::flags = 0;
 
+
 DissectorEth::DissectorEth()
 {
 
@@ -19,9 +20,8 @@ ProTree* DissectorEth::Dissect(rawList_t *rawList, dissResList_t *dissResList,qi
         dissResEth->SetMacSrc(header->src_mac);
         dissResEth->AddToProtocolStackWithSE("ethertype",sizeof (eth_hdr));
     }else{
-        qint32 start = dissResEth->GetProStart("ethertype");
         proTree->AddItem("ethertype",DissectorEth::MsgTop(dissResList->at(index))
-                         ,start,dissResEth->GetProEnd("ethertype"));
+                         ,dissResEth->GetProStart("ethertype"),dissResEth->GetProEnd("ethertype"));
     }
     //qDebug() << "DissectorEth :(关注)" << ((ushort)0x0806 == GetEthPtoType(header));
     switch (GetPtoType(header)) {

@@ -3,7 +3,7 @@
 Dissector::Dissector(Capturer *capturer,Loader *loader)
 {
     this->dissResList = new dissResList_t;
-    this->loader = new Loader();
+    this->loader = loader;
     this->capturer = capturer;
 }
 
