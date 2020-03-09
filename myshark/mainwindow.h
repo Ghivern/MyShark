@@ -24,6 +24,7 @@ private:
 
     Capturer *capturer;
     Dissector *dissector;
+    Loader *loader;
 
 public slots:
     void Print(qint64 index);

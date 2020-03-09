@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     Device device;
     capturer = new Capturer(Device::GetDeviceNameByIndex(0));
-    dissector = new Dissector(capturer);
+    loader = new Loader();
+    dissector = new Dissector(capturer,loader);
     connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
     connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
     capturer->Start();

@@ -9,7 +9,7 @@ class Dissector:public QObject
 {
     Q_OBJECT
 public:
-    Dissector(Capturer *capturer);
+    Dissector(Capturer *capturer,Loader *loader);
     ~Dissector();
     DissRes* GetDissResByIndex(qint64 index);
     Loader* GetLoader();

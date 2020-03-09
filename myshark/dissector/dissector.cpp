@@ -1,6 +1,6 @@
 #include "dissector.h"
 
-Dissector::Dissector(Capturer *capturer)
+Dissector::Dissector(Capturer *capturer,Loader *loader)
 {
     this->dissResList = new dissResList_t;
     this->loader = new Loader();
