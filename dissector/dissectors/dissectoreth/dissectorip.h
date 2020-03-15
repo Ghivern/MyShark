@@ -20,7 +20,7 @@ private:
      * 0:    0: uncheck    1: check
      */
 
-    static ip_hdr *GetIpHdr(DissRes *dissRes);
+    static ip_hdr *GetIpHdr(DissRes *dissRes,Info *info);
     static uchar GetIpHdrLen(ip_hdr *header);
     static uchar GetIpPType(ip_hdr *header);
 

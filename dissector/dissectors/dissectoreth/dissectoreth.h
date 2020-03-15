@@ -9,7 +9,7 @@ public:
     DissectorEth();
     ProTree * Dissect(DissResList *dissResList, qint64 index, Info *info = NULL) override;
 
-    eth_hdr* GetHdr(DissRes *packet);
+    eth_hdr* GetHdr(DissRes *packet,Info *info);
     ushort GetPtoType(eth_hdr *header);
     quint32 GetIntFCS(DissRes *packet);
     QString GetStrFCS(DissRes *packet);

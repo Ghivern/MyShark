@@ -8,21 +8,53 @@ DissectorArp::DissectorArp()
 }
 
 void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
-    arp_hdr *header = GetArpHdr(dissRes);
+        arp_hdr *header = DissectorArp::GetArpHdr(dissRes,info);
     if(info == NULL){
         qDebug() << "DissectorArp : info == NULL";
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->AddToProtocolStackWithSE("arp",sizeof(arp_hdr));
         dissResEth->SetMsg(MsgArpInfo(header));
     }else{
-        Q_UNUSED(proTree)
+        qint32 start = dissRes->GetProStart("arp");
+        proTree->AddItem("arp",DissectorArp::MsgTopLevel(header),dissRes->GetProStart("arp"),dissRes->GetProEnd("arp"));
+
+        proTree->AddItem("arp",DissectorArp::MsgHdType(header),start,start+1,ProTree::NEW);
+        start += 2;
+
+        proTree->AddItem("arp",DissectorArp::MsgProType(header),start,start+1);
+        start +=2;
+
+        proTree->AddItem("arp",DissectorArp::MsgHdSize(header),start,start+0);
+        start +=1;
+
+        proTree->AddItem("arp",DissectorArp::MsgProSize(header),start,start+0);
+        start +=1;
+
+        proTree->AddItem("arp",DissectorArp::MsgOpcode(header),start,start+1);
+        start +=2;
+
+        proTree->AddItem("arp",DissectorArp::MsgSenderMac(header),start,start+5);
+        start +=6;
+
+        proTree->AddItem("arp",DissectorArp::MsgSenderIp(header),start,start+3);
+        start +=4;
+
+        proTree->AddItem("arp",DissectorArp::MsgTargetMac(header),start,start+5);
+        start +=6;
+
+        proTree->AddItem("arp",DissectorArp::MsgTargetIp(header),start,start+3);
+        start +=4;
+
+        proTree->Pop();
+
     }
 }
 
 //Get 方法
-arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes){
-    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
-    dissRes->AddHeadersLen(sizeof(arp_hdr));
+arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes,Info *info){
+    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProEnd("ethertype") + 1);
+    if(info == NULL)
+        dissRes->AddHeadersLen(sizeof(arp_hdr));
     return header;
 }
 
@@ -67,7 +99,7 @@ QString DissectorArp::GetStrArpOpType(arp_hdr *header){
     }
 }
 QString DissectorArp::GetStrArpHSrcAddress(arp_hdr *header){
-    return QString::asprintf("%02x%02x%02x%02x%02x%02x"
+    return QString::asprintf("%02x.%02x.%02x.%02x.%02x.%02x"
             ,header->src_hardware[0]
             ,header->src_hardware[1]
             ,header->src_hardware[2]
@@ -85,7 +117,7 @@ QString DissectorArp::GetStrArpPSrcAddress(arp_hdr *header){
             );
 }
 QString DissectorArp::GetStrArpHDstAddress(arp_hdr *header){
-    return QString::asprintf("%02x%02x%02x%02x%02x%02x"
+    return QString::asprintf("%02x.%02x.%02x.%02x.%02x.%02x"
             ,header->dst_hardware[0]
             ,header->dst_hardware[1]
             ,header->dst_hardware[2]
@@ -115,4 +147,51 @@ QString DissectorArp::MsgArpInfo(arp_hdr *header){
         default:
             return "未知ARP操作类型，值为" + QString(GetArpOpType(header));
     }
+}
+
+QString DissectorArp::MsgTopLevel(arp_hdr *header){
+    ushort op = ntohs(header->op);
+    return QString::asprintf("Address Resolution Protocol (") + ((op == 1)?"Request)":"Reply)") ;
+}
+
+QString DissectorArp::MsgHdType(arp_hdr *header){
+    return "Hardware type :"  + DissectorArp::GetStrAprHType(header);
+}
+
+QString DissectorArp::MsgProType(arp_hdr *header){
+    ushort type = ntohs(header->protocol_type);
+    QString strtype = DissectorArp::GetStrArpPType(header);
+    return QString("Protocol type : ") + strtype + QString::asprintf("(0x%02x%02x)"
+                                                                     ,((uchar*)&type)[1]
+                                                                     ,((uchar*)&type)[0]);
+}
+
+QString DissectorArp::MsgHdSize(arp_hdr *header){
+    return QString::asprintf("Hardware size : %d",header->hardware_address_len);
+}
+
+QString DissectorArp::MsgProSize(arp_hdr *header){
+    return QString::asprintf("Protocol size : %d",header->protocol_address_len);
+}
+
+QString DissectorArp::MsgOpcode(arp_hdr *header){
+    ushort op = ntohs(header->op);
+    return QString::asprintf("Opcode : ") + ((op == 1)?"Request":"Reply")
+            + QString::asprintf(" (%d)",op);
+}
+
+QString DissectorArp::MsgSenderMac(arp_hdr *header){
+    return QString("Sender Mac address : ") + DissectorArp::GetStrArpHSrcAddress(header);
+}
+
+QString DissectorArp::MsgSenderIp(arp_hdr *header){
+    return QString("Sender Ip address : ") + DissectorArp::GetStrArpPSrcAddress(header);
+}
+
+QString DissectorArp::MsgTargetMac(arp_hdr *header){
+    return QString("Target Mac address : ") + DissectorArp::GetStrArpHDstAddress(header);
+}
+
+QString DissectorArp::MsgTargetIp(arp_hdr *header){
+    return QString("Target IP address : ") + DissectorArp::GetStrArpPDstAddress(header);
 }

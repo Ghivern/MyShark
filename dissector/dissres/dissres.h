@@ -52,7 +52,7 @@ protected:
     qint64 no;
     QList<QString> protocolStack;
     QHash<QString,position_t> positionStack;
-    qint32 headersLen;
+    qint32 headersLen = 0;
     QString msg;
 };
 

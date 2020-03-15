@@ -16,13 +16,15 @@ DissectorEth::DissectorEth()
 
 ProTree* DissectorEth::Dissect(DissResList *dissResList,qint64 index, Info *info){
     ProTree *proTree =  DissectorFrame::Dissect(dissResList,index,info);
-    eth_hdr *header = GetHdr(dissResList->at(index));
+    eth_hdr *header = GetHdr(dissResList->at(index),info);
     DissResEth *dissResEth = ((DissResEth*)dissResList->at(index));
     if(info == NULL){
         dissResEth->SetMacDst(header->dst_mac);
         dissResEth->SetMacSrc(header->src_mac);
         dissResEth->SetEthCRCRes(this->GetCalculatedIntFCS(dissResEth) == this->GetIntFCS(dissResEth));
         dissResEth->AddToProtocolStackWithSE("ethertype",sizeof (eth_hdr));
+
+
     }else{
         qint32 start = dissResEth->GetProStart("ethertype");
         proTree->AddItem("ethertype",DissectorEth::MsgTop(dissResList->at(index))
@@ -66,9 +68,10 @@ ProTree* DissectorEth::Dissect(DissResList *dissResList,qint64 index, Info *info
 }
 
 //Get方法
-eth_hdr* DissectorEth::GetHdr(DissRes *dissRes){
+eth_hdr* DissectorEth::GetHdr(DissRes *dissRes,Info *info){
     eth_hdr *header = (eth_hdr*)(dissRes->GetData());
-    dissRes->AddHeadersLen(sizeof(eth_hdr));
+    if(info == NULL)
+        dissRes->AddHeadersLen(sizeof(eth_hdr));
     return header;
 }
 
@@ -202,6 +205,7 @@ QString DissectorEth::MsgIG(uchar *mac){
                               :"Individual address (unicast)");
 }
 
+//Deal方法
 void DissectorEth::DealFCS(ProTree *tree, DissRes *dissRes){
     DissResEth *dissResEth = ((DissResEth*)dissRes);
     QString str;

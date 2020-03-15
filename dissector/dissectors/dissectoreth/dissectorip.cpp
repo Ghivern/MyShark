@@ -10,7 +10,7 @@ DissectorIp::DissectorIp()
 }
 
 void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
-    ip_hdr *header = GetIpHdr(dissRes);
+    ip_hdr *header = GetIpHdr(dissRes,info);
     if(info == NULL){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetIpSrc(header->sourceIP);
@@ -35,11 +35,10 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 
 
 //Get 方法
-ip_hdr* DissectorIp::GetIpHdr(DissRes *dissRes){
-    ip_hdr* ip = (ip_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
-    dissRes->AddHeadersLen(GetIpHdrLen(ip));
-
-
+ip_hdr* DissectorIp::GetIpHdr(DissRes *dissRes,Info *info){
+    ip_hdr* ip = (ip_hdr*)(dissRes->GetData() + dissRes->GetProEnd("ethertype") + 1);
+    if(info == NULL)
+        dissRes->AddHeadersLen(GetIpHdrLen(ip));
     return ip;
 }
 

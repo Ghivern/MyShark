@@ -17,7 +17,7 @@ public:
 private:
     static quint32 flags;
 
-    static arp_hdr* GetArpHdr(DissRes *dissRes);
+    static arp_hdr* GetArpHdr(DissRes *dissRes,Info *info);
     static QString GetStrAprHType(arp_hdr *header);
     static ushort GetArpHType(arp_hdr *header);
     static QString GetStrArpPType(arp_hdr *header);
@@ -32,6 +32,16 @@ private:
     static QString GetStrArpPDstAddress(arp_hdr *header);
 
     static QString MsgArpInfo(arp_hdr *header);
+    static QString MsgTopLevel(arp_hdr *header);
+    static QString MsgHdType(arp_hdr *header);
+    static QString MsgProType(arp_hdr *header);
+    static QString MsgHdSize(arp_hdr *header);
+    static QString MsgProSize(arp_hdr *header);
+    static QString MsgOpcode(arp_hdr *header);
+    static QString MsgSenderMac(arp_hdr *header);
+    static QString MsgSenderIp(arp_hdr *header);
+    static QString MsgTargetMac(arp_hdr *header);
+    static QString MsgTargetIp(arp_hdr *header);
 
 };
 
