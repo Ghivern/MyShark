@@ -2,7 +2,6 @@
 #define DISSECTORARP_H
 #include <QtCore>
 #include "../../protree/protree.h"
-#include "../../../global/global.h"
 #include "../../info/infoeth.h"
 #include "eth_header.h"
 #include "../../dissres/dissreseth.h"
@@ -11,14 +10,14 @@ class DissectorArp
 {
 public:
     DissectorArp();
-    static void Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree ,Info *info);
+    static void Dissect(DissRes *dissRes, ProTree *proTree ,Info *info);
 
 
 
 private:
     static quint32 flags;
 
-    static arp_hdr* GetArpHdr(uchar *packet,DissRes *dissRes);
+    static arp_hdr* GetArpHdr(DissRes *dissRes);
     static QString GetStrAprHType(arp_hdr *header);
     static ushort GetArpHType(arp_hdr *header);
     static QString GetStrArpPType(arp_hdr *header);

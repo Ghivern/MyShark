@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include "../../global/global.h"
 #include "../units/caphandle.h"
+
+#include "../../dissector/dissres/dissreseth.h"
 
 class Capturer:public QThread
 {
@@ -13,14 +14,14 @@ class Capturer:public QThread
 public:
     Capturer(QString devName);
     ~Capturer();
-    rawList_t* GetRawList();
+    QList<DissRes*>* GetDissResList();
 
 protected:
     void run() Q_DECL_OVERRIDE;
 
 private:
     CapHandle *capHandle;
-    rawList_t *rawList;
+    DissResList *dissResList;
     QMutex *mutex;
     bool stop;
 

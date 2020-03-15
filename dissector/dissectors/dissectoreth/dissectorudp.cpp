@@ -9,8 +9,8 @@ DissectorUdp::DissectorUdp()
 }
 
 
-void DissectorUdp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info *info){
-    udp_hdr *header = GetUdpHdr(raw->raw,dissRes);
+void DissectorUdp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
+    udp_hdr *header = GetUdpHdr(dissRes);
     if(info == NULL){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetSrcPort(GetUdpSrcPort(header));
@@ -30,13 +30,9 @@ void DissectorUdp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info 
     }
 }
 
-udp_hdr* DissectorUdp::GetUdpHdr(uchar *packet,DissRes *dissRes){
-    DissResEth *dissResEth = ((DissResEth*)dissRes);
-    udp_hdr *udp = (udp_hdr*)(packet + dissResEth->GetHeadersLen());
-    dissResEth->AddHeadersLen(sizeof(udp_hdr));
-
-
-
+udp_hdr* DissectorUdp::GetUdpHdr(DissRes *dissRes){
+    udp_hdr *udp = (udp_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
+    dissRes->AddHeadersLen(sizeof(udp_hdr));
     return udp;
 }
 

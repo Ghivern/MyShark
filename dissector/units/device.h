@@ -2,7 +2,8 @@
 #define DEVICE_H
 #include <QList>
 #include "pcap.h"
-#include "../../global/global.h"
+
+#include <QDebug>
 
 class Device
 {

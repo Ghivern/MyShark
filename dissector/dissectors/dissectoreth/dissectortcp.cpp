@@ -8,8 +8,8 @@ DissectorTcp::DissectorTcp()
 
 }
 
-void DissectorTcp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info *info){
-    tcp_hdr *header = GetTcpHdr(raw->raw,dissRes);
+void DissectorTcp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
+    tcp_hdr *header = GetTcpHdr(dissRes);
     if(info == NULL){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetDstPort(GetTcpDstPort(header));
@@ -24,13 +24,9 @@ void DissectorTcp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info 
     }
 }
 
-tcp_hdr* DissectorTcp::GetTcpHdr(uchar *packet,DissRes *dissRes){
-    DissResEth *dissResEth = ((DissResEth*)dissRes);
-    tcp_hdr *tcp = (tcp_hdr*)(packet + dissResEth->GetHeadersLen());
-    dissResEth->AddHeadersLen(sizeof(tcp_hdr));
-
-
-
+tcp_hdr* DissectorTcp::GetTcpHdr(DissRes *dissRes){
+    tcp_hdr *tcp = (tcp_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
+    dissRes->AddHeadersLen(sizeof(tcp_hdr));
     return tcp;
 }
 

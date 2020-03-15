@@ -9,18 +9,16 @@ DissRes::DissRes(qint64 no)
     this->headersLen = 0;
 }
 
-void DissRes::SetTv(timeval tv){
-    if(DissRes::isFirstPacket){
-        DissRes::firstTv.tv_sec = tv.tv_sec;
-        DissRes::firstTv.tv_usec = tv.tv_usec;
-        DissRes::isFirstPacket = false;
-    }
-    this->tv.tv_sec = tv.tv_sec;
-    this->tv.tv_usec = tv.tv_usec;
+DissRes::~DissRes(){
+    free(this->packet.data);
+    free(this->packet.pkthdr);
 }
 
-void DissRes::SetCapLen(qint32 capLen){
-    this->capLen = capLen;
+void DissRes::SetPacket(const uchar *data,const pcap_pkthdr *pkthdr){
+    this->packet.data = (uchar*)malloc(pkthdr->caplen);
+    memcpy(this->packet.data,data,pkthdr->caplen);
+    this->packet.pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
+    memcpy(this->packet.pkthdr,pkthdr,sizeof(pcap_pkthdr));
 }
 
 void DissRes::AddToProtocolStack(QString protocol){
@@ -57,6 +55,14 @@ void DissRes::AddProPosition(QString proName, qint32 start, qint32 end){
     this->positionStack.insert(proName,p);
 }
 
+const uchar* DissRes::GetData(){
+    return this->packet.data;
+}
+
+const pcap_pkthdr* DissRes::GetPkthdr(){
+    return this->packet.pkthdr;
+}
+
 void DissRes::SetMsg(QString msg){
     this->msg = msg;
 }
@@ -65,14 +71,30 @@ qint64 DissRes::GetNo(){
     return this->no;
 }
 
+timeval DissRes::GetTimeval(){
+    return this->packet.pkthdr->ts;
+}
+
 float DissRes::GetTimeSinceFirstPacket(){
-    return (this->tv.tv_sec - DissRes::firstTv.tv_sec)
+    return (this->packet.pkthdr->ts.tv_sec - DissRes::firstTv.tv_sec)
             +
-            (this->tv.tv_usec - DissRes::firstTv.tv_usec)/1000000.0;
+            (this->packet.pkthdr->ts.tv_usec - DissRes::firstTv.tv_usec)/1000000.0;
 }
 
 qint32 DissRes::GetCapLen(){
-    return this->capLen;
+    return this->packet.pkthdr->caplen;
+}
+
+qint32 DissRes::GetCapLenBit(){
+    return this->GetCapLen() * 8;
+}
+
+qint32 DissRes::GetLen(){
+    return this->packet.pkthdr->len;
+}
+
+qint32 DissRes::GetLenBit(){
+    return this->GetLen() * 8;
 }
 
 QString DissRes::GetTopProtocol(){

@@ -9,6 +9,7 @@ public:
     void SetIpv6();
     void SetMacSrc(uchar *macSrc);
     void SetMacDst(uchar *macDst);
+    void SetEthCRCRes(bool res);
     void SetIpSrc(uchar *ipSrc);
     void SetIpDst(uchar *ipDst);
     void SetIpv4Src(uchar *ipSrc);
@@ -19,10 +20,15 @@ public:
 
     QString GetStrMacSrc();
     QString GetStrMacDst();
+    bool GetEthCRCRes();
     ushort GetSrcPort();
     ushort GetDstPort();
     QString GetStrIpSrc();
     QString GetStrIpDst();
+    qint32 HaveIpAddr();
+    QString GetStrSrc();
+    QString GetStrDst();
+    bool GetEthCRCRes(bool res);
 
 
 private:
@@ -35,10 +41,12 @@ private:
     bool isIpv6 = false;
     uchar macSrc[6] = {0};
     uchar macDst[6] = {0};
+    bool ethCRCRes = false;
     uchar ipSrc[16] = {0};
     uchar ipDst[16] = {0};
     ushort srcPort = 0;
     ushort dstPort = 0;
+
 };
 
 #endif // DISSRESETH_H

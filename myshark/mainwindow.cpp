@@ -8,8 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     Device device;
     capturer = new Capturer(Device::GetDeviceNameByIndex(0));
-    loader = new Loader();
-    dissector = new Dissector(capturer,loader);
+
+    //loader = new Loader();
+    //dissector = new Dissector(capturer,loader);
+    dissector = new Dissector(capturer);
     connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
     connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
     capturer->Start();
@@ -44,8 +46,8 @@ void MainWindow::Print(qint64 index){
     qDebug() << res->GetNo()
              << ""  << res->GetTimeSinceFirstPacket()
              << ""  << res->GetTopProtocol()
-             << ""  << res->GetStrMacSrc()
-             << ""  << res->GetStrMacDst()
+             << ""  << res->GetStrSrc()
+             << ""  << res->GetStrDst()
              << ""  << res->GetCapLen()
              << ""  << res->GetTopProtocol()
              << ""  << res->GetSrcPort()
@@ -54,12 +56,25 @@ void MainWindow::Print(qint64 index){
 
     Info *info = new Info(0,1);
     ProTree *proTree = this->dissector->GetLoader()->GetDissector(1)->Dissect(
-                this->capturer->GetRawList()
-                ,this->dissector->GetDissResList()
+                this->dissector->GetDissResList()
                 ,index
                 ,info
                 );
     this->PrintProTree(proTree->GetHeader(),1);
     delete info;
+
+    qint32 i;
+    for(i = 0; i < res->GetCapLen() - 5; i+= 6)
+        qDebug() << QString::asprintf("%02x %02x %02x %02x %02x %02x",res->GetData()[i]
+                                                                ,res->GetData()[i + 1]
+                                                                ,res->GetData()[i + 2]
+                                                                ,res->GetData()[i + 3]
+                                                                ,res->GetData()[i + 4]
+                                                                ,res->GetData()[i + 5]);
+    while (i < res->GetCapLen()) {
+        qDebug() << QString::asprintf("%02x",res->GetData()[i]) <<  " ";
+        i++;
+    }
+
 }
 

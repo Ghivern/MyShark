@@ -3,14 +3,14 @@
 
 #include "../dissector_global.h"
 #include "../protree/protree.h"
-#include "../../global/global.h"
+#include "../dissres/dissres.h"
 #include "../info/info.h"
 
 class DissectorBase
 {
 public:
     DissectorBase();
-    virtual ProTree* Dissect(rawList_t *rawList,dissResList_t *dissResList,qint64 index,Info *info = NULL);
+    virtual ProTree* Dissect(DissResList *dissResList,qint64 index,Info *info = NULL);
 };
 
 #endif // DISSECTORBASE_H

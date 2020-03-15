@@ -1,6 +1,5 @@
 #ifndef CAPHANDLE_H
 #define CAPHANDLE_H
-#include "../../global/global.h"
 #include "../../dissector/units/device.h"
 
 class CapHandle

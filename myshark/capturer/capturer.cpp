@@ -4,43 +4,47 @@ Capturer::Capturer(QString devName)
 {
     this->capHandle = new CapHandle(devName);
     this->capHandle->ActivateHandleWithParas();
-    this->rawList = new QList<raw_t*>;
+    this->dissResList = new DissResList;
     this->mutex = new QMutex();
     this->stop = false;
 }
 
 Capturer::~Capturer(){
     delete capHandle;
-    delete rawList;
     delete mutex;
-    for(int index = 0; index < this->rawList->length(); index++){
-        delete this->rawList->at(index)->raw;
-        delete this->rawList->at(index)->pkthdr;
-        delete this->rawList->at(index);
-    }
+    for(int index = 0; index < this->dissResList->length(); index++)
+        delete dissResList->at(index);
+    delete dissResList;
 }
 
-rawList_t* Capturer::GetRawList(){
-    return this->rawList;
+QList<DissRes*>* Capturer::GetDissResList(){
+    return this->dissResList;
 }
 
 void Capturer::run(){
     const uchar *raw;
     struct pcap_pkthdr *pkthdr;
-    raw_t *rawAndPkthdr;
     qint64 index = 0;
     qint32 res;
     while(!this->stop){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-            struct pcap_pkthdr *newPkthdr = new struct pcap_pkthdr;
-            memcpy(newPkthdr,pkthdr,sizeof (struct pcap_pkthdr));
-            uchar *newRaw = new uchar[pkthdr->caplen];
-            memcpy(newRaw,raw,pkthdr->caplen);
-            rawAndPkthdr = new raw_t;
-            rawAndPkthdr->raw = newRaw;
-            rawAndPkthdr->pkthdr = newPkthdr;
+            DissRes *dissRes;
+            switch (this->capHandle->GetLinkType()) {
+            case 1:
+            {
+                dissRes = new DissResEth(index);
+                break;
+            }
+            default:
+            {
+                qDebug() << "未知链路层类型";
+                dissRes = new DissRes(index);
+                break;
+            }
+            }
+            dissRes->SetPacket(raw,pkthdr);
             this->mutex->lock();
-            this->rawList->append(rawAndPkthdr);
+            this->dissResList->append(dissRes);
             emit onePacketCaptured(index);
             qDebug() << "Capturer : capture one packet successfully";
             this->mutex->unlock();

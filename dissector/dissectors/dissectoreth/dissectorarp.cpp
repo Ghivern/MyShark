@@ -7,8 +7,8 @@ DissectorArp::DissectorArp()
 
 }
 
-void DissectorArp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info *info){
-    arp_hdr *header = GetArpHdr(raw->raw,dissRes);
+void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
+    arp_hdr *header = GetArpHdr(dissRes);
     if(info == NULL){
         qDebug() << "DissectorArp : info == NULL";
         DissResEth *dissResEth = ((DissResEth*)dissRes);
@@ -20,13 +20,9 @@ void DissectorArp::Dissect(raw_t *raw, DissRes *dissRes, ProTree *proTree, Info 
 }
 
 //Get 方法
-arp_hdr* DissectorArp::DissectorArp::GetArpHdr(uchar *packet,DissRes *dissRes){
-    DissResEth *dissResEth = ((DissResEth*)dissRes);
-    arp_hdr *header = (arp_hdr*)(packet + dissResEth->GetHeadersLen());
-    dissResEth->AddHeadersLen(sizeof(arp_hdr));
-
-
-
+arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes){
+    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
+    dissRes->AddHeadersLen(sizeof(arp_hdr));
     return header;
 }
 

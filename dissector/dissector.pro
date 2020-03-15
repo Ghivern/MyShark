@@ -53,7 +53,7 @@ HEADERS += \
     loader.h \
     protree/protree.h \
     protree/protreenode.h \
-    ../global/global.h \ \
+    \ \
     stream/tustream.h \
     units/device.h
 

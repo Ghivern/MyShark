@@ -17,6 +17,10 @@ void DissResEth::SetMacDst(uchar *macDst){
     memcpy(this->macDst,macDst,EthfieldLen::MAC_ADDRESS);
 }
 
+void DissResEth::SetEthCRCRes(bool res){
+    this->ethCRCRes = res;
+}
+
 void DissResEth::SetIpSrc(uchar *ipSrc){
     memcpy(this->ipSrc,ipSrc,EthfieldLen::IP_ADDRESS);
 }
@@ -63,6 +67,10 @@ QString DissResEth::GetStrMacDst(){
             );
 }
 
+bool DissResEth::GetEthCRCRes(){
+    return this->ethCRCRes;
+}
+
 ushort DissResEth::GetSrcPort(){
     return this->srcPort;
 }
@@ -72,7 +80,7 @@ ushort DissResEth::GetDstPort(){
 }
 
 QString DissResEth::GetStrIpSrc(){
-    return QString::asprintf("%02x.%02x.%02x.%02x"
+    return QString::asprintf("%d.%d.%d.%d"
             ,this->ipSrc[0]
             ,this->ipSrc[1]
             ,this->ipSrc[2]
@@ -81,10 +89,54 @@ QString DissResEth::GetStrIpSrc(){
 }
 
 QString DissResEth::GetStrIpDst(){
-    return QString::asprintf("%02x.%02x.%02x.%02x"
+    return QString::asprintf("%d.%d.%d.%d"
             ,this->ipDst[0]
             ,this->ipDst[1]
             ,this->ipDst[2]
             ,this->ipDst[3]
             );
 }
+
+qint32 DissResEth::HaveIpAddr(){
+    for(quint32 index = 0; index < 16; index++){
+        if((this->ipDst[index] | this->ipSrc[index]) == 0){
+            continue;
+        }else{
+            if(index > 3)
+                return 6;
+            else
+                return 4;
+        }
+    }
+    return 0;
+}
+
+QString DissResEth::GetStrSrc(){
+    qint32 v = this->HaveIpAddr();
+    switch (v) {
+    case 0:
+        return this->GetStrMacSrc();
+    case 4:
+        return this->GetStrIpSrc();
+    case 6:
+        return "IPv4 Src 地址";
+    default:
+        return "Nuknow";
+    }
+}
+
+
+QString DissResEth::GetStrDst(){
+    qint32 v = this->HaveIpAddr();
+    switch (v) {
+    case 0:
+        return this->GetStrMacDst();
+    case 4:
+        return this->GetStrIpDst();
+    case 6:
+        return "IPv4 Src 地址";
+    default:
+        return "Nuknow";
+    }
+}
+
