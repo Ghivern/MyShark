@@ -28,6 +28,7 @@ public:
     qint32 GetLen();
     qint32 GetLenBit();
     QString GetTopProtocol();
+    QString GetProtocolByIndex(qint32 index);
     QList<QString>& GetProtocolStack();
     qint32 GetHeadersLen();
     qint32 GetProStart(QString proName);

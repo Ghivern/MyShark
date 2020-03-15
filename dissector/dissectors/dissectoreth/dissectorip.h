@@ -21,8 +21,32 @@ private:
      */
 
     static ip_hdr *GetIpHdr(DissRes *dissRes,Info *info);
+    static uchar GetIpVersion(ip_hdr *header);
     static uchar GetIpHdrLen(ip_hdr *header);
+    static uchar GetIpService(ip_hdr *header);
+    static quint16 GetIpTotalLen(ip_hdr *header);
+    static quint16 GetIpIdentification(ip_hdr *header);
+    static quint16 GetIpFlags(ip_hdr *header);
+    static uchar GetIpFlagsReserved(ip_hdr *header);
+    static uchar GetIpFlagsDF(ip_hdr *header);
+    static uchar GetIpFlagsMF(ip_hdr *header);
+    static quint16 GetIpOffset(ip_hdr *header);
+    static uchar GetTTL(ip_hdr *header);
     static uchar GetIpPType(ip_hdr *header);
+    static quint16 GetChecksum(ip_hdr *header);
+
+    static QString MsgIpTop(DissRes *dissRes);
+    static QString MsgIpVersion(ip_hdr *header);
+    static QString MsgIpHdrLen(ip_hdr *header);
+    static QString MsgIpTotalLen(ip_hdr *header);
+    static QString MsgIdentification(ip_hdr *header);
+    static QString MsgIpTTL(ip_hdr *header);
+    static QString MsgIpPType(ip_hdr *header);
+    static QString MsgIpSrc(DissRes *dissRes);
+    static QString MsgIpDst(DissRes *dissRes);
+
+    static void DealIpDS(ip_hdr *header,ProTree *tree,qint32 *start);
+    static void DealIpFlags(ip_hdr *header,ProTree *tree,qint32 *start);
 
     static void FlagSetCheck(uchar option);
     static uchar FlagGetCheck();

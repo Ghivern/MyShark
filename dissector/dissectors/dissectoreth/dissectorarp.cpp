@@ -52,7 +52,7 @@ void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 
 //Get 方法
 arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes,Info *info){
-    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProEnd("ethertype") + 1);
+    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProEnd(dissRes->GetProtocolByIndex(1)) + 1);
     if(info == NULL)
         dissRes->AddHeadersLen(sizeof(arp_hdr));
     return header;

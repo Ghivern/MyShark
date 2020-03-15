@@ -103,6 +103,10 @@ QString DissRes::GetTopProtocol(){
     return this->protocolStack.last();
 }
 
+QString DissRes::GetProtocolByIndex(qint32 index){
+    return this->protocolStack.at(index);
+}
+
 QList<QString>& DissRes::GetProtocolStack(){
     return this->protocolStack;
 }
