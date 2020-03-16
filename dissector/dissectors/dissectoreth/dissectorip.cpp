@@ -2,7 +2,11 @@
 #include "dissectorudp.h"
 #include "dissectortcp.h"
 
-quint32 DissectorIp::flags = 1;
+quint32 DissectorIp::flags = 0;
+/*
+ * bit
+ * 0:    0: uncheck    1: check
+ */
 
 DissectorIp::DissectorIp(){}
 
@@ -17,18 +21,19 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     }else{
         qint32 start = dissRes->GetProStart("ip");
         proTree->AddItem("ip",DissectorIp::MsgIpTop(dissRes),start,dissRes->GetProEnd("ip"));
-        proTree->AddItem("ip",DissectorIp::MsgIpVersion(header),start,start+0,ProTree::NEW);
-        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),start,start+0);  start += 1;
+        proTree->AddItemL("ip",DissectorIp::MsgIpVersion(header),start,0.5,ProTree::NEW);
+        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),&start,0.5);  //start += 1;
         DissectorIp::DealIpDS(header,proTree,&start);
-        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),start,start+1);  start+=2;
-        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),start,start+1);  start+=2;
+        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),&start,2); // start+=2;
+        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),&start,2); // start+=2;
         DissectorIp::DealIpFlags(header,proTree,&start);
-        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),start,start);  start+=1;
-        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),start,start); start+=1;
+        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),&start,1); //  start+=1;
+        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),&start,1); // start+=1;
+        DissectorIp::DealIpChecksum(header,proTree,&start);
         //关于首部检验和
-        start+=2;
-        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),start,start+3);  start+=4;
-        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),start,start+3);   start+=4;
+        //start+=2;
+        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),&start,4);  //start+=4;
+        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),&start,4);//   start+=4;
     }
 
     switch (GetIpPType(header)) {
@@ -101,7 +106,7 @@ uchar DissectorIp::GetIpPType(ip_hdr *header){
 }
 
 quint16 DissectorIp::GetChecksum(ip_hdr *header){
-    return header->checksum;
+    return ntohs(header->checksum);
 }
 
 //Msg方法
@@ -253,6 +258,25 @@ void DissectorIp::DealIpFlags(ip_hdr *header, ProTree *tree, qint32 *start){
     tree->Pop();
 }
 
+void DissectorIp::DealIpChecksum(ip_hdr *header, ProTree *tree, qint32 *start){
+    if(DissectorIp::FlagGetCheck()){
+        quint16 chksum = DissectorIp::GetChecksum(header);
+        quint16 calChksum = DissectorIp::GetCalculateCheckSum(header);
+        bool res = (chksum == calChksum);
+        QString strChksum = QString::asprintf("0x%02x%02x",((uchar*)&chksum)[1],((uchar*)&chksum)[0]);
+        QString strCalChksum = QString::asprintf("0x%02x%02x",((uchar*)&calChksum)[1],((uchar*)&calChksum)[0]);
+
+        QString msg = QString("Header checksum: ") + strChksum + (res ? QString(" [correct]"):QString(" [wrong]"));
+        tree->AddItemL("ip",msg,*start,2);
+
+        msg = QString("[Header checksum status : ") + (res ? QString("Good"):QString("Bad")) + QString(" ]");
+        tree->AddItemL("ip",msg,*start,2);
+
+        msg = QString("[ Calculated checksum : ") + strCalChksum + QString(" ]");
+        tree->AddItem("ip",msg,start,2);
+    }
+}
+
 //Flag 方法
 void DissectorIp::FlagSetCheck(uchar option){
     if(option == 0)
@@ -263,4 +287,26 @@ void DissectorIp::FlagSetCheck(uchar option){
 
 uchar DissectorIp::FlagGetCheck(){
     return (DissectorIp::flags & 0x00000001) >> 0;
+}
+
+//others
+void DissectorIp::GetInverseSum(quint16 *sum, quint16 num){
+    quint32 res = (quint32)*sum + (quint32)num;
+    if(res > 0x0000ffff)
+        *sum =  (quint16)(res - 0x00010000 + 1);
+    else
+        *sum = (quint16)(res);
+}
+
+quint16 DissectorIp::GetCalculateCheckSum(ip_hdr *header){
+    qint32 ipHdrLen = DissectorIp::GetIpHdrLen(header) * 4;
+    qDebug() << "IpHdrLen = " << ipHdrLen;
+    quint16 *start = (quint16*)header;
+    quint16 res = 0;
+    for(qint32 index = 0; index < ipHdrLen/2; index++){
+        if(index != 5){
+            DissectorIp::GetInverseSum(&res,ntohs(start[index]));
+        }
+    }
+    return ~res;
 }

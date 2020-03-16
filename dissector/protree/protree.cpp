@@ -1,8 +1,33 @@
 #include "protree.h"
 
-ProTree::ProTree()
-{
+ProTree::ProTree()  {}
 
+void ProTree::AddItem(QString protocol, QString msg, qint32 position){
+    if(msg.length() != 0){
+        qint32 start = -1;
+        qint32 end = -1;
+        ProTreeNode *newNode = new ProTreeNode(protocol,msg,start,end);
+        if(this->nodeStack.isEmpty()){
+            this->nodeStack.push(newNode);
+            this->header = newNode;
+        }else{
+            if(position == level::CURRENT){
+                this->nodeStack.pop()->SetNext(newNode);
+                this->nodeStack.push(newNode);
+            }else if(position == level::NEW){
+                this->nodeStack.top()->SetNextLevel(newNode);
+                this->nodeStack.push(newNode);
+            }else{
+                while (position < 0) {
+                    this->nodeStack.pop();
+                    position++;
+                }
+                this->nodeStack.pop()->SetNext(newNode);
+                this->nodeStack.push(newNode);
+            }
+
+        }
+    }
 }
 
 void ProTree::AddItem(QString protocol,QString msg,qint32 start,qint32 end,qint32 position){
@@ -30,11 +55,16 @@ void ProTree::AddItem(QString protocol,QString msg,qint32 start,qint32 end,qint3
     }
 }
 
-void ProTree::AddItem(QString protocol, QString msg, qint32 position){
+void ProTree::AddItem(QString protocol,QString msg,qint32 *start,float len,qint32 position){
     if(msg.length() != 0){
-        qint32 start = -1;
-        qint32 end = -1;
-        ProTreeNode *newNode = new ProTreeNode(protocol,msg,start,end);
+        ProTreeNode *newNode;
+        if((qint32)len == len){
+            newNode = new ProTreeNode(protocol,msg,*start,*start + len -1);
+            *start += len;
+        }else{
+            newNode = new ProTreeNode(protocol,msg,*start,*start + (qint32)len);
+            *start += (qint32)len + 1;
+        }
         if(this->nodeStack.isEmpty()){
             this->nodeStack.push(newNode);
             this->header = newNode;
@@ -53,7 +83,36 @@ void ProTree::AddItem(QString protocol, QString msg, qint32 position){
                 this->nodeStack.pop()->SetNext(newNode);
                 this->nodeStack.push(newNode);
             }
+        }
+    }
+}
 
+void ProTree::AddItemL(QString protocol,QString msg,qint32 start,float len,qint32 position){
+    if(msg.length() != 0){
+        ProTreeNode *newNode;
+        if((qint32)len == len){
+            newNode = new ProTreeNode(protocol,msg,start,start + len -1);
+        }else{
+            newNode = new ProTreeNode(protocol,msg,start,start + (qint32)len);
+        }
+        if(this->nodeStack.isEmpty()){
+            this->nodeStack.push(newNode);
+            this->header = newNode;
+        }else{
+            if(position == level::CURRENT){
+                this->nodeStack.pop()->SetNext(newNode);
+                this->nodeStack.push(newNode);
+            }else if(position == level::NEW){
+                this->nodeStack.top()->SetNextLevel(newNode);
+                this->nodeStack.push(newNode);
+            }else{
+                while (position < 0) {
+                    this->nodeStack.pop();
+                    position++;
+                }
+                this->nodeStack.pop()->SetNext(newNode);
+                this->nodeStack.push(newNode);
+            }
         }
     }
 }

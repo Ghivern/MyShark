@@ -44,9 +44,13 @@ private:
 
     static void DealIpDS(ip_hdr *header,ProTree *tree,qint32 *start);
     static void DealIpFlags(ip_hdr *header,ProTree *tree,qint32 *start);
+    static void DealIpChecksum(ip_hdr *header,ProTree *tree,qint32 *start);
 
     static void FlagSetCheck(uchar option);
     static uchar FlagGetCheck();
+
+    static void GetInverseSum(quint16 *sum,quint16 num);
+    static quint16 GetCalculateCheckSum(ip_hdr *header);
 };
 
 #endif // DISSECTORIP_H
