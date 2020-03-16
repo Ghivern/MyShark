@@ -2,18 +2,15 @@
 
 quint32 DissectorArp::flags = 0;
 
-DissectorArp::DissectorArp()
-{
-
-}
+DissectorArp::DissectorArp()  {}
 
 void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         arp_hdr *header = DissectorArp::GetArpHdr(dissRes,info);
     if(info == NULL){
         qDebug() << "DissectorArp : info == NULL";
-        DissResEth *dissResEth = ((DissResEth*)dissRes);
-        dissResEth->AddToProtocolStackWithSE("arp",sizeof(arp_hdr));
-        dissResEth->SetMsg(MsgArpInfo(header));
+        //DissResEth *dissResEth = ((DissResEth*)dissRes);
+        dissRes->AddHeadersLen(sizeof(arp_hdr));
+        dissRes->SetMsg(MsgArpInfo(header));
     }else{
         qint32 start = dissRes->GetProStart("arp");
         proTree->AddItem("arp",DissectorArp::MsgTopLevel(header),dissRes->GetProStart("arp"),dissRes->GetProEnd("arp"));
@@ -52,9 +49,9 @@ void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 
 //Get 方法
 arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes,Info *info){
-    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProEnd(dissRes->GetProtocolByIndex(1)) + 1);
     if(info == NULL)
-        dissRes->AddHeadersLen(sizeof(arp_hdr));
+        dissRes->AddToProtocolStackWithSE("arp",sizeof(arp_hdr));
+    arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProStart("arp"));
     return header;
 }
 

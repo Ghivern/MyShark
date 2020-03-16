@@ -17,7 +17,6 @@ public:
     void SetSrcPort(ushort srcPort);
     void SetDstPort(ushort dstPort);
 
-
     QString GetStrMacSrc();
     QString GetStrMacDst();
     bool GetEthCRCRes();
@@ -29,8 +28,6 @@ public:
     QString GetStrSrc();
     QString GetStrDst();
     bool GetEthCRCRes(bool res);
-
-
 private:
     typedef enum EthfieldLen{
         MAC_ADDRESS = 6,
@@ -46,7 +43,6 @@ private:
     uchar ipDst[16] = {0};
     ushort srcPort = 0;
     ushort dstPort = 0;
-
 };
 
 #endif // DISSRESETH_H

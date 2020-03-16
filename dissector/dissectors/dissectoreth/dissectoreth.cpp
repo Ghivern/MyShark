@@ -9,45 +9,30 @@ quint32 DissectorEth::flags = 1;
 */
 
 
-DissectorEth::DissectorEth()
-{
-
-}
+DissectorEth::DissectorEth() {}
 
 ProTree* DissectorEth::Dissect(DissResList *dissResList,qint64 index, Info *info){
     ProTree *proTree =  DissectorFrame::Dissect(dissResList,index,info);
     eth_hdr *header = GetHdr(dissResList->at(index),info);
     DissResEth *dissResEth = ((DissResEth*)dissResList->at(index));
     if(info == NULL){
+        dissResList->at(index)->AddHeadersLen(sizeof(eth_hdr));
         dissResEth->SetMacDst(header->dst_mac);
         dissResEth->SetMacSrc(header->src_mac);
         dissResEth->SetEthCRCRes(this->GetCalculatedIntFCS(dissResEth) == this->GetIntFCS(dissResEth));
-        dissResEth->AddToProtocolStackWithSE("ethertype",sizeof (eth_hdr));
-
-
     }else{
         qint32 start = dissResEth->GetProStart("ethertype");
-        proTree->AddItem("ethertype",DissectorEth::MsgTop(dissResList->at(index))
-                         ,dissResEth->GetProStart("ethertype"),dissResEth->GetProEnd("ethertype"));
-
-        proTree->AddItem("ethertype",DissectorEth::MsgDst(dissResList->at(index))
-                         ,start,start+5,ProTree::level::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->dst_mac)
-                         ,start,start+5,ProTree::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->dst_mac)
-                         ,start,start+5);
+        proTree->AddItem("ethertype",DissectorEth::MsgTop(dissResList->at(index)),dissResEth->GetProStart("ethertype"),dissResEth->GetProEnd("ethertype"));
+        proTree->AddItem("ethertype",DissectorEth::MsgDst(dissResList->at(index)),start,start+5,ProTree::level::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->dst_mac),start,start+5,ProTree::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->dst_mac),start,start+5);
         proTree->Pop();
         start += 6;
-
-        proTree->AddItem("ethertype",DissectorEth::MsgSrc(dissResList->at(index))
-                         ,start,start+5);
-        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->src_mac)
-                         ,start,start+5,ProTree::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->src_mac)
-                         ,start,start+5);
+        proTree->AddItem("ethertype",DissectorEth::MsgSrc(dissResList->at(index)),start,start+5);
+        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->src_mac),start,start+5,ProTree::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->src_mac),start,start+5);
         proTree->Pop();
         start += 6;
-
         proTree->AddItem("ethertype",DissectorEth::MsgType(header),start,start+1);
         start += 2;
         DissectorEth::DealFCS(proTree,dissResList->at(index));
@@ -69,9 +54,9 @@ ProTree* DissectorEth::Dissect(DissResList *dissResList,qint64 index, Info *info
 
 //Get方法
 eth_hdr* DissectorEth::GetHdr(DissRes *dissRes,Info *info){
-    eth_hdr *header = (eth_hdr*)(dissRes->GetData());
     if(info == NULL)
-        dissRes->AddHeadersLen(sizeof(eth_hdr));
+        dissRes->AddToProtocolStackWithSE("ethertype",sizeof (eth_hdr));
+    eth_hdr *header = (eth_hdr*)(dissRes->GetData() + dissRes->GetProStart("ethertype"));
     return header;
 }
 

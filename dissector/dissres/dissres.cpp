@@ -14,6 +14,7 @@ DissRes::~DissRes(){
     free(this->packet.pkthdr);
 }
 
+//Set Method
 void DissRes::SetPacket(const uchar *data,const pcap_pkthdr *pkthdr){
     this->packet.data = (uchar*)malloc(pkthdr->caplen);
     memcpy(this->packet.data,data,pkthdr->caplen);
@@ -21,50 +22,57 @@ void DissRes::SetPacket(const uchar *data,const pcap_pkthdr *pkthdr){
     memcpy(this->packet.pkthdr,pkthdr,sizeof(pcap_pkthdr));
 }
 
-void DissRes::AddToProtocolStack(QString protocol){
-    this->protocolStack.append(protocol);
-}
-
-void DissRes::AddToProtocolStackWithSE(QString protocol,qint32 len){
-    qint32 preEnd = this->GetTopProEnd();
-    qint32 start,end;
-    if(preEnd == 0)
-        start = preEnd;
-    else
-        start = preEnd + 1;
-    if(len == 0)
-        end = start + len;
-    else
-        end = start +len -1;
-    this->AddProPosition(protocol,start,end);
-    this->AddToProtocolStack(protocol);
+void DissRes::SetMsg(QString msg){
+    this->msg = msg;
 }
 
 void DissRes::SetHeadersLen(qint32 headersLen){
     this->headersLen = headersLen;
 }
 
+//Add Methods
+void DissRes::AddToProtocolStackWithSE(QString protocol,qint32 len){
+    if(!this->proExist(protocol)){
+        qint32 preProEnd = this->getTopProEnd();
+        qint32 start,end;
+        if(preProEnd == 0)
+            start = preProEnd;
+        else
+            start = preProEnd + 1;
+        if(len == 0)
+            end = start;
+        else
+            end = start +len -1;
+        this->addProPosition(protocol,start,end);
+        this->addToProtocolStack(protocol);
+    }
+}
+
+void DissRes::ResetProtocolStackAndPosition(QString protocol, qint32 newLen){
+    if(this->proExist(protocol)){
+        qint32 proStart = this->getTopProStart();
+        qint32 proEnd;
+        if(newLen == 0)
+            proEnd = proStart;
+        else
+            proEnd = proStart + newLen -1;
+        this->positionStack.remove(protocol);
+        this->addProPosition(protocol,proStart,proEnd);
+    }
+}
+
 void DissRes::AddHeadersLen(qint32 headerLen){
     this->headersLen += headerLen;
 }
 
-void DissRes::AddProPosition(QString proName, qint32 start, qint32 end){
-    position_t p;
-    p.start = start;
-    p.end = end;
-    this->positionStack.insert(proName,p);
-}
 
+//GetMethods
 const uchar* DissRes::GetData(){
     return this->packet.data;
 }
 
 const pcap_pkthdr* DissRes::GetPkthdr(){
     return this->packet.pkthdr;
-}
-
-void DissRes::SetMsg(QString msg){
-    this->msg = msg;
 }
 
 qint64 DissRes::GetNo(){
@@ -97,10 +105,22 @@ qint32 DissRes::GetLenBit(){
     return this->GetLen() * 8;
 }
 
+qint32 DissRes::GetHeadersLen(){
+    return this->headersLen;
+}
+
+QString DissRes::GetMsg(){
+    return this->msg;
+}
+
 QString DissRes::GetTopProtocol(){
     if(protocolStack.isEmpty())
         return "";
     return this->protocolStack.last();
+}
+
+qint32 DissRes::GetProtocolStackLen(){
+    return this->protocolStack.length();
 }
 
 QString DissRes::GetProtocolByIndex(qint32 index){
@@ -109,10 +129,6 @@ QString DissRes::GetProtocolByIndex(qint32 index){
 
 QList<QString>& DissRes::GetProtocolStack(){
     return this->protocolStack;
-}
-
-qint32 DissRes::GetHeadersLen(){
-    return this->headersLen;
 }
 
 qint32 DissRes::GetProStart(QString proName){
@@ -126,10 +142,29 @@ qint32 DissRes::GetProEnd(QString proName){
         return 0;
 }
 
-qint32 DissRes::GetTopProEnd(){
+//protected Methods
+void DissRes::addToProtocolStack(QString protocol){
+    this->protocolStack.append(protocol);
+}
+
+void DissRes::addProPosition(QString proName, qint32 start, qint32 end){
+    position_t p;
+    p.start = start;
+    p.end = end;
+    this->positionStack.insert(proName,p);
+}
+
+qint32 DissRes::getTopProEnd(){
     return this->GetProEnd(this->GetTopProtocol());
 }
 
-QString DissRes::GetMsg(){
-    return this->msg;
+qint32 DissRes::getTopProStart(){
+    return this->GetProStart(this->GetTopProtocol());
+}
+
+bool DissRes::proExist(QString proName){
+    if(this->positionStack.contains(proName))
+        return true;
+    else
+        return false;
 }

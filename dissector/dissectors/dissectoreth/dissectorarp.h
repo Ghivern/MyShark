@@ -11,9 +11,6 @@ class DissectorArp
 public:
     DissectorArp();
     static void Dissect(DissRes *dissRes, ProTree *proTree ,Info *info);
-
-
-
 private:
     static quint32 flags;
 
@@ -42,7 +39,6 @@ private:
     static QString MsgSenderIp(arp_hdr *header);
     static QString MsgTargetMac(arp_hdr *header);
     static QString MsgTargetIp(arp_hdr *header);
-
 };
 
 #endif // DISSECTORARP_H

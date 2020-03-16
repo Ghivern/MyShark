@@ -11,12 +11,12 @@ public:
     DissRes(qint64 no);
     ~DissRes();
     void SetPacket(const uchar *data,const pcap_pkthdr *pkthdr);
-    void AddToProtocolStack(QString protocol);
-    void AddToProtocolStackWithSE(QString protocol,qint32 len);
-    void SetHeadersLen(qint32 headersLen);
-    void AddHeadersLen(qint32 headerLen);
-    void AddProPosition(QString proName,qint32 start,qint32 end);
     void SetMsg(QString msg);
+    void SetHeadersLen(qint32 headersLen);
+
+    void AddToProtocolStackWithSE(QString protocol,qint32 len);
+    void ResetProtocolStackAndPosition(QString protocol,qint32 newLen);
+    void AddHeadersLen(qint32 headerLen);
 
     const uchar* GetData();
     const pcap_pkthdr* GetPkthdr();
@@ -27,15 +27,21 @@ public:
     qint32 GetCapLenBit();
     qint32 GetLen();
     qint32 GetLenBit();
+    qint32 GetHeadersLen();
+    QString GetMsg();
     QString GetTopProtocol();
+    qint32 GetProtocolStackLen();
     QString GetProtocolByIndex(qint32 index);
     QList<QString>& GetProtocolStack();
-    qint32 GetHeadersLen();
     qint32 GetProStart(QString proName);
     qint32 GetProEnd(QString proName);
-    qint32 GetTopProEnd();
-    QString GetMsg();
 protected:
+    void addToProtocolStack(QString protocol);
+    void addProPosition(QString proName,qint32 start,qint32 end);
+    qint32 getTopProEnd();
+    qint32 getTopProStart();
+    bool proExist(QString proName);
+
     typedef struct position_t{
         qint32 start;
         qint32 end;
@@ -46,6 +52,7 @@ protected:
         pcap_pkthdr *pkthdr;
     }packet_t;
 
+private:
     static bool isFirstPacket;
     static timeval firstTv;
 

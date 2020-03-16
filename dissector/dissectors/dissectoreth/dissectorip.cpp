@@ -2,52 +2,33 @@
 #include "dissectorudp.h"
 #include "dissectortcp.h"
 
-quint32 DissectorIp::flags = 0;
+quint32 DissectorIp::flags = 1;
 
-DissectorIp::DissectorIp()
-{
-
-}
+DissectorIp::DissectorIp(){}
 
 void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     ip_hdr *header = GetIpHdr(dissRes,info);
     if(info == NULL){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
+        dissRes->AddHeadersLen(DissectorIp::GetIpHdrLen(header));
         dissResEth->SetIpSrc(header->sourceIP);
         dissResEth->SetIpDst(header->destIP);
-        dissResEth->AddToProtocolStackWithSE("ip",DissectorIp::GetIpHdrLen(header) * 4);
+        dissResEth->ResetProtocolStackAndPosition("ip",DissectorIp::GetIpHdrLen(header) * 4);
     }else{
         qint32 start = dissRes->GetProStart("ip");
         proTree->AddItem("ip",DissectorIp::MsgIpTop(dissRes),start,dissRes->GetProEnd("ip"));
-
         proTree->AddItem("ip",DissectorIp::MsgIpVersion(header),start,start+0,ProTree::NEW);
-        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),start,start+0);
-        start += 1;
-
+        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),start,start+0);  start += 1;
         DissectorIp::DealIpDS(header,proTree,&start);
-
-        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),start,start+1);
-        start+=2;
-
-        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),start,start+1);
-        start+=2;
-
+        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),start,start+1);  start+=2;
+        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),start,start+1);  start+=2;
         DissectorIp::DealIpFlags(header,proTree,&start);
-
-        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),start,start);
-        start+=1;
-
-        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),start,start);
-        start+=1;
-
+        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),start,start);  start+=1;
+        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),start,start); start+=1;
         //关于首部检验和
         start+=2;
-
-        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),start,start+3);
-        start+=4;
-
-        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),start,start+3);
-        start+=4;
+        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),start,start+3);  start+=4;
+        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),start,start+3);   start+=4;
     }
 
     switch (GetIpPType(header)) {
@@ -65,9 +46,9 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 
 //Get 方法
 ip_hdr* DissectorIp::GetIpHdr(DissRes *dissRes,Info *info){
-    ip_hdr* ip = (ip_hdr*)(dissRes->GetData() + dissRes->GetProEnd(dissRes->GetProtocolByIndex(1)) + 1);
     if(info == NULL)
-        dissRes->AddHeadersLen(GetIpHdrLen(ip));
+        dissRes->AddToProtocolStackWithSE("ip",sizeof(ip_hdr));
+    ip_hdr *ip = (ip_hdr*)(dissRes->GetData() + dissRes->GetProStart("ip"));
     return ip;
 }
 
