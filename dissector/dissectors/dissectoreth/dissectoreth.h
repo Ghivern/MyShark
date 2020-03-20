@@ -9,6 +9,9 @@ public:
     DissectorEth();
     ProTree * Dissect(DissResList *dissResList, qint64 index, Info *info = NULL) override;
 
+private:
+    static quint32 flags;
+
     eth_hdr* GetHdr(DissRes *packet,Info *info);
     ushort GetPtoType(eth_hdr *header);
     quint32 GetIntFCS(DissRes *packet);
@@ -27,9 +30,6 @@ public:
     QString MsgIG(uchar *mac);
 
     void DealFCS(ProTree *tree,DissRes *dissRes);
-
-private:
-    static quint32 flags;
 };
 
 #endif // DISSECTORETH_H

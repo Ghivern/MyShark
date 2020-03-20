@@ -34,7 +34,7 @@ FORMS += \
     mainwindow.ui
 
 LIBS += -lpcap
-LIBS += -L../dissector  -ldissector
+LIBS += -L../lib -ldissector
 
 QMAKE_RPATHDIR += ../lib
 

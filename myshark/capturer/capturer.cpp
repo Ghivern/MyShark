@@ -45,14 +45,14 @@ void Capturer::run(){
             dissRes->SetPacket(raw,pkthdr);
             this->mutex->lock();
             this->dissResList->append(dissRes);
+            this->mutex->unlock();
             emit onePacketCaptured(index);
             qDebug() << "Capturer : capture one packet successfully";
-            this->mutex->unlock();
             index++;
         }else if(res == 0){
             qDebug() << "Capturer : timeout";
         }else if(res == -1){
-            qDebug() << "Capturer : error";
+            qDebug() << "Capturer : error, 没有权限";
         }else if(res == -2){
             qDebug() << "Capturer : come to file end";
         }else{

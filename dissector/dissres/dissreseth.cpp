@@ -1,20 +1,17 @@
 #include "dissreseth.h"
 
-DissResEth::DissResEth(qint64 no):DissRes(no)
-{
-
-}
+DissResEth::DissResEth(qint64 no):DissRes(no){}
 
 void DissResEth::SetIpv6(){
     this->isIpv6 = true;
 }
 
 void DissResEth::SetMacSrc(uchar *macSrc){
-    memcpy(this->macSrc,macSrc,EthfieldLen::MAC_ADDRESS);
+    memcpy(this->macSrc,macSrc,6);
 }
 
 void DissResEth::SetMacDst(uchar *macDst){
-    memcpy(this->macDst,macDst,EthfieldLen::MAC_ADDRESS);
+    memcpy(this->macDst,macDst,6);
 }
 
 void DissResEth::SetEthCRCRes(bool res){
@@ -22,19 +19,19 @@ void DissResEth::SetEthCRCRes(bool res){
 }
 
 void DissResEth::SetIpSrc(uchar *ipSrc){
-    memcpy(this->ipSrc,ipSrc,EthfieldLen::IP_ADDRESS);
+    memcpy(this->ipSrc,ipSrc,4);
 }
 
 void DissResEth::SetIpDst(uchar *ipDst){
-    memcpy(this->ipDst,ipDst,EthfieldLen::IP_ADDRESS);
+    memcpy(this->ipDst,ipDst,4);
 }
 
-void DissResEth::SetIpv4Src(uchar *ipSrc){
-    memcpy(this->ipSrc,ipSrc,EthfieldLen::IPV6_ADDRESS);
+void DissResEth::SetIpv6Src(uchar *ipSrc){
+    memcpy(this->ipSrc,ipSrc,16);
 }
 
-void DissResEth::SetIpv4Dst(uchar *ipDst){
-    memcpy(this->ipDst,ipDst,EthfieldLen::IPV6_ADDRESS);
+void DissResEth::SetIpv6Dst(uchar *ipDst){
+    memcpy(this->ipDst,ipDst,16);
 }
 
 void DissResEth::SetSrcPort(ushort srcPort){
@@ -97,7 +94,7 @@ QString DissResEth::GetStrIpDst(){
             );
 }
 
-qint32 DissResEth::HaveIpAddr(){
+qint32 DissResEth::ipVersion(){
     for(quint32 index = 0; index < 16; index++){
         if((this->ipDst[index] | this->ipSrc[index]) == 0){
             continue;
@@ -112,7 +109,7 @@ qint32 DissResEth::HaveIpAddr(){
 }
 
 QString DissResEth::GetStrSrc(){
-    qint32 v = this->HaveIpAddr();
+    qint32 v = this->ipVersion();
     switch (v) {
     case 0:
         return this->GetStrMacSrc();
@@ -125,9 +122,8 @@ QString DissResEth::GetStrSrc(){
     }
 }
 
-
 QString DissResEth::GetStrDst(){
-    qint32 v = this->HaveIpAddr();
+    qint32 v = this->ipVersion();
     switch (v) {
     case 0:
         return this->GetStrMacDst();
@@ -139,4 +135,3 @@ QString DissResEth::GetStrDst(){
         return "Nuknow";
     }
 }
-
