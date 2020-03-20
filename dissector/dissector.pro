@@ -59,6 +59,10 @@ HEADERS += \
 
 LIBS += -lpcap
 
+MOC_DIR = ./mocs
+OBJECTS_DIR = ./objs
+DESTDIR = ../lib
+
 # Default rules for deployment.
 unix {
     target.path = /usr/lib

@@ -4,6 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -26,13 +27,21 @@ HEADERS += \
     capturer/capturer.h \
     dissector/dissector.h \
     mainwindow.h \
-    ../global/global.h \
+    #../global/global.h \
     units/caphandle.h \
 
 FORMS += \
     mainwindow.ui
 
-LIBS += -lpcap  -ldissector
+LIBS += -lpcap
+LIBS += -L../dissector  -ldissector
+
+QMAKE_RPATHDIR += ../lib
+
+MOC_DIR = ./mocs
+OBJECTS_DIR = ./objs
+DESTDIR = ../bin
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
