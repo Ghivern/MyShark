@@ -132,7 +132,10 @@ QList<QString>& DissRes::GetProtocolStack(){
 }
 
 qint32 DissRes::GetProStart(QString proName){
-    return this->positionStack.value(proName).start;
+    if(this->positionStack.contains(proName))
+        return this->positionStack.value(proName).start;
+    else
+        return 0;
 }
 
 qint32 DissRes::GetProEnd(QString proName){

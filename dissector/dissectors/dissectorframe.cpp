@@ -17,7 +17,7 @@ ProTree* DissectorFrame::Dissect(DissResList_t *dissResList,qint64 index,Info *i
     }else{
         proTree = new ProTree();
         DissResEth *dissResEth = (DissResEth*)(dissResList->at(index));
-        proTree->AddItem("eth",DissectorFrame::MsgTop(dissResList->at(index),index,info),0,dissResEth->GetHeadersLen() - 1); // -
+        proTree->AddItem("eth",DissectorFrame::MsgTop(dissResList->at(index),index,info),0,dissResEth->GetCapLen() - 1); // -
         proTree->AddItem("eth",DissectorFrame::MsgIfId(info),ProTree::level::NEW); // - -
         proTree->AddItem("eth",DissectorFrame::MsgIfName(info),ProTree::level::NEW); // - - -
         proTree->AddItem("eth",DissectorFrame::MsgEncapType(info),-1); // - -

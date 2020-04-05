@@ -21,8 +21,8 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     }else{
         qint32 start = dissRes->GetProStart("ip");
         proTree->AddItem("ip",DissectorIp::MsgIpTop(dissRes),start,dissRes->GetProEnd("ip"));
-        proTree->AddItemL("ip",DissectorIp::MsgIpVersion(header),start,0.5,ProTree::NEW);
-        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),&start,0.5);  //start += 1;
+        proTree->AddItem("ip",DissectorIp::MsgIpVersion(header),&start,0.5,false,ProTree::NEW);
+        proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),&start,1);  //0.5 + 0.5
         DissectorIp::DealIpDS(header,proTree,&start);
         proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),&start,2); // start+=2;
         proTree->AddItem("ip",DissectorIp::MsgIdentification(header),&start,2); // start+=2;
@@ -267,10 +267,10 @@ void DissectorIp::DealIpChecksum(ip_hdr *header, ProTree *tree, qint32 *start){
         QString strCalChksum = QString::asprintf("0x%02x%02x",((uchar*)&calChksum)[1],((uchar*)&calChksum)[0]);
 
         QString msg = QString("Header checksum: ") + strChksum + (res ? QString(" [correct]"):QString(" [wrong]"));
-        tree->AddItemL("ip",msg,*start,2);
+        tree->AddItem("ip",msg,start,2,false);
 
         msg = QString("[Header checksum status : ") + (res ? QString("Good"):QString("Bad")) + QString(" ]");
-        tree->AddItemL("ip",msg,*start,2);
+        tree->AddItem("ip",msg,start,2,false);
 
         msg = QString("[ Calculated checksum : ") + strCalChksum + QString(" ]");
         tree->AddItem("ip",msg,start,2);

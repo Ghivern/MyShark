@@ -26,18 +26,15 @@ ProTree* DissectorEth::Dissect(DissResList_t *dissResList,qint64 index, Info *in
     }else{
         qint32 start = dissResEth->GetProStart("ethertype");
         proTree->AddItem("ethertype",DissectorEth::MsgTop(dissResList->at(index)),dissResEth->GetProStart("ethertype"),dissResEth->GetProEnd("ethertype"));
-        proTree->AddItem("ethertype",DissectorEth::MsgDst(dissResList->at(index)),start,start+5,ProTree::level::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->dst_mac),start,start+5,ProTree::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->dst_mac),start,start+5);
+        proTree->AddItem("ethertype",DissectorEth::MsgDst(dissResList->at(index)),&start,6,false,ProTree::level::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->dst_mac),&start,6,false,ProTree::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->dst_mac),&start,6);
         proTree->Pop();
-        start += 6;
-        proTree->AddItem("ethertype",DissectorEth::MsgSrc(dissResList->at(index)),start,start+5);
-        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->src_mac),start,start+5,ProTree::NEW);
-        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->src_mac),start,start+5);
+        proTree->AddItem("ethertype",DissectorEth::MsgSrc(dissResList->at(index)),&start,6,false);
+        proTree->AddItem("ethertype",DissectorEth::MsgLG(header->src_mac),&start,6,false,ProTree::NEW);
+        proTree->AddItem("ethertype",DissectorEth::MsgIG(header->src_mac),&start,6);
         proTree->Pop();
-        start += 6;
-        proTree->AddItem("ethertype",DissectorEth::MsgType(header),start,start+1);
-        start += 2;
+        proTree->AddItem("ethertype",DissectorEth::MsgType(header),&start,2);
         DissectorEth::DealFCS(proTree,dissResList->at(index));
         proTree->Pop();
     }
