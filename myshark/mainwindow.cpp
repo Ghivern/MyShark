@@ -9,13 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
     Device device;
     capturer = new Capturer(Device::GetDeviceNameByIndex(0));
 
-    //loader = new Loader();
-    //dissector = new Dissector(capturer,loader);
-    dissector = new Dissector(capturer);
+    dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+
     connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
     connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
     capturer->Start();
-
 }
 
 MainWindow::~MainWindow()
@@ -54,13 +52,13 @@ void MainWindow::Print(qint64 index){
              << ""  << res->GetDstPort()
              << ""  << res->GetMsg();
 
-    Info *info = new Info(0,1);
-    ProTree *proTree = this->dissector->GetLoader()->GetDissector(1)->Dissect(
+    Info *info = new Info(0,1);  //devIndex , linktype
+    ProTree *proTree = this->dissector->GetLoader()->GetDissector(capturer->GetIntLinkType())->Dissect(
                 this->dissector->GetDissResList()
                 ,index
                 ,info
                 );
-    this->PrintProTree(proTree->GetHeader(),1);
+    this->PrintProTree(proTree->GetHeader());
     delete info;
 
     qint32 i;

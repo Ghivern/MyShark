@@ -8,7 +8,7 @@
 class DissectorFrame
 {
 public:
-    static ProTree* Dissect(DissResList *dissResList,qint64 index,Info *info);
+    static ProTree* Dissect(DissResList_t *dissResList,qint64 index,Info *info);
 
 private:
     static quint32 flags;  //用作标志位，控制显示内容和检验等操作
@@ -19,8 +19,8 @@ private:
     static QString MsgEncapType(Info *info);
     static QString MsgStrTime(DissRes *packet);
     static QString MsgEpochTime(DissRes *packet);
-    static QString MsgDeltaPreCapTime(DissResList *dissResList,qint64 index);
-    static QString MsgDeltaPreDisTime(DissResList *dissResList,qint64 index);
+    static QString MsgDeltaPreCapTime(DissResList_t *dissResList,qint64 index);
+    static QString MsgDeltaPreDisTime(DissResList_t *dissResList,qint64 index);
     static QString MsgSinceFirstTime(DissRes *dissRes);
     static QString MsgFrameNo(qint64 index);
     static QString MsgFrameLen(DissRes *packet);

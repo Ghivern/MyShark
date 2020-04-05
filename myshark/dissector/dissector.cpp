@@ -1,16 +1,9 @@
 #include "dissector.h"
 
-Dissector::Dissector(Capturer *capturer,Loader *loader)
-{
-    this->loader = loader;
-    this->capturer = capturer;
-    this->dissResList = capturer->GetDissResList();
-}
-
-Dissector::Dissector(Capturer *capture){
+Dissector::Dissector(DissResList_t* dissResList, int linkType){
+    this->dissResList = dissResList;
+    this->linkType = linkType;
     this->loader = new Loader();
-    this->capturer = capture;
-    this->dissResList = capturer->GetDissResList();
 }
 
 DissRes* Dissector::GetDissResByIndex(qint64 index){
@@ -21,13 +14,14 @@ Loader* Dissector::GetLoader(){
     return this->loader;
 }
 
-DissResList* Dissector::GetDissResList(){
+DissResList_t* Dissector::GetDissResList(){
     return this->dissResList;
 }
 
 void Dissector::Dissect(qint64 index){
-    //通过Loader进行解析
-    qDebug() << "Dissector : Dissect" ;
-    this->loader->GetDissector(1)->Dissect(this->dissResList,index);
+    //通过Loader 查找相应链路层类型的解析器
+    qDebug() << this->linkType;
+    this->loader->GetDissector(this->linkType)->Dissect(this->dissResList,index);
+    qDebug() << "解析器调用完成";
     emit onePacketDissected(index);
 }

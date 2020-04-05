@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void PrintProTree(ProTreeNode *proTreeNode,qint32 level);
+    void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
 
 private:
     Ui::MainWindow *ui;

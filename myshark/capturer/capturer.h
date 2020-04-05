@@ -14,6 +14,7 @@ class Capturer:public QThread
 public:
     Capturer(QString devName);
     ~Capturer();
+    qint32 GetIntLinkType();
     QList<DissRes*>* GetDissResList();
 
 protected:
@@ -21,7 +22,7 @@ protected:
 
 private:
     CapHandle *capHandle;
-    DissResList *dissResList;
+    DissResList_t *dissResList;
     QMutex *mutex;
     bool stop;
 

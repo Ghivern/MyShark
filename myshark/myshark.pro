@@ -36,6 +36,8 @@ FORMS += \
 LIBS += -lpcap
 LIBS += -L../lib -ldissector
 
+INCLUDEPATH += ~/gitRepositories/MyShark/dissector/
+
 QMAKE_RPATHDIR += ../lib
 
 MOC_DIR = ./mocs

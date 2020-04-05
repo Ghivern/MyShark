@@ -4,7 +4,7 @@ Capturer::Capturer(QString devName)
 {
     this->capHandle = new CapHandle(devName);
     this->capHandle->ActivateHandleWithParas();
-    this->dissResList = new DissResList;
+    this->dissResList = new DissResList_t;
     this->mutex = new QMutex();
     this->stop = false;
 }
@@ -15,6 +15,10 @@ Capturer::~Capturer(){
     for(int index = 0; index < this->dissResList->length(); index++)
         delete dissResList->at(index);
     delete dissResList;
+}
+
+qint32 Capturer::GetIntLinkType(){
+    return this->capHandle->GetLinkType();
 }
 
 QList<DissRes*>* Capturer::GetDissResList(){

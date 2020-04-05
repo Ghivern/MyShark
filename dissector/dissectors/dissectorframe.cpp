@@ -7,12 +7,13 @@ quint32 DissectorFrame::flags = 0x1;  //赋予默认配置
  * 1:       0    generate an epoch time entry for each frame
 */
 
-ProTree* DissectorFrame::Dissect(DissResList *dissResList,qint64 index,Info *info){
+ProTree* DissectorFrame::Dissect(DissResList_t *dissResList,qint64 index,Info *info){
     ProTree *proTree = NULL;
     if(info == NULL){
         qDebug() << "DissectorFrame : info == NULL";
         dissResList->at(index)->SetHeadersLen(0);
         dissResList->at(index)->AddToProtocolStackWithSE("eth",0);
+
     }else{
         proTree = new ProTree();
         DissResEth *dissResEth = (DissResEth*)(dissResList->at(index));
@@ -73,7 +74,7 @@ QString DissectorFrame::MsgEpochTime(DissRes *packet){
                              ,packet->GetTimeval().tv_sec,packet->GetTimeval().tv_usec);
 }
 
-QString DissectorFrame::MsgDeltaPreCapTime(DissResList *dissResList, qint64 index){
+QString DissectorFrame::MsgDeltaPreCapTime(DissResList_t *dissResList, qint64 index){
     DissResEth *dissResEth = ((DissResEth*)dissResList->at(index));
     DissResEth *dissResEthP = ((DissResEth*)dissResList->at(index == 0 ? 0:index-1));
     return QString::asprintf("[Time delta from previous captured frame : %f seconds]"
@@ -82,7 +83,7 @@ QString DissectorFrame::MsgDeltaPreCapTime(DissResList *dissResList, qint64 inde
                              );
 }
 
-QString DissectorFrame::MsgDeltaPreDisTime(DissResList *dissResList, qint64 index){
+QString DissectorFrame::MsgDeltaPreDisTime(DissResList_t *dissResList, qint64 index){
     DissResEth *dissResEth = ((DissResEth*)dissResList->at(index));
     DissResEth *dissResEthP = ((DissResEth*)dissResList->at(index == 0 ? 0:index-1));
     return QString::asprintf("[Time delta from previous displayed frame : %f seconds]"

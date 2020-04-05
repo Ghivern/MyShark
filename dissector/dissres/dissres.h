@@ -53,17 +53,17 @@ protected:
     }packet_t;
 
 private:
-    static bool isFirstPacket;
-    static timeval firstTv;
+    static bool isFirstPacket;  //第一个包进入时其值为true，解析完成，置为false;
+    static timeval firstTv; //结合isFirstPacket,记录第一个包的到达时间
 
-    packet_t packet;
-    qint64 no;
-    QList<QString> protocolStack;
-    QHash<QString,position_t> positionStack;
+    packet_t packet;  //存储指向原始数据的指针
+    qint64 no;  //记录在自己在列表中的位置
+    QList<QString> protocolStack;   //协议栈： eth:ipv4:tcp ,以此种结构存储包中的协议栈
+    QHash<QString,position_t> positionStack;  //位置栈：存协议栈中各个协议段的起始位置和结束位置
     qint32 headersLen = 0;
-    QString msg;
+    QString msg;  //包解析结果的简明总结
 };
 
-typedef QList<DissRes*> DissResList;
+typedef QList<DissRes*> DissResList_t;
 
 #endif // DISSRES_H

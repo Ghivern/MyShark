@@ -8,16 +8,16 @@ class Dissector:public QObject
 {
     Q_OBJECT
 public:
-    Dissector(Capturer *capturer,Loader *loader);
-    Dissector(Capturer *capture);
+    Dissector(DissResList_t* dissResList, int linkType);
     DissRes* GetDissResByIndex(qint64 index);
-    Loader* GetLoader();
-    DissResList* GetDissResList();
+    Loader* GetLoader(); // -
+    DissResList_t* GetDissResList();
 
 private:
     Loader *loader;
-    Capturer *capturer;
+    Capturer *capturer; //-
     QList<DissRes*> *dissResList;
+    int linkType;
 
 signals:
     void onePacketDissected(qint64 index);

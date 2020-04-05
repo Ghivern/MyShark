@@ -10,7 +10,7 @@ class DissectorBase
 {
 public:
     DissectorBase();
-    virtual ProTree* Dissect(DissResList *dissResList,qint64 index,Info *info = NULL);
+    virtual ProTree* Dissect(DissResList_t *dissResList,qint64 index,Info *info = NULL);
 };
 
 #endif // DISSECTORBASE_H
