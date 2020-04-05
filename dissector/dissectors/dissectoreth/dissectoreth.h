@@ -12,7 +12,7 @@ public:
 private:
     static quint32 flags;
 
-    eth_hdr* GetHdr(DissRes *packet,Info *info);
+    eth_hdr* GetHdr(DissRes *packet,bool first=false);
     ushort GetPtoType(eth_hdr *header);
     quint32 GetIntFCS(DissRes *packet);
     QString GetStrFCS(DissRes *packet);

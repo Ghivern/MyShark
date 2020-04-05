@@ -10,7 +10,7 @@ class DissectorIpv6
 {
 public:
     DissectorIpv6();
-    static void Dissect(DissRes *dissRes, ProTree *proTree ,Info *info);
+    static void Dissect(DissRes *dissRes, ProTree *proTree, Info *info);
 
 private:
     static quint32 flags;

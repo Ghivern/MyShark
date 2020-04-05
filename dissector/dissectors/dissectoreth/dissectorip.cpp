@@ -11,7 +11,7 @@ quint32 DissectorIp::flags = 0;
 DissectorIp::DissectorIp(){}
 
 void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
-    ip_hdr *header = GetIpHdr(dissRes,info);
+    ip_hdr *header = GetIpHdr(dissRes,info==NULL?true:false);
     if(info == NULL){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissRes->AddHeadersLen(DissectorIp::GetIpHdrLen(header));
@@ -24,16 +24,14 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         proTree->AddItem("ip",DissectorIp::MsgIpVersion(header),&start,0.5,false,ProTree::NEW);
         proTree->AddItem("ip",DissectorIp::MsgIpHdrLen(header),&start,1);  //0.5 + 0.5
         DissectorIp::DealIpDS(header,proTree,&start);
-        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),&start,2); // start+=2;
-        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),&start,2); // start+=2;
+        proTree->AddItem("ip",DissectorIp::MsgIpTotalLen(header),&start,2);
+        proTree->AddItem("ip",DissectorIp::MsgIdentification(header),&start,2);
         DissectorIp::DealIpFlags(header,proTree,&start);
-        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),&start,1); //  start+=1;
-        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),&start,1); // start+=1;
+        proTree->AddItem("ip",DissectorIp::MsgIpTTL(header),&start,1);
+        proTree->AddItem("ip",DissectorIp::MsgIpPType(header),&start,1);
         DissectorIp::DealIpChecksum(header,proTree,&start);
-        //关于首部检验和
-        //start+=2;
-        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),&start,4);  //start+=4;
-        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),&start,4);//   start+=4;
+        proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),&start,4);
+        proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),&start,4);
     }
 
     switch (GetIpPType(header)) {
@@ -50,8 +48,8 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 
 
 //Get 方法
-ip_hdr* DissectorIp::GetIpHdr(DissRes *dissRes,Info *info){
-    if(info == NULL)
+ip_hdr* DissectorIp::GetIpHdr(DissRes *dissRes,bool first){
+    if(first)
         dissRes->AddToProtocolStackWithSE("ip",sizeof(ip_hdr));
     ip_hdr *ip = (ip_hdr*)(dissRes->GetData() + dissRes->GetProStart("ip"));
     return ip;

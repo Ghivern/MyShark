@@ -14,7 +14,7 @@ public:
 private:
     static quint32 flags;
 
-    static arp_hdr* GetArpHdr(DissRes *dissRes,Info *info);
+    static arp_hdr* GetArpHdr(DissRes *dissRes,bool first);
     static QString GetStrAprHType(arp_hdr *header);
     static ushort GetArpHType(arp_hdr *header);
     static QString GetStrArpPType(arp_hdr *header);

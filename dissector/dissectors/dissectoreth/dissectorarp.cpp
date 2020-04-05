@@ -5,7 +5,7 @@ quint32 DissectorArp::flags = 0;
 DissectorArp::DissectorArp()  {}
 
 void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
-        arp_hdr *header = DissectorArp::GetArpHdr(dissRes,info);
+        arp_hdr *header = DissectorArp::GetArpHdr(dissRes,info==NULL?true:false);
     if(info == NULL){
         qDebug() << "DissectorArp : info == NULL";
         //DissResEth *dissResEth = ((DissResEth*)dissRes);
@@ -48,8 +48,8 @@ void DissectorArp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
 }
 
 //Get 方法
-arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes,Info *info){
-    if(info == NULL)
+arp_hdr* DissectorArp::DissectorArp::GetArpHdr(DissRes *dissRes,bool first){
+    if(first)
         dissRes->AddToProtocolStackWithSE("arp",sizeof(arp_hdr));
     arp_hdr *header = (arp_hdr*)(dissRes->GetData() + dissRes->GetProStart("arp"));
     return header;

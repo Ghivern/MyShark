@@ -17,7 +17,7 @@ private:
      * bit
      * 0:    0: uncheck    1: check
      */
-    static ip_hdr *GetIpHdr(DissRes *dissRes,Info *info);
+    static ip_hdr *GetIpHdr(DissRes *dissRes,bool first);
     static uchar GetIpVersion(ip_hdr *header);
     static uchar GetIpHdrLen(ip_hdr *header);
     static uchar GetIpService(ip_hdr *header);

@@ -15,7 +15,7 @@ ProTree* DissectorEth::Dissect(DissResList_t *dissResList,qint64 index, Info *in
     qDebug() << "准备进入DissectorEth";
     ProTree *proTree =  DissectorFrame::Dissect(dissResList,index,info);
     qDebug() << "DissectorFrame成功";
-    eth_hdr *header = GetHdr(dissResList->at(index),info);
+    eth_hdr *header = GetHdr(dissResList->at(index),info==NULL?true:false);
     DissResEth *dissResEth = ((DissResEth*)dissResList->at(index));
     if(info == NULL){
         dissResList->at(index)->AddHeadersLen(sizeof(eth_hdr));
@@ -53,8 +53,8 @@ ProTree* DissectorEth::Dissect(DissResList_t *dissResList,qint64 index, Info *in
 }
 
 //Get方法
-eth_hdr* DissectorEth::GetHdr(DissRes *dissRes,Info *info){
-    if(info == NULL)
+eth_hdr* DissectorEth::GetHdr(DissRes *dissRes,bool first){
+    if(first)
         dissRes->AddToProtocolStackWithSE("ethertype",sizeof (eth_hdr));
     eth_hdr *header = (eth_hdr*)(dissRes->GetData() + dissRes->GetProStart("ethertype"));
     return header;
