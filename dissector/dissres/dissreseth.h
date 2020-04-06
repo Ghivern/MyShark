@@ -1,6 +1,7 @@
 #ifndef DISSRESETH_H
 #define DISSRESETH_H
 #include "dissres.h"
+#include "../dissectors/dissectoreth/eth_header.h"
 
 class DissResEth:public DissRes
 {
@@ -26,6 +27,8 @@ public:
     ushort GetDstPort();
     QString GetStrIpSrc();
     QString GetStrIpDst();
+    quint32 GetIpSrcAddress();
+    quint32 GetIpDstAddress();
     qint32 ipVersion();  //返回ip的版本，若无网络层，则返回0，此时只有Mac地址
     QString GetStrSrc();
     QString GetStrDst();

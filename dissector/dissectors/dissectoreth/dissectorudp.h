@@ -14,13 +14,31 @@ public:
 
     static void Dissect(DissRes *dissRes, ProTree *proTree ,Info *info);
 
+    //Get方法
+    static udp_hdr* GetUdpHdr(DissRes *dissRes,bool first=false);
+    static ushort GetUdpSrcPort(udp_hdr *header);
+    static ushort GetUdpDstPort(udp_hdr *header);
+    static ushort GetUdpLength(udp_hdr *header);
+    static ushort GetUdpCheckSum(udp_hdr *header);
+    static QString GetUdpStrCheckSum(udp_hdr *header);
+
+
+    //Get方法，参数直接为DissRes*
+    static ushort GetUdpSrcPort(DissRes *dissRes);
+    static ushort GetUdpDstPort(DissRes *header);
+
+    //计算检验和
+    static void GetInverseSum(quint16 *sum,quint16 num);
+    static quint16 GetCalculateCheckSum(DissRes *dissRes);
+    static QString GetStrCalculateCheckSum(DissRes *dissRes);
+
 private:
+    static const qint16 PSEUDO_HEADER_LEN = 12;
+
     static quint32 flags;
     static TUStream stream;
 
-    static udp_hdr* GetUdpHdr(DissRes *dissRes);
-    static ushort GetUdpSrcPort(udp_hdr *header);
-    static ushort GetUdpDstPort(udp_hdr *header);
+
 
 };
 

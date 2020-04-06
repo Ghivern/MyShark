@@ -17,7 +17,7 @@ private:
      * bit
      * 0:    0: uncheck    1: check
      */
-    static ip_hdr *GetIpHdr(DissRes *dissRes,bool first);
+    static ip_hdr *GetIpHdr(DissRes *dissRes,bool first=false);
     static uchar GetIpVersion(ip_hdr *header);
     static uchar GetIpHdrLen(ip_hdr *header);
     static uchar GetIpService(ip_hdr *header);
@@ -31,6 +31,12 @@ private:
     static uchar GetTTL(ip_hdr *header);
     static uchar GetIpPType(ip_hdr *header);
     static quint16 GetChecksum(ip_hdr *header);
+
+    //Get 方法，参数直接为DissRes*
+    static quint32 GetIpSrcAddress(DissRes *dissRes);
+    static quint32 GetIpDstAddress(DissRes *dissRes);
+    static QString GetIpStrSrcAddress(DissRes *dissRes);
+    static QString GetIpStrDstAddress(DissRes *dissRes);
 
     static QString MsgIpTop(DissRes *dissRes);
     static QString MsgIpVersion(ip_hdr *header);

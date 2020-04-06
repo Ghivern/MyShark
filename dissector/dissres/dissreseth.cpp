@@ -76,6 +76,18 @@ ushort DissResEth::GetDstPort(){
     return this->dstPort;
 }
 
+quint32 DissResEth::GetIpSrcAddress(){
+    quint32 address;
+    memcpy(&address,this->ipSrc,IP_LENS::SOURCEIP);
+    return ntohl(address);
+}
+
+quint32 DissResEth::GetIpDstAddress(){
+    quint32 address;
+    memcpy(&address,this->ipDst,IP_LENS::DESTIP);
+    return ntohl(address);
+}
+
 QString DissResEth::GetStrIpSrc(){
     return QString::asprintf("%d.%d.%d.%d"
             ,this->ipSrc[0]

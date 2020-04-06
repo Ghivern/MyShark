@@ -107,6 +107,42 @@ quint16 DissectorIp::GetChecksum(ip_hdr *header){
     return ntohs(header->checksum);
 }
 
+
+//Get 方法，参数直接为DissRes*
+quint32 DissectorIp::GetIpSrcAddress(DissRes *dissRes){
+    ip_hdr *header = GetIpHdr(dissRes);
+    quint32 address;
+    memcpy(&address,header->sourceIP,IP_LENS::SOURCEIP);
+    return ntohl(address);
+}
+
+quint32 DissectorIp::GetIpDstAddress(DissRes *dissRes){
+    ip_hdr *header = GetIpHdr(dissRes);
+    quint32 address;
+    memcpy(&address,header->destIP,IP_LENS::DESTIP);
+    return ntohl(address);
+}
+
+QString DissectorIp::GetIpStrSrcAddress(DissRes *dissRes){
+    ip_hdr *header = GetIpHdr(dissRes);
+    return QString::asprintf("%d.%d.%d.%d"
+            ,header->sourceIP[0]
+            ,header->sourceIP[1]
+            ,header->sourceIP[2]
+            ,header->sourceIP[3]
+            );
+}
+
+QString DissectorIp::GetIpStrDstAddress(DissRes *dissRes){
+    ip_hdr *header = GetIpHdr(dissRes);
+    return QString::asprintf("%d.%d.%d.%d"
+            ,header->destIP[0]
+            ,header->destIP[1]
+            ,header->destIP[2]
+            ,header->destIP[3]
+            );
+}
+
 //Msg方法
 QString DissectorIp::MsgIpTop(DissRes *dissRes){
     DissResEth *dissResEth = ((DissResEth*)dissRes);

@@ -35,6 +35,7 @@ public:
     QList<QString>& GetProtocolStack();
     qint32 GetProStart(QString proName);
     qint32 GetProEnd(QString proName);
+
 protected:
     void addToProtocolStack(QString protocol);
     void addProPosition(QString proName,qint32 start,qint32 end);
