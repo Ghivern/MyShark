@@ -1,7 +1,6 @@
 #include "dissectortcp.h"
 
 quint32 DissectorTcp::flags = 0;
-TUStream DissectorTcp::stream;
 
 DissectorTcp::DissectorTcp()
 {
@@ -14,10 +13,10 @@ void DissectorTcp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetDstPort(GetTcpDstPort(header));
         dissResEth->SetSrcPort(GetTcpSrcPort(header));
-        DissectorTcp::stream.Append(dissResEth->GetStrIpSrc()
-                                    ,dissResEth->GetSrcPort()
-                                    ,dissResEth->GetStrIpDst()
-                                    ,dissResEth->GetDstPort());
+//        DissectorTcp::stream.Append(dissResEth->GetStrIpSrc()
+//                                    ,dissResEth->GetSrcPort()
+//                                    ,dissResEth->GetStrIpDst()
+//                                    ,dissResEth->GetDstPort());
         dissResEth->AddToProtocolStackWithSE("tcp",sizeof(tcp_hdr));
     }else{
         Q_UNUSED(proTree)

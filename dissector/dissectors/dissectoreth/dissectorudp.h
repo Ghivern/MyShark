@@ -5,7 +5,7 @@
 #include "../../info/infoeth.h"
 #include "eth_header.h"
 #include "../../dissres/dissreseth.h"
-#include "../../stream/tustream.h"
+#include "../../stream/streamrecorder.h"
 
 class DissectorUdp
 {
@@ -36,7 +36,7 @@ private:
     static const qint16 PSEUDO_HEADER_LEN = 12;
 
     static quint32 flags;
-    static TUStream stream;
+
 
 
 

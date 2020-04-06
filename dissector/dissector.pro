@@ -32,7 +32,9 @@ SOURCES += \
     loader.cpp \
     protree/protree.cpp \
     protree/protreenode.cpp \
-    stream/tustream.cpp \
+    stream/streamindex.cpp \
+    stream/streamitem.cpp \
+    stream/streamrecorder.cpp \
     units/device.cpp
 
 HEADERS += \
@@ -54,7 +56,9 @@ HEADERS += \
     protree/protree.h \
     protree/protreenode.h \
     \ \
-    stream/tustream.h \
+    stream/streamindex.h \
+    stream/streamitem.h \
+    stream/streamrecorder.h \
     units/device.h
 
 LIBS += -lpcap

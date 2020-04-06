@@ -5,7 +5,7 @@
 #include "../../info/infoeth.h"
 #include "eth_header.h"
 #include "../../dissres/dissreseth.h"
-#include "../../stream/tustream.h"
+#include "../../stream/streamrecorder.h"
 
 class DissectorTcp
 {
@@ -15,7 +15,6 @@ public:
 
 private:
     static quint32 flags;
-    static TUStream stream;
 
     static tcp_hdr* GetTcpHdr(DissRes *dissRes);
     static ushort GetTcpSrcPort(tcp_hdr *header);

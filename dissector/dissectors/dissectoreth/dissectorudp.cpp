@@ -1,12 +1,9 @@
 #include "dissectorudp.h"
 
 quint32 DissectorUdp::flags = 0;
-TUStream DissectorUdp::stream;
 
-//qint16 DissectorUdp::PSEUDO_HEADER_LEN = 12;
 
-DissectorUdp::DissectorUdp()
-{
+DissectorUdp::DissectorUdp() {
 
 }
 
@@ -17,19 +14,14 @@ void DissectorUdp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetSrcPort(GetUdpSrcPort(header));
         dissResEth->SetDstPort(GetUdpDstPort(header));
-        DissectorUdp::stream.Append(dissResEth->GetStrIpSrc()
-                                    ,dissResEth->GetSrcPort()
-                                    ,dissResEth->GetStrIpDst()
-                                    ,dissResEth->GetDstPort());
-        qDebug() << "DissectorUdp : (关注 StreamIndex)" <<
-                    DissectorUdp::stream.StreamIndex(dissResEth->GetStrIpSrc()
-                                                     ,dissResEth->GetSrcPort()
-                                                     ,dissResEth->GetStrIpDst()
-                                                     ,dissResEth->GetDstPort());
+
+
     }else{
         proTree->AddItem("udp","调试");
         proTree->AddItem("udp",DissectorUdp::GetUdpStrCheckSum(header),ProTree::level::NEW);
         proTree->AddItem("udp",DissectorUdp::GetStrCalculateCheckSum(dissRes));
+        QString text = "hello";
+
     }
 }
 
