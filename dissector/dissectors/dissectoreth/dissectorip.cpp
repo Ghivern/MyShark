@@ -2,6 +2,7 @@
 #include "dissectorudp.h"
 #include "dissectortcp.h"
 
+StreamRecorder DissectorIp::streamRecorder;
 quint32 DissectorIp::flags = 0;
 /*
  * bit
@@ -12,12 +13,14 @@ DissectorIp::DissectorIp(){}
 
 void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     ip_hdr *header = GetIpHdr(dissRes,info==NULL?true:false);
+    DissResEth *dissResEth = ((DissResEth*)dissRes);
     if(info == NULL){
-        DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissRes->AddHeadersLen(DissectorIp::GetIpHdrLen(header));
         dissResEth->SetIpSrc(header->sourceIP);
         dissResEth->SetIpDst(header->destIP);
         dissResEth->ResetProtocolStackAndPosition("ip",DissectorIp::GetIpHdrLen(header) * 4);
+
+        streamRecorder.Add(dissResEth->GetStrIpSrc(),dissResEth->GetStrDst(),0,0,dissResEth->GetNo());
     }else{
         qint32 start = dissRes->GetProStart("ip");
         proTree->AddItem("ip",DissectorIp::MsgIpTop(dissRes),start,dissRes->GetProEnd("ip"));
@@ -32,6 +35,7 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         DissectorIp::DealIpChecksum(header,proTree,&start);
         proTree->AddItem("ip",DissectorIp::MsgIpSrc(dissRes),&start,4);
         proTree->AddItem("ip",DissectorIp::MsgIpDst(dissRes),&start,4);
+        proTree->Pop();
     }
 
     switch (GetIpPType(header)) {

@@ -11,6 +11,7 @@ public:
     public:
         Position_Direction(qint64 dissRes_index);
         bool Modify(qint64 dissRes_index,bool direction);
+        QHash<bool,QList<qint64>*> GetPD();
     private:
         QHash<bool,QList<qint64>*> dissRes_index_hash;
     };
@@ -18,6 +19,9 @@ public:
     StreamItem(QString addressA,QString addressB,quint32 portA,quint32 portB,qint64 dissRes_index,qint64 *streamIndex);
     ~StreamItem();
     void Modify(qint64 dissRes_index, QString addressS,qint64 *streamIndex);
+    qint64 GetStreamIndex(QString addressS);
+    QList<qint64>* GetPositions(bool AB = true);
+    qint64 GetPositionsCount(bool AB = true);
 
 private:
     QString addressA;

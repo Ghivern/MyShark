@@ -128,7 +128,7 @@ QString DissResEth::GetStrSrc(){
     case 4:
         return this->GetStrIpSrc();
     case 6:
-        return "IPv4 Src 地址";
+        return "IPv6 Src 地址";
     default:
         return "Nuknow";
     }

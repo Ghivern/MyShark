@@ -1,6 +1,10 @@
 #include "dissectorudp.h"
 
-quint32 DissectorUdp::flags = 0;
+/*
+ * bit 0: validate the udp checksum
+ */
+quint32 DissectorUdp::flags = 0x1;
+StreamRecorder DissectorUdp::streamRecorder;
 
 
 DissectorUdp::DissectorUdp() {
@@ -10,18 +14,23 @@ DissectorUdp::DissectorUdp() {
 
 void DissectorUdp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     udp_hdr *header = GetUdpHdr(dissRes,info==NULL?true:false);
+    DissResEth *dissResEth = ((DissResEth*)dissRes);
     if(info == NULL){
-        DissResEth *dissResEth = ((DissResEth*)dissRes);
         dissResEth->SetSrcPort(GetUdpSrcPort(header));
         dissResEth->SetDstPort(GetUdpDstPort(header));
-
-
+        GetStreamRecorder().Add(dissResEth->GetStrIpSrc()
+                                ,dissResEth->GetStrIpDst()
+                                ,dissResEth->GetSrcPort()
+                                ,dissResEth->GetDstPort()
+                                ,dissResEth->GetNo());
     }else{
-        proTree->AddItem("udp","调试");
-        proTree->AddItem("udp",DissectorUdp::GetUdpStrCheckSum(header),ProTree::level::NEW);
-        proTree->AddItem("udp",DissectorUdp::GetStrCalculateCheckSum(dissRes));
-        QString text = "hello";
-
+        proTree->AddItem("udp",UdpMsgSummery(dissResEth));
+        proTree->AddItem("udp",UdpMsgSourcePort(dissResEth),ProTree::level::NEW);
+        proTree->AddItem("udp",UdpMsgDestinationPort(dissResEth));
+        proTree->AddItem("udp",UdpMsgLength(header));
+        UdpDealChecksum(proTree,dissRes);
+        proTree->AddItem("udp",UdpMsgStreamIndex(dissResEth));
+        proTree->Pop();
     }
 }
 
@@ -57,6 +66,11 @@ QString DissectorUdp::GetUdpStrCheckSum(udp_hdr *header){
                              );
 }
 
+//获取StreamRecorder
+StreamRecorder& DissectorUdp::GetStreamRecorder(){
+    return streamRecorder;
+}
+
 
 //Get方法，参数直接为DissRes*类型
 ushort DissectorUdp::GetUdpDstPort(DissRes *dissRes){
@@ -65,6 +79,86 @@ ushort DissectorUdp::GetUdpDstPort(DissRes *dissRes){
 
 ushort DissectorUdp::GetUdpSrcPort(DissRes *dissRes){
     return GetUdpSrcPort(GetUdpHdr(dissRes));
+}
+
+//Flag方法
+bool DissectorUdp::UdpFlagValidateChecksum(){
+    if(DissectorUdp::flags & VALIDATE_CHECKSUM)
+        return true;
+    else
+        return false;
+}
+
+//Msg方法
+QString DissectorUdp::UdpMsgSummery(DissResEth *dissResEth){
+    return QString::asprintf("User Datagram Protocol, Src Port : %ud, Dst Port : %ud"
+                             ,dissResEth->GetSrcPort()
+                             ,dissResEth->GetDstPort()
+                             );
+}
+
+QString DissectorUdp::UdpMsgSourcePort(DissResEth *dissResEth){
+    return QString::asprintf("Source Port : %ud",dissResEth->GetSrcPort());
+}
+
+QString DissectorUdp::UdpMsgDestinationPort(DissResEth *dissResEth){
+    return QString::asprintf("Destination Port : %ud",dissResEth->GetDstPort());
+}
+
+QString DissectorUdp::UdpMsgLength(udp_hdr *header){
+    return QString::asprintf("Length : %ud",GetUdpLength(header));
+}
+
+void DissectorUdp::UdpDealChecksum(ProTree *tree,DissRes *dissRes){
+    QString msg;
+    udp_hdr *header = GetUdpHdr(dissRes);
+    if(!UdpFlagValidateChecksum()){  //不验证checksum
+        msg.append("Checksum : ").append(GetUdpStrCheckSum(header)).append(" [unverified]");
+        tree->AddItem("udp",msg);
+        msg.clear();
+        msg.append("[Check status : unverified]");
+        tree->AddItem("udp",msg);
+    }else{
+        quint16 cal_checksum = GetCalculateCheckSum(dissRes);
+        if(cal_checksum == GetUdpCheckSum(header)){  //相等
+            msg.append("Checksum : ").append(GetUdpStrCheckSum(header)).append("[correct]");
+            tree->AddItem("udp",msg);
+
+            msg.clear();
+            msg.append("[Calculated checksum : ")
+                    .append(GetStrCalculateCheckSum(cal_checksum))
+                    .append("]");
+            tree->AddItem("udp",msg,ProTree::level::NEW);
+            tree->Pop();
+
+            msg.clear();
+            msg.append("[Check status : Good]");
+            tree->AddItem("udp",msg,ProTree::level::NEW);
+        }else{
+            msg.append("Checksum : ").append(GetUdpStrCheckSum(header))
+                    .append(" incorrect, should be ")
+                    .append(GetStrCalculateCheckSum(cal_checksum))
+                    .append( QString::asprintf(" (maybe caused by \"UDP checksum offload\"?") );
+            tree->AddItem("udp",msg);
+
+            msg.clear();
+            msg.append("[Calculated checksum : ")
+                    .append(GetStrCalculateCheckSum(cal_checksum))
+                    .append("]");
+            tree->AddItem("udp",msg,ProTree::level::NEW);
+            tree->Pop();
+
+            msg.clear();
+            msg.append("[Checksum status : Bad]");
+            tree->AddItem("udp",msg);
+        }
+    }
+}
+
+QString DissectorUdp::UdpMsgStreamIndex(DissResEth *dissResEth){
+    qint64 streamIndex =GetStreamRecorder()
+            .GetStreamIndex(dissResEth->GetStrSrc(),dissResEth->GetStrDst(),dissResEth->GetSrcPort(),dissResEth->GetDstPort());
+    return QString::asprintf("[Stream Index : %lld]",streamIndex);
 }
 
 //计算检验和
@@ -108,6 +202,13 @@ quint16 DissectorUdp::GetCalculateCheckSum(DissRes *dissRes){
 
 QString DissectorUdp::GetStrCalculateCheckSum(DissRes *dissRes){
     quint16 checksum = GetCalculateCheckSum(dissRes);
+    return QString::asprintf("0x%02x%02x"
+                             ,((uchar*)&checksum)[1]
+                             ,((uchar*)&checksum)[0]
+                             );
+}
+
+QString DissectorUdp::GetStrCalculateCheckSum(quint16 checksum){
     return QString::asprintf("0x%02x%02x"
                              ,((uchar*)&checksum)[1]
                              ,((uchar*)&checksum)[0]

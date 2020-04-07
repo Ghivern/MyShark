@@ -5,14 +5,18 @@
 #include "../../info/infoeth.h"
 #include "eth_header.h"
 #include "../../dissres/dissreseth.h"
+#include "../../stream/streamrecorder.h"
 
 class DissectorIp
 {
 public:
+    static StreamRecorder streamRecorder;
+
     DissectorIp();
     static void Dissect(DissRes *dissRes, ProTree *proTree ,Info *info);
 private:
     static quint32 flags;
+
     /*
      * bit
      * 0:    0: uncheck    1: check

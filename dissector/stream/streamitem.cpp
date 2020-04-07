@@ -15,6 +15,10 @@ bool StreamItem::Position_Direction::Modify(qint64 dissRes_index,bool direction)
     return add_new_list;
 }
 
+QHash<bool,QList<qint64>*> StreamItem::Position_Direction::GetPD(){
+    return this->dissRes_index_hash;
+}
+
 StreamItem::StreamItem(QString addressA,QString addressB,quint32 portA,quint32 portB,qint64 dissRes_index,qint64 *streamIndex){
     this->addressA.append(addressA);
     this->addressB.append(addressB);
@@ -39,4 +43,18 @@ void StreamItem::Modify(qint64 dissRes_index, QString addressS,qint64 *streamInd
     }
 }
 
+qint64 StreamItem::GetStreamIndex(QString addressS){
+    if(addressS.compare(this->addressA) == 0)
+        return this->streamIndexAB;
+    else
+        return this->streamIndexBA;
+}
+
+QList<qint64>* StreamItem::GetPositions(bool AB){
+    return this->pd->GetPD().value(AB);
+}
+
+qint64 StreamItem::GetPositionsCount(bool AB){
+    return this->pd->GetPD().value(AB)->length();
+}
 

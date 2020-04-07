@@ -5,6 +5,7 @@
 #include "../protree/protree.h"
 #include "../dissres/dissres.h"
 #include "../info/info.h"
+#include "../stream/streamrecorder.h"
 
 class DissectorBase
 {

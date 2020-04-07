@@ -14,3 +14,19 @@ void StreamRecorder::Add(QString addressS,QString addressD,quint16 portS,quint16
         this->streams.at(streamItem_index)->Modify(dissRes_index,addressS,&this->streamIndex);
     }
 }
+
+qint64 StreamRecorder::GetStreamIndex(QString addressS, QString addressD, quint16 portS, quint16 portD){
+    qint64 streamItem_index = this->index.GetStreamItemIndex(addressS,addressD,portS,portD);
+    if(streamItem_index != -1)
+        return this->streams.at(streamItem_index)->GetStreamIndex(addressS);
+    else
+        return -1;
+}
+
+qint64 StreamRecorder::GetStreamItemCount(){
+    return this->streams.length();
+}
+
+StreamItem* StreamRecorder::GetStreamItemByIndex(qint64 index){
+    return this->streams.at(index);
+}

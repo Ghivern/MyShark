@@ -9,6 +9,9 @@ class StreamRecorder
 public:
     StreamRecorder();
     void Add(QString addressS,QString addressD,quint16 portS,quint16 portD,qint64 dissRes_index);
+    qint64 GetStreamIndex(QString addressS,QString addressD,quint16 portS,quint16 portD);
+    qint64 GetStreamItemCount();
+    StreamItem* GetStreamItemByIndex(qint64 index);
 
 private:
     qint64 streamIndex = 0;
