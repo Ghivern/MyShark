@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     Device device;
-    capturer = new Capturer(Device::GetDeviceNameByIndex(0));
+    capturer = new Capturer(Device::GetDeviceNameByIndex(2));
 
     dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
 

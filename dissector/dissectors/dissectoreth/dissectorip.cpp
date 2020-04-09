@@ -15,6 +15,7 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     ip_hdr *header = GetIpHdr(dissRes,info==NULL?true:false);
     DissResEth *dissResEth = ((DissResEth*)dissRes);
     if(info == NULL){
+        dissResEth->SetIpVersion(4);
         dissRes->AddHeadersLen(DissectorIp::GetIpHdrLen(header));
         dissResEth->SetIpSrc(header->sourceIP);
         dissResEth->SetIpDst(header->destIP);

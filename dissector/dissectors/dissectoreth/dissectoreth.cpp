@@ -1,6 +1,7 @@
 #include "dissectoreth.h"
 #include "dissectorarp.h"
 #include "dissectorip.h"
+#include "dissectoripv6.h"
 
 quint32 DissectorEth::flags = 1;
 /*  bit0:    validate the ethernet checksum if possible
@@ -44,6 +45,9 @@ ProTree* DissectorEth::Dissect(DissResList_t *dissResList,qint64 index, Info *in
         break;
     case (ushort)0x0806:
         DissectorArp::Dissect(dissResList->at(index),proTree,info);
+        break;
+    case (ushort)0x86dd:
+        DissectorIpv6::Dissect(dissResList->at(index),proTree,info);
         break;
     default:
         ((DissResEth*)dissResList->at(index))->SetMsg("ETH: 未知上层协议");
@@ -171,6 +175,9 @@ QString DissectorEth::MsgType(eth_hdr *eth){
         break;
     case 0x0806:
         strtype = "Arp";
+        break;
+    case 0x86dd:
+        strtype = "Ipv6";
         break;
     }
     return QString("Type: ") + strtype + QString::asprintf("(0x%02x%02x)",((uchar*)&inttype)[1],((uchar*)&inttype)[0]);

@@ -33,6 +33,17 @@ public:
     static quint8 Ipv6GetHopLimit(ipv6_hdr *header);
     static quint8 Ipv6GetHopLimit(DissRes *dissRes);
 
+    //Msg方法
+    static QString Ipv6MsgSummery(ipv6_hdr *header,DissResEth *dissResEth);
+    static QString Ipv6MsgVersion(ipv6_hdr *header);
+    static void Ipv6DealTrafficClass(ipv6_hdr *header,ProTree *tree,qint32 *start);
+    static QString Ipv6MsgFlowLabel(ipv6_hdr *header);
+    static QString Ipv6MsgPayloadLength(ipv6_hdr *header);
+    static QString Ipv6MsgNextHeader(ipv6_hdr *header);
+    static QString Ipv6MsgHopLimit(ipv6_hdr *header);
+    static QString Ipv6MsgSourceAddress(DissResEth *dissResEth);
+    static QString Ipv6MsgDestinationAddress(DissResEth *dissResEth);
+
 private:
     static quint32 flags;
     static StreamRecorder streamRecorder;

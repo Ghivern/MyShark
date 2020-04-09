@@ -9,7 +9,7 @@ public:
     enum  STREAM_POSITION {SRCTODST,DSTTOSRC};  //用于表示流方向
 
     DissResEth(qint64 no);
-    void SetIpv6();
+    void SetIpVersion(qint32 version);
     void SetMacSrc(uchar *macSrc);
     void SetMacDst(uchar *macDst);
     void SetEthCRCRes(bool res);
@@ -25,21 +25,31 @@ public:
     bool GetEthCRCRes();
     ushort GetSrcPort();
     ushort GetDstPort();
-    QString GetStrIpSrc();
-    QString GetStrIpDst();
+
+    //Ipv4
     quint32 GetIpSrcAddress();
     quint32 GetIpDstAddress();
+    QString GetStrIpSrc();
+    QString GetStrIpDst();
+
+    //Ipv6
+    QString GetStrIpv6Address(quint8 *address);
     QString GetStrIpv6Src(); // +
     QString GetStrIpv6Dst();  // +
+    void GetIpv6Address(quint8 *address,quint64 *high,quint64 *low);//+
     void GetIpv6SrcAddress(quint64 *high,quint64 *low);//+
     void GetIpv6DstAddress(quint64 *hide,quint64 *low);//+
+    void GetIpv6AddressNetworkOrder(quint8 *address,quint64 *high,quint64 *low);//+
+    void GetIpv6SrcAddressNetworkOrder(quint64 *high,quint64 *low); // +
+    void GetIpv6DstAddressNetworkOrder(quint64 *high,quint64 *low); // +
+
     qint32 ipVersion();  //返回ip的版本，若无网络层，则返回0，此时只有Mac地址
     QString GetStrSrc();
     QString GetStrDst();
     //bool GetEthCRCRes(bool res);
 
 private:
-    bool isIpv6 = false;
+    qint32 version = 0;
     uchar macSrc[6] = {0};
     uchar macDst[6] = {0};
     bool ethCRCRes = false;
@@ -47,13 +57,6 @@ private:
     uchar ipDst[16] = {0};
     ushort srcPort = -1;
     ushort dstPort = -1;
-
-    //统计流
-    //<proName,streamIndex>
-    QHash<QString,qint64> streamIndex;
-    //<proName,streamDirection>
-    QHash<QString,STREAM_POSITION>  streamDirection;
-    //有待添加处理这两个记录器的方法
 
 };
 
