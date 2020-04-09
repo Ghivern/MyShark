@@ -18,6 +18,8 @@ void DissectorUdp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
     if(info == NULL){
         dissResEth->SetSrcPort(GetUdpSrcPort(header));
         dissResEth->SetDstPort(GetUdpDstPort(header));
+
+        //添加进流记录器
         GetStreamRecorder().Add(dissResEth->GetStrIpSrc()
                                 ,dissResEth->GetStrIpDst()
                                 ,dissResEth->GetSrcPort()

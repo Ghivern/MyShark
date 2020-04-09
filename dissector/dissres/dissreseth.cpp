@@ -19,19 +19,19 @@ void DissResEth::SetEthCRCRes(bool res){
 }
 
 void DissResEth::SetIpSrc(uchar *ipSrc){
-    memcpy(this->ipSrc,ipSrc,4);
+    memcpy(this->ipSrc,ipSrc,IP_LENS::SOURCEIP);
 }
 
 void DissResEth::SetIpDst(uchar *ipDst){
-    memcpy(this->ipDst,ipDst,4);
+    memcpy(this->ipDst,ipDst,IP_LENS::DESTIP);
 }
 
 void DissResEth::SetIpv6Src(uchar *ipSrc){
-    memcpy(this->ipSrc,ipSrc,16);
+    memcpy(this->ipSrc,ipSrc,IPV6_LEN::SRC_ADDRESS);
 }
 
 void DissResEth::SetIpv6Dst(uchar *ipDst){
-    memcpy(this->ipDst,ipDst,16);
+    memcpy(this->ipDst,ipDst,IPV6_LEN::DST_ADDRESS);
 }
 
 void DissResEth::SetSrcPort(ushort srcPort){

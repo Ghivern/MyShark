@@ -65,6 +65,34 @@ typedef enum IP_LENS{
     DESTIP = 4
 }IP_LENS;
 
+typedef struct ipv6_hdr{
+    quint64 vtf;  // version : 4 --> traffic class : 8 --> flow label : 20
+    quint16 payloadLength;
+    quint8 nextHeader;
+    quint8 hopLimit;
+    quint8 srcAddress[16];
+    quint64 dstAddress[16];
+}ipv6_hdr;
+
+typedef enum IPV6_LEN{
+    VERSION_BIT = 4,
+    TRAFFIC_CLASS_BIT = 8,
+    FLOW_LABEL_BIT = 20,
+    PAYLOAD_LENGTH_BIT = 16,
+    NEXT_HEADER_BIT = 8,
+    HOP_LIMIT_BIT = 8,
+    SRC_ADDRESS_BIT = 128,
+    DST_ADDRESS_BIT = 128,
+
+    //单位： byte
+    VTS = 4,
+    PAYLOAD_LENGTH = 2,
+    NEXT_HEADER = 1,
+    HOP_LIMIT = 1,
+    SRC_ADDRESS = 16,
+    DST_ADDRESS = 16
+} IPV6_LEN;
+
 typedef struct tcp_hdr
 {
     ushort sport;

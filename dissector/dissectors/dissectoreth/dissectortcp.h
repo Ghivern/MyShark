@@ -13,12 +13,19 @@ public:
     DissectorTcp();
     static void Dissect(DissRes *dissRes, ProTree *proTree, Info *info);
 
+    //获取流记录器
+    static StreamRecorder& GetStreamRecorder();
+
+    //Get方法
+    static tcp_hdr* TcpGetHdr(DissRes *dissRes);
+    static ushort TcpGetSrcPort(tcp_hdr *header);
+    static ushort TcpGetDstPort(tcp_hdr *header);
+
 private:
     static quint32 flags;
+    static StreamRecorder streamRecorder;
 
-    static tcp_hdr* GetTcpHdr(DissRes *dissRes);
-    static ushort GetTcpSrcPort(tcp_hdr *header);
-    static ushort GetTcpDstPort(tcp_hdr *header);
+
 };
 
 #endif // DISSECTORTCP_H

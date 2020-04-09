@@ -31,6 +31,12 @@ private:
     qint64 streamIndexAB;
     qint64 streamIndexBA;
     Position_Direction *pd;
+    /*[TODO] 添加处理方法
+     * 在Tcp流中：
+     * reserves[0]:  A -- > B first seq
+     * reserves[1]:  B -- > A first seq
+     */
+    quint32 reserves[8];
 };
 
 #endif // STREAMITEM_H

@@ -29,6 +29,10 @@ public:
     QString GetStrIpDst();
     quint32 GetIpSrcAddress();
     quint32 GetIpDstAddress();
+    QString GetStrIpv6Src(); // +
+    QString GetStrIpv6Dst();  // +
+    void GetIpv6SrcAddress(quint64 *high,quint64 *low);//+
+    void GetIpv6DstAddress(quint64 *hide,quint64 *low);//+
     qint32 ipVersion();  //返回ip的版本，若无网络层，则返回0，此时只有Mac地址
     QString GetStrSrc();
     QString GetStrDst();

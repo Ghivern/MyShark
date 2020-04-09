@@ -14,7 +14,7 @@ public:
     void SetMsg(QString msg);
     void SetHeadersLen(qint32 headersLen);
 
-    void AddToProtocolStackWithSE(QString protocol,qint32 len);
+    void AddToProtocolStackWithSE(QString protocol,qint32 len,bool hide = false);
     void ResetProtocolStackAndPosition(QString protocol,qint32 newLen);
     void AddHeadersLen(qint32 headerLen);
 

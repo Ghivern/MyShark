@@ -31,7 +31,7 @@ void DissRes::SetHeadersLen(qint32 headersLen){
 }
 
 //Add Methods
-void DissRes::AddToProtocolStackWithSE(QString protocol,qint32 len){
+void DissRes::AddToProtocolStackWithSE(QString protocol,qint32 len,bool hide){
     if(!this->proExist(protocol)){
         qint32 preProEnd = this->getTopProEnd();
         qint32 start,end;
@@ -44,7 +44,8 @@ void DissRes::AddToProtocolStackWithSE(QString protocol,qint32 len){
         else
             end = start +len -1;
         this->addProPosition(protocol,start,end);
-        this->addToProtocolStack(protocol);
+        if(!hide)
+            this->addToProtocolStack(protocol);
     }
 }
 
