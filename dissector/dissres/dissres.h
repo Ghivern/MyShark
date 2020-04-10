@@ -34,7 +34,11 @@ public:
     QString GetProtocolByIndex(qint32 index);
     QList<QString>& GetProtocolStack();
     qint32 GetProStart(QString proName);
+    const quint8* GetProStartPtr(QString proName);
     qint32 GetProEnd(QString proName);
+    const quint8* GetProEndPtr(QString proName);
+
+
 
 protected:
     void addToProtocolStack(QString protocol);
@@ -56,6 +60,7 @@ protected:
 private:
     static bool isFirstPacket;  //第一个包进入时其值为true，解析完成，置为false;
     static timeval firstTv; //结合isFirstPacket,记录第一个包的到达时间
+
 
     packet_t packet;  //存储指向原始数据的指针
     qint64 no;  //记录在自己在列表中的位置

@@ -19,9 +19,11 @@ void DissectorIp::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         dissRes->AddHeadersLen(DissectorIp::GetIpHdrLen(header));
         dissResEth->SetIpSrc(header->sourceIP);
         dissResEth->SetIpDst(header->destIP);
+        dissResEth->SetIpTotalLen(DissectorIp::GetIpTotalLen(header));
+        dissResEth->SetIpHeaderLen(DissectorIp::GetIpHdrLen(header));
         dissResEth->ResetProtocolStackAndPosition("ip",DissectorIp::GetIpHdrLen(header) * 4);
 
-        streamRecorder.Add(dissResEth->GetStrIpSrc(),dissResEth->GetStrDst(),0,0,dissResEth->GetNo());
+        streamRecorder.Add(dissResEth->GetStrIpSrc(),dissResEth->GetStrDst(),dissResEth->GetNo());
     }else{
         qint32 start = dissRes->GetProStart("ip");
         proTree->AddItem("ip",DissectorIp::MsgIpTop(dissRes),start,dissRes->GetProEnd("ip"));

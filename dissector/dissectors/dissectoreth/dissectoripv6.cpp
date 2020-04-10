@@ -20,6 +20,7 @@ void DissectorIpv6::Dissect(DissRes *dissRes, ProTree *proTree, Info *info){
         dissResEth->SetIpVersion(6);
         dissResEth->SetIpv6Src(header->srcAddress);
         dissResEth->SetIpv6Dst(header->dstAddress);
+        dissResEth->SetIpTotalLen(Ipv6GetPayloadLength(header) + IPV6_LEN::BASE_HEADER);
 
         streamRecorder.Add(dissResEth->GetStrIpSrc(),dissResEth->GetStrIpDst(),0,0,dissResEth->GetNo());
     }else{

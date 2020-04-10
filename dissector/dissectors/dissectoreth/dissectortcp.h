@@ -4,10 +4,11 @@
 #include "../../protree/protree.h"
 #include "../../info/infoeth.h"
 #include "eth_header.h"
+#include "../dissectorbase.h"
 #include "../../dissres/dissreseth.h"
 #include "../../stream/streamrecorder.h"
 
-class DissectorTcp
+class DissectorTcp :  public DissectorBase
 {
 public:
     DissectorTcp();
@@ -17,7 +18,7 @@ public:
     static StreamRecorder& GetStreamRecorder();
 
     //Get方法
-    static tcp_hdr* TcpGetHdr(DissRes *dissRes);
+    static tcp_hdr* TcpGetHdr(DissRes *dissRes,bool first = false);
     static ushort TcpGetSrcPort(tcp_hdr *header);
     static ushort TcpGetDstPort(tcp_hdr *header);
 

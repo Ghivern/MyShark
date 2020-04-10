@@ -62,7 +62,9 @@ typedef enum IP_LENS{
     PROTOCOL = 1,
     CHECKSUM = 2,
     SOURCEIP = 4,
-    DESTIP = 4
+    DESTIP = 4,
+
+    IPV4_ADDRESS = 4
 }IP_LENS;
 
 typedef struct ipv6_hdr{
@@ -91,7 +93,9 @@ typedef enum IPV6_LEN{
     HOP_LIMIT = 1,
     SRC_ADDRESS = 16,
     DST_ADDRESS = 16,
-    ADDRESS = 16
+    ADDRESS = 16,
+
+    BASE_HEADER = 40
 } IPV6_LEN;
 
 typedef struct tcp_hdr

@@ -36,6 +36,7 @@ SOURCES += \
     stream/streamitem.cpp \
     stream/streamrecorder.cpp \
     units/bit.cpp \
+    units/checksum.cpp \
     units/device.cpp
 
 HEADERS += \
@@ -61,6 +62,7 @@ HEADERS += \
     stream/streamitem.h \
     stream/streamrecorder.h \
     units/bit.h \
+    units/checksum.h \
     units/device.h
 
 LIBS += -lpcap

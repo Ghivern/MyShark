@@ -20,6 +20,11 @@ void DissRes::SetPacket(const uchar *data,const pcap_pkthdr *pkthdr){
     memcpy(this->packet.data,data,pkthdr->caplen);
     this->packet.pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
     memcpy(this->packet.pkthdr,pkthdr,sizeof(pcap_pkthdr));
+    if(isFirstPacket){
+        firstTv.tv_sec = pkthdr->ts.tv_sec;
+        firstTv.tv_usec = pkthdr->ts.tv_usec;
+        isFirstPacket = false;
+    }
 }
 
 void DissRes::SetMsg(QString msg){
@@ -139,12 +144,21 @@ qint32 DissRes::GetProStart(QString proName){
         return 0;
 }
 
+const quint8* DissRes::GetProStartPtr(QString proName){
+    return this->GetData() + this->GetProStart(proName);
+}
+
 qint32 DissRes::GetProEnd(QString proName){
     if(this->positionStack.contains(proName))
         return this->positionStack.value(proName).end;
     else
         return 0;
 }
+
+const quint8* DissRes::GetProEndPtr(QString proName){
+    return this->GetData() + this->GetProEnd(proName);
+}
+
 
 //protected Methods
 void DissRes::addToProtocolStack(QString protocol){

@@ -33,10 +33,9 @@ StreamRecorder& DissectorTcp::GetStreamRecorder(){
 }
 
 //Get方法
-tcp_hdr* DissectorTcp::TcpGetHdr(DissRes *dissRes){
-    tcp_hdr *tcp = (tcp_hdr*)(dissRes->GetData() + dissRes->GetHeadersLen());
+tcp_hdr* DissectorTcp::TcpGetHdr(DissRes *dissRes,bool first){
     dissRes->AddHeadersLen(sizeof(tcp_hdr));
-    return tcp;
+    return (tcp_hdr*)BaseGetHdr(dissRes,"tcp",sizeof (tcp_hdr),first);
 }
 
 ushort DissectorTcp::TcpGetDstPort(tcp_hdr *header){

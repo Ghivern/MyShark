@@ -15,6 +15,10 @@ void StreamRecorder::Add(QString addressS,QString addressD,quint16 portS,quint16
     }
 }
 
+void StreamRecorder::Add(QString addressS, QString addressD, qint64 dissRes_index){
+    StreamRecorder::Add(addressS,addressD,0,0,dissRes_index);
+}
+
 qint64 StreamRecorder::GetStreamIndex(QString addressS, QString addressD, quint16 portS, quint16 portD){
     qint64 streamItem_index = this->index.GetStreamItemIndex(addressS,addressD,portS,portD);
     if(streamItem_index != -1)
