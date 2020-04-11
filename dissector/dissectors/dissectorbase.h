@@ -11,7 +11,7 @@ class DissectorBase
 {
 public:
     DissectorBase();
-    //virtual ProTree* Dissect(DissResList_t *dissResList,qint64 index,Info *info = NULL);
+    virtual ProTree* Dissect(DissResList_t *dissResList,qint64 index,Info *info = NULL);
 
     static const quint8* BaseGetHdr(DissRes *dissRes,QString proName,qint32 len,bool first = false, bool hide = false);
 };

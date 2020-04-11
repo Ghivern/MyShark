@@ -1,34 +1,56 @@
-#ifndef CHECKSUM_H
+﻿#ifndef CHECKSUM_H
 #define CHECKSUM_H
 #include "../dissres/dissreseth.h"
-/* Ipv4 只计算首部
- * Ipv6 没有检验和字段
+/*
+ * Pseudo Header:
+ * Src Addr | Dst Addr | Zero-Char | protocol-number | length
  *
- * 伪首部(Pseudo Header)：  源IP地址
- *                         目的IP地址
- *                         0(1 byte)|Ip首部中的protocolNumber(1byte)|Tcp/Udp数据报length
- * TCP/UDP:  伪首部 + TCP/UDP数据报
+ * 协议     |   检验字段
+ * -----------------------------------
+ * Ipv4    |   首部
+ * Ipv6    |   无
+ * Tcp/Udp |   Pseudo Header + 数据报
  */
 
 class CheckSum
 {
 public:
-    CheckSum(DissResEth *dissResEth,quint8 protocolNumber,QString proName,quint16 length); //带伪首部的检验和计算
-
-    CheckSum(DissResEth *dissResEth,QString proName,quint16 length); //不带伪首部
-
+    /*
+     * 生成Pseudo Header的构造函数
+     * 1.目前支持TCP、UDP、IPV4
+     * 2.withPseudoHeader指示是否添加伪首部，默认不添加
+     * 3.length表明待检验数据的长度
+     * 4.协议名称用小写 tcp、udp、ipv4
+     */
+    CheckSum(DissResEth *dissResEth,QString proName,quint16 length, bool withPseudoHeader = false);
     ~CheckSum();
+
+     quint16 GetChecksum();
+     QString GetStrChecksum();
 private:
+    quint8* GetPseudoHeader(DissResEth *dissResEth,quint8 proNumber,quint16 length);
+    void GetInverseSum(quint16 *sum,quint16 num);
+
+    const qint32 IPV6_ADDR_LEN = 16;
+    const qint32 IPV4_ADDR_LEN = 4;
     const qint32 ZERO_CHAR = 1;
     const qint32 PROTOCOL_NUMBER = 1;
     const qint32 LENGTH = 2;
 
-    quint8 *pseudoHeader;
+    const qint32 IPV4_CHECKSUM_POSITION = 5;
+    const qint32 TCP_CHECKSUM_POSITION = 8;
+    const qint32 UDP_CHECKSUM_POSITION = 3;
+
+    quint8 *pseudoHeaderPtr;
     qint16 pseudoHeaderLength;
 
     const quint8 *data;
-    quint16 length;  //进行校验和运算的数据长度
-    QString proName;
+    quint16 dataLength;
+
+    qint32 checksum_position;
+
+    bool done;
+    quint16 checksum;
 };
 
 #endif // CHECKSUM_H

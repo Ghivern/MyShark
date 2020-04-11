@@ -7,7 +7,7 @@ class DissectorEth:public DissectorBase
 {
 public:
     DissectorEth();
-    ProTree * Dissect(DissResList_t *dissResList, qint64 index, Info *info = NULL) override;
+    ProTree * Dissect(DissResList_t *dissResList, qint64 index, Info *info = NULL);
 
 private:
     static quint32 flags;
