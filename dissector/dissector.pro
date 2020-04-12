@@ -25,8 +25,16 @@ SOURCES += \
     dissectors/dissectoreth/dissectorip.cpp \
     dissectors/dissectoreth/dissectortcp.cpp \
     dissectors/dissectoreth/dissectorudp.cpp \
+    dissres/dissectresultbase.cpp \
+    dissres/dissectresutltframe.cpp \
     dissres/dissres.cpp \
     dissres/dissreseth.cpp \
+    dissres/tcp_ip_protocol_family/dissectresultarp.cpp \
+    dissres/tcp_ip_protocol_family/dissectresultipv4.cpp \
+    dissres/tcp_ip_protocol_family/dissectresultipv6.cpp \
+    dissres/tcp_ip_protocol_family/dissectresultlinklayer.cpp \
+    dissres/tcp_ip_protocol_family/dissectresulttcp.cpp \
+    dissres/tcp_ip_protocol_family/dissectresultudp.cpp \
     info/info.cpp \
     info/infoeth.cpp \
     loader.cpp \
@@ -50,8 +58,16 @@ HEADERS += \
     dissectors/dissectoreth/dissectortcp.h \
     dissectors/dissectoreth/dissectorudp.h \
     dissectors/dissectoreth/eth_header.h \
+    dissres/dissectresultbase.h \
+    dissres/dissectresutltframe.h \
     dissres/dissres.h \
     dissres/dissreseth.h \
+    dissres/tcp_ip_protocol_family/dissectresultarp.h \
+    dissres/tcp_ip_protocol_family/dissectresultipv4.h \
+    dissres/tcp_ip_protocol_family/dissectresultipv6.h \
+    dissres/tcp_ip_protocol_family/dissectresultlinklayer.h \
+    dissres/tcp_ip_protocol_family/dissectresulttcp.h \
+    dissres/tcp_ip_protocol_family/dissectresultudp.h \
     info/info.h \
     info/infoeth.h \
     loader.h \
