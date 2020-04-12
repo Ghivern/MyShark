@@ -21,7 +21,7 @@ public:
 
     void SetSummery(QString summery);
     void UpdateProtocolHeaderLengthCount(qint32 headerLength);
-    void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength, bool hide = false);
+    void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength);
     void UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength);
 
 
@@ -43,20 +43,14 @@ public:
     QString GetProtocolNameByIndex(qint32 index);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
 private:
-    typedef struct pcaket_t{
-        quint8 *data;
-        pcap_pkthdr *pkthdr;
-    }packet_t;
-
 
     static bool isFirstPacket;
     static timeval firstPacketCaptureTime;
 
-    packet_t packet;
+    pcap_pkthdr *pkthdr;
 
     PROTOCOL_FAMILY_TYPE protocol_family_type;
 
-    QString summery;
     void *protocol_family_base_layer;
     DissectResultBase *dissectResultBase;
 };

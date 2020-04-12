@@ -7,6 +7,7 @@ DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultB
     this->dissectResultBase = dissectResultBase;
     dissectResultBase->PushToProtocolList("ether",LINKLAYER_FIELD_LENGTH::LINKLAYER_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ether");
+    dissectResultBase->UpdateProtocolHeaderLengthCount(LINKLAYER_TEMP_TOTAL_LEN);
     this->AddNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type);
 }
 

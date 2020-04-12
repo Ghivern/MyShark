@@ -21,6 +21,7 @@
  * DS: Differntiated Service   RFC 2474 3168 3260
  * offset:  片偏移
  * ttl : time to live
+ * 考虑到Ipv4的首部拓展很少使用，所以暂时不做处理
  */
 
 namespace tcp_ip_protocol_family {
@@ -55,6 +56,8 @@ public:
     void* GetNextLayer();
     DissectResultTcp* GetNextLayerTcp();
     DissectResultUdp* GetNextLayerUdp();
+
+    quint8 GetHeaderLength();
 
 private:
     struct header_t{

@@ -5,7 +5,7 @@ DissectResultBase::DissectResultBase(const quint8 *data, qint64 index){
     this->index = index;
 }
 
-void DissectResultBase::PushToProtocolList(QString protocolName, qint32 protocolHeaderLength, bool hide){
+void DissectResultBase::PushToProtocolList(QString protocolName, qint32 protocolHeaderLength){
     position_t position;
     if(this->protocolList.isEmpty())
         position.start = 0;
@@ -14,8 +14,7 @@ void DissectResultBase::PushToProtocolList(QString protocolName, qint32 protocol
     position.end = position.start + protocolHeaderLength;
     this->protocolPositionHash.insert(protocolName,position);
 
-    if(!hide)
-        this->protocolList.append(protocolName);
+    this->protocolList.append(protocolName);
 }
 
 void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength){
@@ -37,6 +36,15 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
 
 }
 
+void DissectResultBase::SetData(quint8 *data){
+    this->data = data;
+}
+
+void DissectResultBase::SetSummery(QString summery){
+    this->summery.clear();
+    this->summery.append(summery);
+}
+
 qint32 DissectResultBase::GetProtocolHeaderLengthCount(){
     return this->protocolHeaderLengthCount;
 }
@@ -54,4 +62,8 @@ QString DissectResultBase::GetProtocolNameByIndex(qint32 index){
 
 const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protocolName){
     return this->data + this->protocolPositionHash.value(protocolName).start;
+}
+
+QString DissectResultBase::GetSummery(){
+    return this->summery;
 }
