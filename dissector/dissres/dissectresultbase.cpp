@@ -5,6 +5,10 @@ DissectResultBase::DissectResultBase(const quint8 *data, qint64 index){
     this->index = index;
 }
 
+void DissectResultBase::UpdateProtocolHeaderLengthCount(qint32 headerLength){
+    this->protocolHeaderLengthCount += headerLength;
+}
+
 void DissectResultBase::PushToProtocolList(QString protocolName, qint32 protocolHeaderLength){
     position_t position;
     if(this->protocolList.isEmpty())
@@ -39,6 +43,14 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
 void DissectResultBase::SetSummery(QString summery){
     this->summery.clear();
     this->summery.append(summery);
+}
+
+const quint8* DissectResultBase::GetData(){
+    return this->data;
+}
+
+quint64 DissectResultBase::GetIndex(){
+    return this->index;
 }
 
 qint32 DissectResultBase::GetProtocolHeaderLengthCount(){

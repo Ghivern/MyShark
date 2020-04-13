@@ -92,3 +92,7 @@ unix {
     target.path = /usr/lib
 }
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    others/ethernet-addresses \
+    others/ethernet-well-know-addresses

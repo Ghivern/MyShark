@@ -1,38 +1,39 @@
 #include "dissectresultlinklayer.h"
+#include <QDebug>
 
 using namespace tcp_ip_protocol_family;
 
-const QString DissectResultLinkLayer::relatice_dir = "../../others/";
-const QString DissectResultLinkLayer::ethernet_address_file_path = relatice_dir + "ethernet_address_file";
-const QString DissectResultLinkLayer::well_know_ethernet_address_file_path = relatice_dir + "well_know_ethernet_address_file";
-const QString DissectResultLinkLayer::ethernet_manufacturers_file_path = relatice_dir + "ethernet_manufacturers_file";
+const QString DissectResultLinkLayer::relative_dir = "../others/";
+const QString DissectResultLinkLayer::ethernet_address_file_path = relative_dir + "ethernet-addresses";
+const QString DissectResultLinkLayer::ethernet_well_know_address_file_path = relative_dir + "ethernet-well-know-addresses";
 
 QHash<QString,QString> DissectResultLinkLayer::ethernet_address_modify_hash;
 QFile DissectResultLinkLayer::file_ethernet_address(ethernet_address_file_path);
-QFile DissectResultLinkLayer::file_well_know_ethernet_address(well_know_ethernet_address_file_path);
-QFile DissectResultLinkLayer::file_ethernet_manufacturers(ethernet_manufacturers_file_path);
+QFile DissectResultLinkLayer::file_ethernet_well_know_address(ethernet_well_know_address_file_path);
 
 DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase){
     this->protocol_family_network_layer = NULL;
     this->dissectResultBase = dissectResultBase;
-    dissectResultBase->PushToProtocolList("ether",LINKLAYER_FIELD_LENGTH::LINKLAYER_TEMP_TOTAL_LEN);
+    dissectResultBase->PushToProtocolList("ether",LINKLAYER_FIELD_LENGTH::LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ether");
-    dissectResultBase->UpdateProtocolHeaderLengthCount(LINKLAYER_TEMP_TOTAL_LEN);
+    dissectResultBase->UpdateProtocolHeaderLengthCount(LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN);
     if(this->header != NULL)
         this->AddNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type);
 }
 
 void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type){
     switch(type){
-    case LINKLAYER_IPV4:
+    case LINKLAYER_PROTOCOL_TYPE_IPV4:
         this->protocol_family_network_layer = (void*)(new DissectResultIpv4(dissectResultBase));
         break;
-    case LINKLAYER_IPV6:
+    case LINKLAYER_PROTOCOL_TYPE_IPV6:
         this->protocol_family_network_layer = (void*)(new DissectResultIpv6(dissectResultBase));
         break;
-    case LINKLAYER_ARP:
+    case LINKLAYER_PROTOCOL_TYPE_ARP:
         this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase));
         break;
+    default:
+        this->protocol_family_network_layer = NULL;
     }
 }
 
@@ -52,52 +53,162 @@ DissectResultArp* DissectResultLinkLayer::GetNextLayerArp(){
     return (DissectResultArp*)this->GetNextLayer();
 }
 
-quint8* DissectResultLinkLayer::GetSourceAddressPtr(){
+
+
+/*
+ * 获取协议首部字段位置或值的方法
+ */
+
+const quint8* DissectResultLinkLayer::GetSourceAddressPtr(){
     return this->header->src;
 }
 
+const quint8* DissectResultLinkLayer::GetDestinationAddressPtr(){
+    return this->header->dst;
+}
+
 QString DissectResultLinkLayer::GetSourceAddressOriginalStr(){
+    return this->GetAddressOriginalStr(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressOriginalStr(){
+    return this->GetAddressOriginalStr(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressStr(){
+    return this->GetAddressStr(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressStr(){
+    return this->GetAddressStr(this->header->dst);
+}
+
+bool DissectResultLinkLayer::SourceAddressIsGroup(){
+    return this->IsGroupAddress(this->header->src);
+}
+
+bool DissectResultLinkLayer::DestinationAddressIsGroup(){
+    return this->IsGroupAddress(this->header->dst);
+}
+
+bool DissectResultLinkLayer::SourceAddressIsLocalAdministered(){
+    return this->IsLocalAdministeredAddress(this->header->src);
+}
+
+bool DissectResultLinkLayer::DestinationAddressIsLocalAdministered(){
+    return this->IsLocalAdministeredAddress(this->header->dst);
+}
+
+const quint8* DissectResultLinkLayer::GetTypePtr(){
+    return this->header->type;
+}
+
+QString DissectResultLinkLayer::GetTypeStr(){
+    return QString("0x%1%2").arg(this->header->type[0],2,16,QLatin1Char('0')).arg(this->header->type[1],2,16,QLatin1Char('0'));
+}
+
+QString DissectResultLinkLayer::GetTypeName(){
+    switch (*(quint16*)this->header->type) {
+    case LINKLAYER_PROTOCOL_TYPE_ARP:
+        return "arp";
+    case LINKLAYER_PROTOCOL_TYPE_IPV4:
+        return "ipv4";
+    case LINKLAYER_PROTOCOL_TYPE_IPV6:
+        return "ipv6";
+    default:
+        return "";
+    }
+}
+
+//Private
+
+QString DissectResultLinkLayer::GetAddressOriginalStr(quint8 *address){
     QString originalAddress = "";
-    for(qint32 index = 0; index < LINKLAYER_SRC_ADDR; index++){
-        originalAddress =  originalAddress.append("%1").arg(this->header->src[index],2,16,QLatin1Char('0'));
-        if(index != LINKLAYER_SRC_ADDR - 1)
+    for(qint32 index = 0; index < LINKLAYER_FIELD_LENGTH_SRC_ADDR; index++){
+        originalAddress =  originalAddress.append("%1").arg(address[index],2,16,QLatin1Char('0'));
+        if(index != LINKLAYER_FIELD_LENGTH_SRC_ADDR - 1)
             originalAddress.append(":");
     }
     return originalAddress;
 }
 
-QString DissectResultLinkLayer::GetSourceAddressStr(){
-    QString originalAddress = this->GetSourceAddressOriginalStr();
-    if(ethernet_address_modify_hash.contains(originalAddress)){
+QString DissectResultLinkLayer::GetAddressStr(quint8 *address){
+    /*
+     * XX:XX:XX:XX:XX:XX
+     * XX:XX:XX
+     * XX:XX:XX:X
+     * XX:XX:XX:XX:X
+     */
+    QString originalAddress = this->GetAddressOriginalStr(address);
+    if(ethernet_address_modify_hash.contains(originalAddress)){   //all
         return ethernet_address_modify_hash.value(originalAddress);
+    }else if(ethernet_address_modify_hash.contains(originalAddress.left(13))){  //left 36 bit
+        return originalAddress.replace(0,13,ethernet_address_modify_hash.value(originalAddress.left(13))+"_");
+    }else if(ethernet_address_modify_hash.contains(originalAddress.left(10))){  //left 28 bit
+        return originalAddress.replace(0,10,ethernet_address_modify_hash.value(originalAddress.left(10))+"_");
     }else if(ethernet_address_modify_hash.contains(originalAddress.left(8))){
-        return originalAddress.replace(0,8,ethernet_address_modify_hash.value(originalAddress.left(8)));
+        return originalAddress.replace(8,1,'_')
+                .replace(0,8,ethernet_address_modify_hash.value(originalAddress.left(8)));
     }else{
         if(file_ethernet_address.exists() && file_ethernet_address.open(QIODevice::ReadOnly | QIODevice::Text)){
             QTextStream stream(&file_ethernet_address);
             stream.setAutoDetectUnicode(true);
             while(!stream.atEnd()){
-                QString aline = stream.readLine();
-                QStringList stringList = aline.split(' ',QString::SkipEmptyParts);
-                if(originalAddress == stringList.first()){
-                    ethernet_address_modify_hash.insert(stringList.first(),stringList.last());
-                    goto recursion;
+                QStringList stringList = stream.readLine().split(' ');
+                if(originalAddress == stringList.first().toLower() && stringList.length() > 1){
+                    ethernet_address_modify_hash.insert(stringList.first().toLower(),stringList.at(1));
+                    file_ethernet_address.close();
+                    return stringList.at(1);
                 }
             }
             file_ethernet_address.close();
         }
 
-        if(file_well_know_ethernet_address.exists() && file_well_know_ethernet_address.open(QIODevice::ReadOnly)){
-
+        if(file_ethernet_well_know_address.exists() && file_ethernet_well_know_address.open(QIODevice::ReadOnly | QIODevice::Text)){
+            bool havefind = false;
+            QTextStream stream(&file_ethernet_well_know_address);
+            stream.setAutoDetectUnicode(true);
+            while(!stream.atEnd()){
+                QStringList stringList = stream.readLine().split(' ');
+                if(stringList.length() > 1){
+                    if(stringList.first().length() == 8){
+                        if(stringList.first().toLower() == originalAddress.left(8)){
+                            ethernet_address_modify_hash.insert(stringList.first().toLower(),stringList.at(1));
+                            havefind = true;
+                        }
+                    }else if(stringList.first().length() == 20){
+                        if(stringList.first().toLower() == originalAddress.left(13)){
+                            ethernet_address_modify_hash.insert(stringList.first().toLower().left(13),stringList.at(1));
+                            havefind = true;
+                        }else if(stringList.first().toLower() == originalAddress.left(10)){
+                            ethernet_address_modify_hash.insert(stringList.first().toLower().left(10),stringList.at(1));
+                            havefind = true;
+                        }else{
+                            continue;
+                        }
+                    }else{
+                        continue;
+                    }
+                }
+            }
+            if(!havefind)
+                ethernet_address_modify_hash.insert(originalAddress,originalAddress);
+            file_ethernet_well_know_address.close();
         }
-
-        if(file_ethernet_manufacturers.exists() && file_ethernet_manufacturers.open(QIODevice::ReadOnly)){
-
-        }
-
-        return originalAddress;
-
-        recursion:
-        return this->GetSourceAddressStr();
+        return this->GetAddressStr(address);
     }
+}
+
+bool DissectResultLinkLayer::IsGroupAddress(const quint8 *address){
+    if((address[0] & 0x01) == 0x01)
+        return true;
+    else
+        return false;
+}
+
+bool DissectResultLinkLayer::IsLocalAdministeredAddress(const quint8 *address){
+    if((address[0] & 0x02) == 0x02)
+        return true;
+    else
+        return false;
 }

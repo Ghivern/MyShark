@@ -34,7 +34,6 @@ void DissectResultFrame::SetSummery(QString summery){
 }
 
 void DissectResultFrame::UpdateProtocolHeaderLengthCount(qint32 headerLength){
-    //this->protocolHeaderLengthCount += headerLength;
     this->dissectResultBase->UpdateProtocolHeaderLengthCount(headerLength);
 }
 
@@ -50,8 +49,7 @@ const quint8* DissectResultFrame::GetData(){
     return this->dissectResultBase->GetData();
 }
 
-qint64 DissectResultFrame::GetIndex(){
-    //return this->index;
+quint64 DissectResultFrame::GetIndex(){
     return this->dissectResultBase->GetIndex();
 }
 
@@ -85,8 +83,8 @@ void* DissectResultFrame::GetProtocolFamilyBaseLayer(){
     return this->protocol_family_base_layer;
 }
 
-DissectResultFrame* DissectResultFrame::GetTcpIpProtocolFamilyBaseLayer(){
-    return (DissectResultFrame*)this->protocol_family_base_layer;
+tcp_ip_protocol_family::DissectResultLinkLayer* DissectResultFrame::GetTcpIpProtocolFamilyBaseLayer(){
+    return (tcp_ip_protocol_family::DissectResultLinkLayer*)this->protocol_family_base_layer;
 }
 
 QString DissectResultFrame::GetSummery(){

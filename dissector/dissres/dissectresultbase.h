@@ -20,7 +20,7 @@ public:
     void SetSummery(QString summery);
 
     const quint8* GetData();
-    qint64 GetIndex();
+    quint64 GetIndex();
     qint32 GetProtocolHeaderLengthCount();
     qint32 GetProtocolListLength();
     QString GetProtocolNameByIndex(qint32 index);

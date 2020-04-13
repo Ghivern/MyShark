@@ -8,6 +8,8 @@
 
 #include "../../dissector/dissres/dissreseth.h"
 
+#include "../dissector/dissres/dissectresutltframe.h"
+
 class Capturer:public QThread
 {
     Q_OBJECT
@@ -17,6 +19,8 @@ public:
     qint32 GetIntLinkType();
     QList<DissRes*>* GetDissResList();
 
+    QList<DissectResultFrame*> testList;
+
 protected:
     void run() Q_DECL_OVERRIDE;
 
@@ -25,6 +29,8 @@ private:
     DissResList_t *dissResList;
     QMutex *mutex;
     bool stop;
+
+
 
 signals:
     void onePacketCaptured(qint64 index);

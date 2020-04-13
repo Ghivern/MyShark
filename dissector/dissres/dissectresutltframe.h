@@ -26,7 +26,7 @@ public:
 
 
     const quint8* GetData();
-    qint64 GetIndex();
+    quint64 GetIndex();
     quint64 GetCaptureTimeSec();
     quint64 GetCaptureTimeUSec();
     double GetRelativeTimeSinceFirstPacket();
@@ -36,7 +36,7 @@ public:
 
     void* GetProtocolFamilyBaseLayer();
     /*定制化方法，获得特定类型的指针*/
-    DissectResultFrame* GetTcpIpProtocolFamilyBaseLayer();
+    tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();
 
     QString GetSummery();
     qint32 GetProtocolListLength();

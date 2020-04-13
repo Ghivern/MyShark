@@ -1,5 +1,6 @@
 #include "capturer.h"
 
+
 Capturer::Capturer(QString devName)
 {
     this->capHandle = new CapHandle(devName);
@@ -37,6 +38,7 @@ void Capturer::run(){
             case 1:
             {
                 dissRes = new DissResEth(index);
+                this->testList.append(new DissectResultFrame(raw,pkthdr,index,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY));
                 break;
             }
             default:
