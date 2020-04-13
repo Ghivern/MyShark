@@ -4,14 +4,12 @@ bool DissectResultFrame::isFirstPacket = true;
 timeval DissectResultFrame::firstPacketCaptureTime;
 
 DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index, PROTOCOL_FAMILY_TYPE protocol_family_type){
-    //this->packet.data = (quint8*)malloc(pkthdr->caplen);
     quint8 *dst_data = (quint8*)malloc(pkthdr->caplen);
     memcpy(dst_data,data,pkthdr->caplen);
-    this->dissectResultBase->SetData(dst_data);
     this->pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
     memcpy(this->pkthdr,pkthdr,sizeof(pcap_pkthdr));
 
-    this->dissectResultBase = new DissectResultBase(this->packet.data,index);
+    this->dissectResultBase = new DissectResultBase(dst_data,index);
 
     this->protocol_family_type = protocol_family_type;
     switch (protocol_family_type)

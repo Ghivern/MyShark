@@ -7,9 +7,11 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
     this->dissectResultBase = dissectResultBase;
     dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ipv4");
-    dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength());
-    dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength());
-    this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type);
+    if(this->header != NULL){
+        dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength());
+        dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength());
+        this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type);
+    }
 }
 
 void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type){

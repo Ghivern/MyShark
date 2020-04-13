@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QFile>
+#include <QTextStream>
 #include <arpa/inet.h>
 #include "../dissectresultbase.h"
 #include "dissectresultipv4.h"

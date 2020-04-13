@@ -17,7 +17,6 @@ public:
     void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength);
     void UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength);
 
-    void SetData(quint8 *data);
     void SetSummery(QString summery);
 
     const quint8* GetData();
@@ -34,13 +33,17 @@ private:
         qint32 end;
     }position_t;
 
-    quint8 *data;
+    const quint8 *data;
     qint64 index;
     qint32 protocolHeaderLengthCount;
     QList<QString> protocolList;
     QHash<QString,position_t> protocolPositionHash;
 
     QString summery;
+
+    /*保留字段，用于底层解析结果向高层解析结果传送数据*/
+    QHash<QString,quint64> reserveHash;
+    void *reserve;
 };
 
 #endif // DISSECTRESULTBASE_H
