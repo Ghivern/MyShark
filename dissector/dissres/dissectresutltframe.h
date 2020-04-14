@@ -32,8 +32,8 @@ public:
 
     const quint8* GetData();
     quint64 GetIndex();
-    quint64 GetCaptureTimeSec();
-    quint64 GetCaptureTimeUSec();
+    qint64 GetCaptureTimeSec();
+    qint64 GetCaptureTimeUSec();
     double GetRelativeTimeSinceFirstPacket();
     qint32 GetCapLen();
     qint32 GetLen();
@@ -49,12 +49,12 @@ public:
     QString GetProtocolNameByIndex(qint32 index);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
 private:
-
     static bool isFirstPacket;
     static timeval firstPacketCaptureTime;
 
     pcap_pkthdr *pkthdr;
 
+    /*构造函数中用于判断应该新建何种协议族的DissectResultLinkLayer*/
     PROTOCOL_FAMILY_TYPE protocol_family_type;
 
     void *protocol_family_base_layer;

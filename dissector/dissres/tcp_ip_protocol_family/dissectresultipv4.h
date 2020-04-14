@@ -2,9 +2,11 @@
 #define DISSECTRESULTIPV4_H
 
 #include "arpa/inet.h"
+#include "time.h"
 
 #include "../converter.h"
 
+#include "../dissectresultcommonstream.h"
 #include "../dissectresultbase.h"
 #include "dissectresulttcp.h"
 #include "dissectresultudp.h"
@@ -31,7 +33,7 @@
 namespace tcp_ip_protocol_family {
 
 
-class DissectResultIpv4
+class DissectResultIpv4:public DissectResultCommonStream
 {
 public:
     enum NETWORKLAYER_IPV4_FIELD_LENGTH{
@@ -58,10 +60,8 @@ public:
     void AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
 
     void* GetNextLayer();
-//    DissectResultTcp* GetNextLayerTcp();
-//    DissectResultUdp* GetNextLayerUdp();
 
-    /*获得协议首部位置或值的方法*/
+
     /*0                   1          |        2                   3
      *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -75,6 +75,7 @@ public:
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      */
 
+    /*获得协议首部位置或值的方法*/
     const quint8* GetVersionHeaderLengthPtr();
     quint8 GetVersion();
     quint8 GetHeaderLength();
@@ -121,6 +122,8 @@ private:
         quint8 srcaddr[NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR];
         quint8 dstaddr[NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR];
     };
+
+    static Stream stream;
 
     struct header_t *header;
     DissectResultBase *dissectResultBase;

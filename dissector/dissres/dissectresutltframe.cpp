@@ -6,10 +6,12 @@ timeval DissectResultFrame::firstPacketCaptureTime;
 DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index, PROTOCOL_FAMILY_TYPE protocol_family_type){
     quint8 *dst_data = (quint8*)malloc(pkthdr->caplen);
     memcpy(dst_data,data,pkthdr->caplen);
-    this->pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
-    memcpy(this->pkthdr,pkthdr,sizeof(pcap_pkthdr));
+    pcap_pkthdr *dst_pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
+    memcpy(dst_pkthdr,pkthdr,sizeof(pcap_pkthdr));
+    this->pkthdr = dst_pkthdr;
 
-    this->dissectResultBase = new DissectResultBase(dst_data,index);
+
+    this->dissectResultBase = new DissectResultBase(dst_data,dst_pkthdr,index);
 
     this->protocol_family_type = protocol_family_type;
     switch (protocol_family_type)
@@ -19,7 +21,6 @@ DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pk
         break;
     default:
         this->protocol_family_base_layer = NULL;
-        break;
     }
 
     if(isFirstPacket){
@@ -53,11 +54,11 @@ quint64 DissectResultFrame::GetIndex(){
     return this->dissectResultBase->GetIndex();
 }
 
-quint64 DissectResultFrame::GetCaptureTimeSec(){
+qint64 DissectResultFrame::GetCaptureTimeSec(){
     return this->pkthdr->ts.tv_sec;
 }
 
-quint64 DissectResultFrame::GetCaptureTimeUSec(){
+qint64 DissectResultFrame::GetCaptureTimeUSec(){
     return this->pkthdr->ts.tv_usec;
 }
 

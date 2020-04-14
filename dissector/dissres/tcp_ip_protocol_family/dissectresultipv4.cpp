@@ -2,6 +2,8 @@
 
 using namespace tcp_ip_protocol_family;
 
+Stream DissectResultIpv4::stream;
+
 DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
     this->protocol_family_transport_layer = NULL;
     this->dissectResultBase = dissectResultBase;
@@ -10,8 +12,13 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
     if(this->header != NULL){
         dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength());
         dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength());
+        this->streamIndexPlusOne = DissectResultIpv4::stream.Add(dissectResultBase,header->srcaddr,header->dstaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
         this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type);
     }
+
+    if(dissectResultBase->GetPkthdr()->caplen - dissectResultBase->GetAdditionalVal("linklayer_have_fcs") - this->GetTotalLength() < 4)
+        *((bool*)dissectResultBase->GetAdditionalPtr("linklayer_have_fcs")) = false;
+    dissectResultBase->RemoveAdditional("linklayer_have_fcs");
 }
 
 void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
@@ -86,11 +93,11 @@ QString DissectResultIpv4::GetDifferentiatedServiceStr(){
 
 /*Total Length*/
 const quint8* DissectResultIpv4::GetTotalLengthPrt(){
-    return this->header->ttl;
+    return this->header->totalLen;
 }
 
 quint16 DissectResultIpv4::GetTotalLength(){
-    return ntohs(*this->header->ttl);
+    return ntohs(*(quint16*)this->header->totalLen);
 }
 
 /*Identification*/
@@ -99,7 +106,7 @@ const quint8* DissectResultIpv4::GetIdentificationPtr(){
 }
 
 quint16 DissectResultIpv4::GetIdentification(){
-    return ntohs(*this->header->ident);
+    return ntohs(*(quint16*)this->header->ident);
 }
 
 QString DissectResultIpv4::GetIdentificationStr(){

@@ -8,6 +8,7 @@
 
 #include "../converter.h"
 
+#include "../dissectresultcommonstream.h"
 #include "../dissectresultbase.h"
 #include "dissectresultipv4.h"
 #include "dissectresultipv6.h"
@@ -20,7 +21,7 @@
  *   Destination Address         |                               >
  *                               >      Source Address           |
  *    Type                       |      Data(46 ~ 1500)          .
- *                               >      FCS                      |
+ *                               >      FCS                      >
  * ---------------------------------------------------------------
  *
  * Mac Address
@@ -37,7 +38,7 @@
 
 namespace tcp_ip_protocol_family {
 
-class DissectResultLinkLayer
+class DissectResultLinkLayer:public DissectResultCommonStream
 {
 public:
     enum LINKLAYER_FIELD_LENGTH{
@@ -59,18 +60,6 @@ public:
     void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type);
 
     void* GetNextLayer();
-//    DissectResultIpv4* GetNextLayerIpv4();
-//    DissectResultIpv6* GetNextLayerIpv6();
-//    DissectResultArp* GetNextLayerArp();
-
-    /*
-     *直达特定协议解析结果的方法
-     */
-//    DissectResultArp* GetArpDissectResult();
-//    DissectResultIpv4* GetIpv4DissectResult();
-//    DissectResultIpv6* GetIpv6DissectResult();
-//    DissectResultUdp* GetUdpDissectResult();
-//    DissectResultTcp* GetTcpDissectResult();
 
     /*
      * 获取协议首部字段位置或值的方法
@@ -93,6 +82,14 @@ public:
     const quint8* GetTypePtr();
     QString GetTypeStr();
     QString GetTypeName();
+
+    /*处理FCS*/
+    bool HaveFCS();
+    const quint8* GetFCSPtr();
+    QString GetFCSStr();
+    /*结果是主机字节序*/
+    quint32 GetCalculatedFCS();
+    QString GetCalculatedFCSStr();
 
 private:
     QString GetAddressOriginalStr(quint8 *address);
@@ -121,6 +118,10 @@ private:
 
     static QHash<QString,QString> ethernet_address_modify_hash;
 
+    /*Mac流记录器*/
+    static Stream stream;
+
+    bool haveFCS;
 
     /*解析结果的基本元素*/
     struct header_t *header;

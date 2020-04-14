@@ -1,8 +1,9 @@
 #include "dissectresultbase.h"
 
-DissectResultBase::DissectResultBase(const quint8 *data, qint64 index){
+DissectResultBase::DissectResultBase(const quint8 *data,const pcap_pkthdr *pkther, qint64 index){
     this->data = data;
     this->index = index;
+    this->pkthdr = pkther;
 }
 
 void DissectResultBase::UpdateProtocolHeaderLengthCount(qint32 headerLength){
@@ -49,6 +50,10 @@ const quint8* DissectResultBase::GetData(){
     return this->data;
 }
 
+const pcap_pkthdr* DissectResultBase::GetPkthdr(){
+    return this->pkthdr;
+}
+
 quint64 DissectResultBase::GetIndex(){
     return this->index;
 }
@@ -77,4 +82,60 @@ const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protoco
 
 QString DissectResultBase::GetSummery(){
     return this->summery;
+}
+
+/*保留字段的操作*/
+void DissectResultBase::ClearReserve(){
+    this->reserve_ptr.clear();
+    this->reserve_val.clear();
+}
+
+void DissectResultBase::ClearReserveVal(){
+    this->reserve_val.clear();
+}
+
+void DissectResultBase::ClearReservePtr(){
+    this->reserve_ptr.clear();
+}
+
+void DissectResultBase::AddAdditional(QString name, qint64 val){
+    this->reserve_val.insert(name,val);
+}
+
+void DissectResultBase::AddAdditional(QString name, void *ptr, qint32 dataLen){
+    struct reserve res;
+    res.ptr = (void*)ptr;
+    res.len = dataLen;
+    this->reserve_ptr.insert(name,res);
+}
+
+void DissectResultBase::AddAdditional(QString name, qint64 val, void *ptr, qint32 dataLen){
+    struct reserve res;
+    res.ptr = ptr;
+    res.len = dataLen;
+    this->reserve_ptr.insert(name,res);
+    this->reserve_val.insert(name,val);
+}
+
+void DissectResultBase::RemoveAdditional(QString name){
+    this->reserve_ptr.remove(name);
+    this->reserve_val.remove(name);
+}
+
+void DissectResultBase::RemoveAdditionalVal(QString name){
+    this->reserve_val.remove(name);
+}
+
+void DissectResultBase::RemoveAdditionalPtr(QString name){
+    this->reserve_ptr.remove(name);
+}
+
+qint64 DissectResultBase::GetAdditionalVal(QString name){
+    return this->reserve_val.value(name);
+}
+
+void* DissectResultBase::GetAdditionalPtr(QString name, qint32 *len){
+    if(len!=NULL)
+        *len = this->reserve_ptr.value(name).len;
+    return this->reserve_ptr.value(name).ptr;
 }

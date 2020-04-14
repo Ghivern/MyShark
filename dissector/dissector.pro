@@ -27,6 +27,7 @@ SOURCES += \
     dissectors/dissectoreth/dissectorudp.cpp \
     dissres/converter.cpp \
     dissres/dissectresultbase.cpp \
+    dissres/dissectresultcommonstream.cpp \
     dissres/dissectresutltframe.cpp \
     dissres/dissres.cpp \
     dissres/dissreseth.cpp \
@@ -41,6 +42,7 @@ SOURCES += \
     loader.cpp \
     protree/protree.cpp \
     protree/protreenode.cpp \
+    stream/stream.cpp \
     stream/streamindex.cpp \
     stream/streamitem.cpp \
     stream/streamrecorder.cpp \
@@ -61,6 +63,7 @@ HEADERS += \
     dissectors/dissectoreth/eth_header.h \
     dissres/converter.h \
     dissres/dissectresultbase.h \
+    dissres/dissectresultcommonstream.h \
     dissres/dissectresutltframe.h \
     dissres/dissres.h \
     dissres/dissreseth.h \
@@ -76,6 +79,7 @@ HEADERS += \
     protree/protree.h \
     protree/protreenode.h \
     \ \
+    stream/stream.h \
     stream/streamindex.h \
     stream/streamitem.h \
     stream/streamrecorder.h \
