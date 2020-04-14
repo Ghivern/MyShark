@@ -53,7 +53,7 @@ void Capturer::run(){
             this->dissResList->append(dissRes);
             this->mutex->unlock();
             emit onePacketCaptured(index);
-            qDebug() << "Capturer : capture one packet successfully";
+            //qDebug() << "Capturer : capture one packet successfully";
             index++;
         }else if(res == 0){
             qDebug() << "Capturer : timeout";

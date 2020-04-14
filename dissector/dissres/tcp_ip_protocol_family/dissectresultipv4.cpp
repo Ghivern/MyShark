@@ -5,7 +5,7 @@ using namespace tcp_ip_protocol_family;
 DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
     this->protocol_family_transport_layer = NULL;
     this->dissectResultBase = dissectResultBase;
-    dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_TEMP_TOTAL_LEN);
+    dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_FIELD_LENGTH_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ipv4");
     if(this->header != NULL){
         dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength());
@@ -16,10 +16,10 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
 
 void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
     switch (type) {
-        case NETWORKLAYER_IPV4_TCP:
+        case NETWORKLAYER_IPV4_TYPE_TCP:
         this->protocol_family_transport_layer = (void*)(new DissectResultTcp(dissectResultBase));
         break;
-    case NETWORKLAYER_IPV4_UDP:
+    case NETWORKLAYER_IPV4_TYPE_UDP:
         this->protocol_family_transport_layer = (void*)(new DissectResultUdp(dissectResultBase));
         break;
     }
@@ -29,13 +29,13 @@ void* DissectResultIpv4::GetNextLayer(){
     return this->protocol_family_transport_layer;
 }
 
-DissectResultTcp* DissectResultIpv4::GetNextLayerTcp(){
-    return (DissectResultTcp*)this->protocol_family_transport_layer;
-}
+//DissectResultTcp* DissectResultIpv4::GetNextLayerTcp(){
+//    return (DissectResultTcp*)this->protocol_family_transport_layer;
+//}
 
-DissectResultUdp* DissectResultIpv4::GetNextLayerUdp(){
-    return (DissectResultUdp*)this->protocol_family_transport_layer;
-}
+//DissectResultUdp* DissectResultIpv4::GetNextLayerUdp(){
+//    return (DissectResultUdp*)this->protocol_family_transport_layer;
+//}
 
 
 
@@ -61,6 +61,113 @@ DissectResultUdp* DissectResultIpv4::GetNextLayerUdp(){
  * ttl : time to live
  * 考虑到Ipv4的首部拓展很少使用，所以暂时不做处理
  */
+/*Version-HeaderLength*/
+const quint8* DissectResultIpv4::GetVersionHeaderLengthPtr(){
+    return this->header->version_hdrLen;
+}
+
+quint8 DissectResultIpv4::GetVersion(){
+    return (*this->header->version_hdrLen & 0xf0) >> 4;
+}
+
 quint8 DissectResultIpv4::GetHeaderLength(){
-    return this->header->version_hdrLen & 0x0f;
+    return *this->header->version_hdrLen & 0x0f;
+}
+
+/*Differentiated Service*/
+const quint8* DissectResultIpv4::GetDifferentiatedServicePrt(){
+    return this->header->DS;
+}
+
+QString DissectResultIpv4::GetDifferentiatedServiceStr(){
+    return Converter::ConvertQuint8ArrayToHexStr(this->header->DS,NETWORKLAYER_IPV4_FIELD_LENGTH_DS);
+}
+
+
+/*Total Length*/
+const quint8* DissectResultIpv4::GetTotalLengthPrt(){
+    return this->header->ttl;
+}
+
+quint16 DissectResultIpv4::GetTotalLength(){
+    return ntohs(*this->header->ttl);
+}
+
+/*Identification*/
+const quint8* DissectResultIpv4::GetIdentificationPtr(){
+    return this->header->ident;
+}
+
+quint16 DissectResultIpv4::GetIdentification(){
+    return ntohs(*this->header->ident);
+}
+
+QString DissectResultIpv4::GetIdentificationStr(){
+    return Converter::ConvertQuint8ArrayToHexStr(this->header->ident,NETWORKLAYER_IPV4_FIELD_LENGTH_IDENT);
+}
+
+/*Flag-Offset*/
+const quint8* DissectResultIpv4::GetFlagOffsetPtr(){
+    return this->header->flag_offset;
+}
+
+QString DissectResultIpv4::GetFlagOffsetStr(){
+    Converter converter(this->header->flag_offset,NETWORKLAYER_IPV4_FIELD_LENGTH_FLAG_OFFSET);
+    return converter.ConvertQuint8ArrayToHexStr();
+}
+
+/*Time To Live*/
+const quint8* DissectResultIpv4::GetTimeToLivePtr(){
+    return this->header->ttl;
+}
+
+quint8 DissectResultIpv4::GetTimeToLive(){
+    return *this->header->ttl;
+}
+
+/*Type*/
+const quint8* DissectResultIpv4::GetTypePtr(){
+    return this->header->type;
+}
+
+quint8 DissectResultIpv4::GetType(){
+    return *this->header->type;
+}
+
+QString DissectResultIpv4::GetTypeName(){
+    switch (*this->header->type) {
+    case NETWORKLAYER_IPV4_TYPE_TCP:
+        return "tcp";
+    case NETWORKLAYER_IPV4_TYPE_UDP:
+        return "udp";
+    default:
+        return "networklayer_ipv4_undeal_type";
+    }
+}
+
+/*Checksum*/
+const quint8* DissectResultIpv4::GetChecksumPtr(){
+    return this->header->headerchecksum;
+}
+
+QString DissectResultIpv4::GetChecksumStr(){
+    return Converter::ConvertQuint8ArrayToHexStr(this->header->headerchecksum,NETWORKLAYER_IPV4_FIELD_LENGTH_HEADERCHECKSUM);
+}
+
+/*Source Address*/
+const quint8* DissectResultIpv4::GetSourceAddressPtr(){
+    return this->header->srcaddr;
+}
+
+QString DissectResultIpv4::GetSourceAddressStr(){
+    return Converter::ConvertQuint8ArrayToDecStr(this->header->srcaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR,".","");
+}
+
+/*Destination Address*/
+const quint8* DissectResultIpv4::GetDestinationAddressPtr(){
+    return this->header->dstaddr;
+}
+
+QString DissectResultIpv4::GetDestinationAddressStr(){
+    return Converter::ConvertQuint8ArrayToDecStr(this->header->dstaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR,".","");
 }

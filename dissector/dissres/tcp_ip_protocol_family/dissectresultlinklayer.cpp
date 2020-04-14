@@ -23,13 +23,13 @@ DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultB
 
 void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type){
     switch(type){
-    case LINKLAYER_PROTOCOL_TYPE_IPV4:
+    case LINKLAYER_TYPE_IPV4:
         this->protocol_family_network_layer = (void*)(new DissectResultIpv4(dissectResultBase));
         break;
-    case LINKLAYER_PROTOCOL_TYPE_IPV6:
+    case LINKLAYER_TYPE_IPV6:
         this->protocol_family_network_layer = (void*)(new DissectResultIpv6(dissectResultBase));
         break;
-    case LINKLAYER_PROTOCOL_TYPE_ARP:
+    case LINKLAYER_TYPE_ARP:
         this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase));
         break;
     default:
@@ -41,17 +41,17 @@ void* DissectResultLinkLayer::GetNextLayer(){
     return this->protocol_family_network_layer;
 }
 
-DissectResultIpv4* DissectResultLinkLayer::GetNextLayerIpv4(){
-    return (DissectResultIpv4*)this->GetNextLayer();
-}
+//DissectResultIpv4* DissectResultLinkLayer::GetNextLayerIpv4(){
+//    return (DissectResultIpv4*)this->GetNextLayer();
+//}
 
-DissectResultIpv6* DissectResultLinkLayer::GetNextLayerIpv6(){
-    return (DissectResultIpv6*)this->GetNextLayer();
-}
+//DissectResultIpv6* DissectResultLinkLayer::GetNextLayerIpv6(){
+//    return (DissectResultIpv6*)this->GetNextLayer();
+//}
 
-DissectResultArp* DissectResultLinkLayer::GetNextLayerArp(){
-    return (DissectResultArp*)this->GetNextLayer();
-}
+//DissectResultArp* DissectResultLinkLayer::GetNextLayerArp(){
+//    return (DissectResultArp*)this->GetNextLayer();
+//}
 
 
 
@@ -104,32 +104,27 @@ const quint8* DissectResultLinkLayer::GetTypePtr(){
 }
 
 QString DissectResultLinkLayer::GetTypeStr(){
-    return QString("0x%1%2").arg(this->header->type[0],2,16,QLatin1Char('0')).arg(this->header->type[1],2,16,QLatin1Char('0'));
+    return Converter::ConvertQuint8ArrayToHexStr(this->header->type,LINKLAYER_FIELD_LENGTH_TYPE);
+//    return QString("0x%1%2").arg(this->header->type[0],2,16,QLatin1Char('0')).arg(this->header->type[1],2,16,QLatin1Char('0'));
 }
 
 QString DissectResultLinkLayer::GetTypeName(){
     switch (*(quint16*)this->header->type) {
-    case LINKLAYER_PROTOCOL_TYPE_ARP:
+    case LINKLAYER_TYPE_ARP:
         return "arp";
-    case LINKLAYER_PROTOCOL_TYPE_IPV4:
+    case LINKLAYER_TYPE_IPV4:
         return "ipv4";
-    case LINKLAYER_PROTOCOL_TYPE_IPV6:
+    case LINKLAYER_TYPE_IPV6:
         return "ipv6";
     default:
-        return "";
+        return "linklayer_nudeal_type";
     }
 }
 
 //Private
 
 QString DissectResultLinkLayer::GetAddressOriginalStr(quint8 *address){
-    QString originalAddress = "";
-    for(qint32 index = 0; index < LINKLAYER_FIELD_LENGTH_SRC_ADDR; index++){
-        originalAddress =  originalAddress.append("%1").arg(address[index],2,16,QLatin1Char('0'));
-        if(index != LINKLAYER_FIELD_LENGTH_SRC_ADDR - 1)
-            originalAddress.append(":");
-    }
-    return originalAddress;
+    return Converter::ConvertQuint8ArrayToHexStr(address,LINKLAYER_FIELD_LENGTH_SRC_ADDR,":","");
 }
 
 QString DissectResultLinkLayer::GetAddressStr(quint8 *address){

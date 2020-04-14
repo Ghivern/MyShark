@@ -8,6 +8,11 @@
 
 #include "./dissectresultbase.h"
 #include "./tcp_ip_protocol_family/dissectresultlinklayer.h"
+#include "./tcp_ip_protocol_family/dissectresultarp.h"
+#include "./tcp_ip_protocol_family/dissectresultipv4.h"
+#include "./tcp_ip_protocol_family/dissectresultipv6.h"
+#include "./tcp_ip_protocol_family/dissectresultudp.h"
+#include "./tcp_ip_protocol_family/dissectresulttcp.h"
 
 class DissectResultFrame
 {
@@ -37,6 +42,7 @@ public:
     void* GetProtocolFamilyBaseLayer();
     /*定制化方法，获得特定类型的指针*/
     tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();
+
 
     QString GetSummery();
     qint32 GetProtocolListLength();

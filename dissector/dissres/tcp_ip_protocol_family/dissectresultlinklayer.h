@@ -5,6 +5,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <arpa/inet.h>
+
+#include "../converter.h"
+
 #include "../dissectresultbase.h"
 #include "dissectresultipv4.h"
 #include "dissectresultipv6.h"
@@ -47,27 +50,27 @@ public:
     };
 
     enum LINKLAYER_PROTOCOL_TYPE{
-      LINKLAYER_PROTOCOL_TYPE_IPV4 = 0x0008,   // 0x0800的网络字节序
-      LINKLAYER_PROTOCOL_TYPE_IPV6 = 0xdd86,
-      LINKLAYER_PROTOCOL_TYPE_ARP = 0x0608
+      LINKLAYER_TYPE_IPV4 = 0x0008,   // 0x0800的网络字节序
+      LINKLAYER_TYPE_IPV6 = 0xdd86,
+      LINKLAYER_TYPE_ARP = 0x0608
     };
 
     DissectResultLinkLayer(DissectResultBase *dissectResultBase);
     void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type);
 
     void* GetNextLayer();
-    DissectResultIpv4* GetNextLayerIpv4();
-    DissectResultIpv6* GetNextLayerIpv6();
-    DissectResultArp* GetNextLayerArp();
+//    DissectResultIpv4* GetNextLayerIpv4();
+//    DissectResultIpv6* GetNextLayerIpv6();
+//    DissectResultArp* GetNextLayerArp();
 
     /*
      *直达特定协议解析结果的方法
      */
-    DissectResultArp* GetArpDissectResult();
-    DissectResultIpv4* GetIpv4DissectResult();
-    DissectResultIpv6* GetIpv6DissectResult();
-    DissectResultUdp* GetUdpDissectResult();
-    DissectResultTcp* GetTcpDissectResult();
+//    DissectResultArp* GetArpDissectResult();
+//    DissectResultIpv4* GetIpv4DissectResult();
+//    DissectResultIpv6* GetIpv6DissectResult();
+//    DissectResultUdp* GetUdpDissectResult();
+//    DissectResultTcp* GetTcpDissectResult();
 
     /*
      * 获取协议首部字段位置或值的方法

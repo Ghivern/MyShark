@@ -22,6 +22,8 @@
  *
  *                                       .
  */
+namespace tcp_ip_protocol_family {
+
 
 class DissectResultIpv6
 {
@@ -29,4 +31,5 @@ public:
     DissectResultIpv6(DissectResultBase *dissectResultBase);
 };
 
+}
 #endif // DISSECTRESULTIPV6_H

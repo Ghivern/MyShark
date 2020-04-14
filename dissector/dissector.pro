@@ -25,6 +25,7 @@ SOURCES += \
     dissectors/dissectoreth/dissectorip.cpp \
     dissectors/dissectoreth/dissectortcp.cpp \
     dissectors/dissectoreth/dissectorudp.cpp \
+    dissres/converter.cpp \
     dissres/dissectresultbase.cpp \
     dissres/dissectresutltframe.cpp \
     dissres/dissres.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     dissectors/dissectoreth/dissectortcp.h \
     dissectors/dissectoreth/dissectorudp.h \
     dissectors/dissectoreth/eth_header.h \
+    dissres/converter.h \
     dissres/dissectresultbase.h \
     dissres/dissectresutltframe.h \
     dissres/dissres.h \

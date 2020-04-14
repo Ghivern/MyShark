@@ -50,10 +50,13 @@
  * ---------------------------------------------------------------
  */
 
+namespace tcp_ip_protocol_family {
+
 class DissectResultTcp
 {
 public:
     DissectResultTcp(DissectResultBase *dissectResultBase);
 };
 
+}
 #endif // DISSECTRESULTTCP_H

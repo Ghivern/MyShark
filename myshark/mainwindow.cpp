@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "../dissector/dissres/dissectresutltframe.h"
+#include "../dissector/dissres/tcp_ip_protocol_family/dissectresultlinklayer.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -52,25 +53,44 @@ void MainWindow::Print(qint64 index){
 //             << ""  << res->GetSrcPort()
 //             << ""  << res->GetDstPort()
 //             << ""  << res->GetMsg();
-    qDebug() << "来自DissectResultFrame"
-             << this->capturer->testList.at(index)->GetIndex()
-             << this->capturer->testList.at(index)->GetRelativeTimeSinceFirstPacket()
-             << this->capturer->testList.at(index)->GetCapLen();
+    DissectResultFrame *frame = this->capturer->testList.at(index);
+    qDebug() << "DissectResultFrame"
+             << "Index:" <<frame->GetIndex()
+             << "Time:" << frame->GetRelativeTimeSinceFirstPacket()
+             << "CapLen" << frame->GetCapLen();
 
-            QString srcIG = this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsGroup() ? "Group Address":"Individual Address";
-            QString srcGL = this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsLocalAdministered() ? "Global unique address":"Local administered address";
-            QString dstIG = this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsGroup() ? "Group Address":"Individual Address";
-            QString dstGL = this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsLocalAdministered() ? "Global unique address":"Local administered address";
-    qDebug() << "来自DissectResultLinkLayer"
-             << this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->GetSourceAddressStr()
-             << this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->GetDestinationAddressStr()
-             << this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr()
-             << this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->GetTypeName()
-             << (this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsGroup() ? "Group":"Individual")
-             << (this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsLocalAdministered() ? "Local":"Global")
-             << (this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsGroup() ? "Group":"Individual")
-             << (this->capturer->testList.at(index)->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsLocalAdministered() ? "Local":"Global")
+    qDebug() << "DissectResultLinkLayer"
+             << "Addr:"<< frame->GetTcpIpProtocolFamilyBaseLayer()->GetSourceAddressStr()
+             << frame->GetTcpIpProtocolFamilyBaseLayer()->GetDestinationAddressStr()
+             << "Type:" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr()
+             << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeName()
+             << "I/G:" << (frame->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsGroup() ? "Group":"Individual")
+             << (frame->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsGroup() ? "Group":"Individual")
+             << "G/L:" << (frame->GetTcpIpProtocolFamilyBaseLayer()->SourceAddressIsLocalAdministered() ? "Local":"Global")
+             << (frame->GetTcpIpProtocolFamilyBaseLayer()->DestinationAddressIsLocalAdministered() ? "Local":"Global")
              ;
+
+    switch (*(quint16*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypePtr()) {
+    case tcp_ip_protocol_family::DissectResultLinkLayer::LINKLAYER_TYPE_IPV4:
+    {
+        tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
+        qDebug() << "DissectResultIpv4"
+                 << "Version:"<< ipv4->GetVersion()
+                 << "Adr:" << ipv4->GetSourceAddressStr()
+                 << ipv4->GetDestinationAddressStr()
+                 << "Type:" << ipv4->GetType() << ipv4->GetTypeName()
+                 << "Ceksum:" << ipv4->GetChecksumStr();
+        break;
+    }
+    default:
+        qDebug() << "DissectResultIpv4"
+                 << "还没有处理的协议"
+                 << "协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr()
+                 << "协议名为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeName();
+
+    }
+
+    qDebug() << "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-";
 
 //    Info *info = new Info(0,1);  //devIndex , linktype
 //    ProTree *proTree = this->dissector->GetLoader()->GetDissector(capturer->GetIntLinkType())->Dissect(

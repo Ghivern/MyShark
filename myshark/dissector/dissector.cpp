@@ -19,9 +19,9 @@ DissResList_t* Dissector::GetDissResList(){
 }
 
 void Dissector::Dissect(qint64 index){
-    //通过Loader 查找相应链路层类型的解析器
-    qDebug() << this->linkType;
-    this->loader->GetDissector(this->linkType)->Dissect(this->dissResList,index);
-    qDebug() << "解析器调用完成";
+//    //通过Loader 查找相应链路层类型的解析器
+//    qDebug() << this->linkType;
+//    this->loader->GetDissector(this->linkType)->Dissect(this->dissResList,index);
+//    qDebug() << "解析器调用完成";
     emit onePacketDissected(index);
 }

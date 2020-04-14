@@ -32,11 +32,14 @@
  * Zero                                          | Next Header   |
  */
 
+namespace tcp_ip_protocol_family {
 
 class DissectResultUdp
 {
 public:
     DissectResultUdp(DissectResultBase *dissectResultBase);
 };
+
+}
 
 #endif // DISSECTRESULTUDP_H

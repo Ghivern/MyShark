@@ -8,11 +8,15 @@
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
  */
 
+namespace tcp_ip_protocol_family {
 
 class DissectResultArp
 {
 public:
     DissectResultArp(DissectResultBase *dissectResultBase);
 };
+
+}
+
 
 #endif // DISSECTRESULTARP_H
