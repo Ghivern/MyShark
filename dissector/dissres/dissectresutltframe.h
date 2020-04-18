@@ -21,7 +21,7 @@ public:
         TCP_IP_PROTOCOL_FAMILY = 1
     }PROTOCOL_FAMILY_TYPE;
 
-    DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index, PROTOCOL_FAMILY_TYPE protocol_family_type = PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY);
+    DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index,PROTOCOL_FAMILY_TYPE protocol_family_type = PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY);
     ~DissectResultFrame();
 
     void SetSummery(QString summery);
@@ -44,6 +44,7 @@ public:
     tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();
 
 
+
     QString GetSummery();
     qint32 GetProtocolListLength();
     QString GetProtocolNameByIndex(qint32 index);
@@ -51,6 +52,7 @@ public:
 private:
     static bool isFirstPacket;
     static timeval firstPacketCaptureTime;
+    static QList<DissectResultBase*> *dissectResultBaseList;
 
     pcap_pkthdr *pkthdr;
 

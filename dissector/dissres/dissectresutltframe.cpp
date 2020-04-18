@@ -2,8 +2,9 @@
 
 bool DissectResultFrame::isFirstPacket = true;
 timeval DissectResultFrame::firstPacketCaptureTime;
+QList<DissectResultBase*>* DissectResultFrame::dissectResultBaseList = new QList<DissectResultBase*>;
 
-DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index, PROTOCOL_FAMILY_TYPE protocol_family_type){
+DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index,PROTOCOL_FAMILY_TYPE protocol_family_type){
     quint8 *dst_data = (quint8*)malloc(pkthdr->caplen);
     memcpy(dst_data,data,pkthdr->caplen);
     pcap_pkthdr *dst_pkthdr = (pcap_pkthdr*)malloc(sizeof(pcap_pkthdr));
@@ -12,6 +13,8 @@ DissectResultFrame::DissectResultFrame(const quint8 *data, const pcap_pkthdr *pk
 
 
     this->dissectResultBase = new DissectResultBase(dst_data,dst_pkthdr,index);
+    DissectResultFrame::dissectResultBaseList->append(this->dissectResultBase);
+    this->dissectResultBase->AddAdditional(DISSECT_RESULT_BASE_LIST,dissectResultBaseList);
 
     this->protocol_family_type = protocol_family_type;
     switch (protocol_family_type)

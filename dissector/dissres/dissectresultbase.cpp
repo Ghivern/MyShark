@@ -80,6 +80,13 @@ const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protoco
         return NULL;
 }
 
+const quint8* DissectResultBase::GetProtocolHeaderEndPtrByName(QString protocolName){
+    if(this->protocolPositionHash.contains(protocolName))
+        return this->data + this->protocolPositionHash.value(protocolName).end;
+    else
+        return NULL;
+}
+
 QString DissectResultBase::GetSummery(){
     return this->summery;
 }
@@ -131,10 +138,14 @@ void DissectResultBase::RemoveAdditionalPtr(QString name){
 }
 
 qint64 DissectResultBase::GetAdditionalVal(QString name){
+    if(!this->reserve_val.contains(name))
+        return -1;
     return this->reserve_val.value(name);
 }
 
 void* DissectResultBase::GetAdditionalPtr(QString name, qint32 *len){
+    if(!this->reserve_ptr.contains(name))
+        return NULL;
     if(len!=NULL)
         *len = this->reserve_ptr.value(name).len;
     return this->reserve_ptr.value(name).ptr;

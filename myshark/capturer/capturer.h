@@ -20,6 +20,7 @@ public:
     QList<DissRes*>* GetDissResList();
 
     QList<DissectResultFrame*> testList;
+    QList<DissectResultBase*> packetList;
 
 protected:
     void run() Q_DECL_OVERRIDE;

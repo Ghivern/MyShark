@@ -6,6 +6,8 @@
 
 #include "pcap.h"
 
+
+
 /*
  * 主要功能就是获取各层协议首部的起始地址
  */
@@ -28,6 +30,7 @@ public:
     qint32 GetProtocolListLength();
     QString GetProtocolNameByIndex(qint32 index);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
+    const quint8* GetProtocolHeaderEndPtrByName(QString protocolName);
     QString GetSummery();
 
     /*保留字段的操作*/

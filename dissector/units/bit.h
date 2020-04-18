@@ -11,6 +11,8 @@ public:
     Bit& Set(quint64 data);
     quint8 GetBit(qint32 position);
 
+    static quint8 GetBitFromOctetPtr(quint8 *data,qint32 position);
+
 private:
     quint64 data;
 };

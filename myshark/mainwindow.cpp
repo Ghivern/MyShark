@@ -86,7 +86,36 @@ void MainWindow::Print(qint64 index){
                  << "Adr:" << ipv4->GetSourceAddressStr()
                  << ipv4->GetDestinationAddressStr()
                  << "Type:" << ipv4->GetType() << ipv4->GetTypeName()
-                 << "Ceksum:" << ipv4->GetChecksumStr();
+                 << "Ceksum:" << ipv4->GetChecksumStr()
+                 << "ECN:" << ipv4->GetDSField_ECN_meanning()
+                 << "DSCP:" << ipv4->GetDSField_DSCP_meanning()
+                 << "Flag-Offset" << ipv4->GetFlagOffsetStr()
+                 << "DF:" << ipv4->DF_meaning()
+                 << "MF:" << ipv4->MF_meaning()
+                 << "Fragment:" << ipv4->GetFragmentOffset()
+                 ;
+
+        switch (ipv4->GetType()) {
+        case tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_TYPE_TCP:
+        {
+        tcp_ip_protocol_family::DissectResultTcp *tcp = (tcp_ip_protocol_family::DissectResultTcp*)ipv4->GetNextLayer();
+        qDebug() << "Tcp->"
+                 << "srcPort:" << tcp->GetSourcePort()
+                 << "dstPort:" << tcp->GetDestinationPort()
+                 << "stream:" << tcp->GetStreamIndex()
+                 << "SYN:" << (tcp->SYN()?"yes":"no")
+                 << "seq:" << tcp->GetSeq()
+                 << "r-seq:" << tcp->GetRelativeSeq()
+                 //<< "status:" << tcp->GetSegmentStatusStr()
+                    ;
+        break;
+        }
+        default:
+            qDebug() << "未处理->"
+                     << "还没有处理的协议"
+                     ;
+        }
+
         break;
     }
     default:
