@@ -93,6 +93,7 @@ public:
 
     /*实际就是获取首部长度，单位为四字节*/
     quint8 GetOffset();
+    quint32 GetPayloadLen();
 
     bool URG();
     bool ACK();
@@ -109,6 +110,9 @@ public:
     quint16 GetUrgentPoint();
 
     QString GetSegmentStatusStr();
+
+    /*从DissectResultBase的保留字段获取数据*/
+    qint64 GetPrevious();
 
 
 private:
@@ -145,7 +149,7 @@ private:
 
     static StreamTcp stream;
 
-    quint16 total_length;
+    qint32 total_length;
 
     struct header_t *header;
     DissectResultBase *dissectResultBase;

@@ -8,6 +8,7 @@ StreamTcp DissectResultTcp::stream;
 DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
 {
     this->dissectResultBase = dissectResultBase;
+    this->total_length = dissectResultBase->GetAdditionalVal("tcp_total_len");
 
     dissectResultBase->PushToProtocolList("tcp",TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("tcp");
@@ -17,7 +18,7 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     dissectResultBase->AddAdditional("issyn",this->SYN()?1:0);
     dissectResultBase->AddAdditional("seq",this->GetSeq());
     dissectResultBase->AddAdditional("ack",this->GetAck());
-    dissectResultBase->AddAdditional("len",dissectResultBase->GetAdditionalVal("tcp_total_len") - this->GetOffset() * 4);
+    dissectResultBase->AddAdditional("len",this->GetPayloadLen());
     this->streamIndexPlusOne = stream.AddWithWindow(dissectResultBase
                          ,(quint8*)dissectResultBase->GetAdditionalPtr("srcAddr")
                          ,(quint8*)dissectResultBase->GetAdditionalPtr("dstAddr")
@@ -26,7 +27,7 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                          ,this->GetDestinationPortPtr()
                          ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
                          );
-    qDebug() << "streamIndexPlusOne = " << this->streamIndexPlusOne;
+    //qDebug() << "streamIndexPlusOne = " << this->streamIndexPlusOne;
 }
 
 quint8* DissectResultTcp::GetSourcePortPtr(){
@@ -65,6 +66,9 @@ quint8 DissectResultTcp::GetOffset(){
     return (this->header->offset_reserved_flags[0] & 0xf0) >> 4;
 }
 
+quint32 DissectResultTcp::GetPayloadLen(){
+    return this->total_length - this->GetOffset() * 4;
+}
 
 bool DissectResultTcp::SYN(){
     if(((this->header->offset_reserved_flags[1] & 0x02) >> 1) == 1)
@@ -80,7 +84,13 @@ QString DissectResultTcp::GetSegmentStatusStr(){
     switch (status) {
     case StreamTcp::TCP_A_OUT_OF_ORDER:
         return "out of order";
+    case StreamTcp::TCP_A_RETRANSMISSION:
+        return "retransmission";
     default:
         return "normal";
     }
+}
+
+qint64 DissectResultTcp::GetPrevious(){
+    return this->dissectResultBase->GetAdditionalVal(PRE_SEGMENT);
 }
