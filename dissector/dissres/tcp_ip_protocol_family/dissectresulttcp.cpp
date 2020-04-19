@@ -86,6 +86,8 @@ QString DissectResultTcp::GetSegmentStatusStr(){
         return "out of order";
     case StreamTcp::TCP_A_RETRANSMISSION:
         return "retransmission";
+    case StreamTcp::TCP_A_FAST_RETRANSMISSION:
+        return "fast retransmission";
     default:
         return "normal";
     }

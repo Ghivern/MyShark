@@ -74,7 +74,7 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
                 segment.index = index;
                 data = dissectResultBase->GetProtocolHeaderEndPtrByName("tcp");
                 if(this->acks.contains(-streamIndexPlusOne) && this->acks.value(-streamIndexPlusOne).length() >= 4)
-                     dissectResultBase->AddAdditional(SEGMENT_STATUS,TCP_A_RETRANSMISSION);
+                     dissectResultBase->AddAdditional(SEGMENT_STATUS,TCP_A_FAST_RETRANSMISSION);
                 if(seq < maxSeq){
                     dissectResultBase->AddAdditional(VALIED_DATA_PTR,(void*)(data + maxSeq - seq));
                 }else{
@@ -107,11 +107,14 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
                             (*this->windows.find(streamIndexPlusOne)).segmentList.append(out_of_order_segment);
                             maxSeq = out_of_order_segment.seq + out_of_order_segment.len;
                             (*this->windows.find(streamIndexPlusOne)).maxSeq = maxSeq;
-
+                            waitforRemove.push(i);
                         }else{
                             continue;
                         }
                     }
+                }
+                while(!waitforRemove.isEmpty()){
+                    (*this->windows.find(streamIndexPlusOne)).outOfOrderSegmentList.removeAt(waitforRemove.pop());
                 }
             }else{
                 struct segment_t outOfOrderSegment;

@@ -108,6 +108,8 @@ void MainWindow::Print(qint64 index){
                  << "seq:" << tcp->GetSeq()
                  << "r-seq:" << tcp->GetRelativeSeq()
                  << "len:" << tcp->GetPayloadLen()
+                 //<< "ack:" << tcp->GetAck()
+                 //<< "r-ack:" << tcp->GetRelativeAck()
                  << "pre:" <<((tcp->GetPrevious() == -1)?"无":QString("%1").arg(tcp->GetPrevious()))
                  << "status:" << tcp->GetSegmentStatusStr()
                     ;
