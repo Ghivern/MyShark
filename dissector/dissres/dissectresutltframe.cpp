@@ -49,6 +49,10 @@ void DissectResultFrame::UpdateProtocolList(QString protocolName, qint32 newProt
     this->dissectResultBase->UpdateProtocolList(protocolName,newProtocolHeaderLength);
 }
 
+QString DissectResultFrame::GetTopProtocolName(){
+    return this->dissectResultBase->GetTopProtocolName();
+}
+
 const quint8* DissectResultFrame::GetData(){
     return this->dissectResultBase->GetData();
 }
@@ -105,4 +109,8 @@ QString DissectResultFrame::GetProtocolNameByIndex(qint32 index){
 
 const quint8* DissectResultFrame::GetProtocolHeaderStartPtrByName(QString protocolName){
     return this->dissectResultBase->GetProtocolHeaderStartPtrByName(protocolName);
+}
+
+bool DissectResultFrame::ContainProtocol(QString proName){
+    return this->dissectResultBase->ContainProtocol(proName);
 }

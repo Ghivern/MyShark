@@ -8,19 +8,98 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Device device;
-    capturer = new Capturer(Device::GetDeviceNameByIndex(0));
 
-    dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+    this->setupUi();
+    this->setupSignal();
 
-    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
-    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
     capturer->Start();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setupUi(){
+    this->ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    this->ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    this->ui->lineEdit->setPlaceholderText("Display filter");
+}
+
+void MainWindow::setupSignal(){
+    //connect(ui->interfaceListWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(StartCapture(QListWidgetItem *)));
+    capturer = new Capturer(DeviceList::capHandle);
+    dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+
+    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
+    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
+
+
+    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+}
+
+
+void MainWindow::addToTable(DissectResultFrame *frame){
+    QTableWidgetItem *item;
+    QString str;
+    qint32 row = this->ui->tableWidget->rowCount();
+
+    this->ui->tableWidget->insertRow(row);
+
+    //No
+    str.append(QString("%1").arg(frame->GetIndex()));
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_NO,item);
+
+    //Time
+    str.clear();
+    str.append(QString::asprintf("%.8lf",frame->GetRelativeTimeSinceFirstPacket()));
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_TIME,item);
+
+
+    //Source
+    str.clear();
+    if(frame->ContainProtocol("ipv4")){
+        tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
+        str.append(ipv4->GetSourceAddressStr());
+    }else{
+        tcp_ip_protocol_family::DissectResultLinkLayer *linklayer = frame->GetTcpIpProtocolFamilyBaseLayer();
+        str.append(linklayer->GetSourceAddressStr());
+    }
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_SOURCE,item);
+
+    //Destination
+    str.clear();
+    if(frame->ContainProtocol("ipv4")){
+        tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
+        str.append(ipv4->GetDestinationAddressStr());
+    }else{
+        tcp_ip_protocol_family::DissectResultLinkLayer *linklayer = frame->GetTcpIpProtocolFamilyBaseLayer();
+        str.append(linklayer->GetDestinationAddressStr());
+    }
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_DESTINATION,item);
+
+    //Protocol
+    str.clear();
+    str.append(frame->GetTopProtocolName());
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_PROTOCOL,item);
+
+    //Length
+    str.clear();
+    str.append(QString("%1").arg(frame->GetCapLen()));
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_LENGTH,item);
+
+    //Summery
+    str.append(frame->GetSummery());
+    item = new QTableWidgetItem(str);
+    this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
 }
 
 void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
@@ -39,6 +118,17 @@ void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
             PrintProTree(proTreeNode->GetNextLevel(),level + 5);
         proTreeNode = proTreeNode->GetNext();
     }
+}
+
+void MainWindow::StartCapture(QListWidgetItem *item){
+    //ui->interfaceListWidget->hide();
+    this->capturer = new Capturer(item->text());
+    this->dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
+    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
+    this->capturer->start();
+
+    qDebug() << "选中的DeviceName: " << item->text();
 }
 
 void MainWindow::Print(qint64 index){

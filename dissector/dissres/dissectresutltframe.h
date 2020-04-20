@@ -28,6 +28,7 @@ public:
     void UpdateProtocolHeaderLengthCount(qint32 headerLength);
     void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength);
     void UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength);
+    QString GetTopProtocolName();
 
 
     const quint8* GetData();
@@ -43,12 +44,12 @@ public:
     /*定制化方法，获得特定类型的指针*/
     tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();
 
-
-
     QString GetSummery();
     qint32 GetProtocolListLength();
     QString GetProtocolNameByIndex(qint32 index);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
+
+    bool ContainProtocol(QString proName);
 private:
     static bool isFirstPacket;
     static timeval firstPacketCaptureTime;

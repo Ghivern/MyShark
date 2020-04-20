@@ -41,6 +41,17 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
 
 }
 
+bool DissectResultBase::ContainProtocol(QString proName){
+    if(this->protocolList.contains(proName))
+        return true;
+    else
+        return false;
+}
+
+QString DissectResultBase::GetTopProtocolName(){
+    return this->protocolList.last();
+}
+
 void DissectResultBase::SetSummery(QString summery){
     this->summery.clear();
     this->summery.append(summery);

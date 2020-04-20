@@ -12,6 +12,7 @@ public:
     ~Device();
 
     qint32 GetDeviceCount();
+    QStringList GetDevices();
 
     static qint32 GetDeviceIndexByName(QString devName);
     static QString GetDeviceNameByIndex(qint32 index);

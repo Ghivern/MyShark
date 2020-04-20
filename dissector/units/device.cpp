@@ -28,6 +28,10 @@ qint32 Device::GetDeviceCount(){
     return this->devices.length();
 }
 
+QStringList Device::GetDevices(){
+    return QStringList(this->devNames);
+}
+
 //Static Methods
 qint32 Device::GetDeviceIndexByName(QString devName){
     return Device::devNames.indexOf(devName);

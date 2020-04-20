@@ -10,6 +10,13 @@ Capturer::Capturer(QString devName)
     this->stop = false;
 }
 
+Capturer::Capturer(CapHandle *capHandle){
+    this->capHandle = capHandle;
+    this->dissResList = new DissResList_t;
+    this->mutex = new QMutex();
+    this->stop = false;
+}
+
 Capturer::~Capturer(){
     delete capHandle;
     delete mutex;
@@ -52,6 +59,7 @@ void Capturer::run(){
             this->mutex->lock();
             this->dissResList->append(dissRes);
             this->mutex->unlock();
+            emit onePacketCaptured(this->testList.at(index));
             emit onePacketCaptured(index);
             //qDebug() << "Capturer : capture one packet successfully";
             index++;

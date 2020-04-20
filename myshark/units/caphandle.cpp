@@ -9,9 +9,10 @@ CapHandle::CapHandle()
 
 CapHandle::CapHandle(QString devName){
     char errbuf[PCAP_ERRBUF_SIZE];
+    this->error.clear();
     this->pcapHandle = pcap_create(devName.toLatin1(),errbuf);
     if( this->pcapHandle == NULL ){
-        qDebug() << "CapHandle :" << QLatin1String(errbuf);;
+        this->error.append(QLatin1String(errbuf));
     }else{
         this->devName = devName;
         this->devIndex = Device::GetDeviceIndexByName(devName);
@@ -20,9 +21,10 @@ CapHandle::CapHandle(QString devName){
 
 CapHandle::CapHandle(qint32 devIndex){
     char errbuf[PCAP_ERRBUF_SIZE];
+    this->error.clear();
     this->pcapHandle = pcap_create(devName.toLatin1(),errbuf);
     if( this->pcapHandle == NULL ){
-        qDebug() << "CapHandle :" << QLatin1String(errbuf);;
+        this->error.append(QLatin1String(errbuf));
     }else{
         this->devName = Device::GetDeviceNameByIndex(devIndex);
         this->devIndex = devIndex;
@@ -31,9 +33,10 @@ CapHandle::CapHandle(qint32 devIndex){
 
 void CapHandle::createPcapHandle(QString devName){
     char errbuf[PCAP_ERRBUF_SIZE];
+    this->error.clear();
     this->pcapHandle = pcap_create(devName.toLatin1(),errbuf);
     if( this->pcapHandle == NULL ){
-        qDebug() << "CapHandle :" << QLatin1String(errbuf);;
+        this->error.append(QLatin1String(errbuf));
     }else{
         this->devName = devName;
         this->devIndex = Device::GetDeviceIndexByName(devName);
@@ -42,9 +45,10 @@ void CapHandle::createPcapHandle(QString devName){
 
 void CapHandle::createPcapHandle(qint32 devIndex){
     char errbuf[PCAP_ERRBUF_SIZE];
+    this->error.clear();
     this->pcapHandle = pcap_create(devName.toLatin1(),errbuf);
     if( this->pcapHandle == NULL ){
-        qDebug() << "CapHandle :" << QLatin1String(errbuf);;
+        this->error.append(QLatin1String(errbuf));
     }else{
         this->devName = Device::GetDeviceNameByIndex(devIndex);
         this->devIndex = devIndex;
@@ -64,14 +68,15 @@ qint32 CapHandle::SetImmediateMode(qint32 immediateMode){
 }
 
 qint32 CapHandle::ActivateHandle(){
+    this->error.clear();
     if( pcap_activate(this->pcapHandle) < 0){
-        qDebug() << "CapHandle： " << QLatin1String(pcap_geterr(this->pcapHandle));
+        this->error.append(QLatin1String(pcap_geterr(this->pcapHandle)));
         return -1;
     }
     return 0;
 }
 
-qint32 CapHandle::ActivateHandleWithParas(qint32 snapLen, qint32 promisc, qint32 immediateMode){
+qint32 CapHandle::ActivateHandleWithParas(qint32 promisc, qint32 immediateMode,qint32 snapLen){
     this->SetPromisc(promisc);
     this->SetSnaplen(snapLen);
     this->SetImmediateMode(immediateMode);
@@ -100,4 +105,8 @@ QString CapHandle::GetDeviceName(){
 
 qint32 CapHandle::GetDeviceIndex(){
     return this->devIndex;
+}
+
+QString CapHandle::GetError(){
+    return this->error;
 }

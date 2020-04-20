@@ -17,7 +17,7 @@ public:
     qint32 SetImmediateMode(qint32 immediateMode);
 
     qint32 ActivateHandle();
-    qint32 ActivateHandleWithParas(qint32 snapLen = 65535,qint32 promisc = 1,qint32 immediateMode = 1);
+    qint32 ActivateHandleWithParas(qint32 promisc = 1,qint32 immediateMode = 1,qint32 snapLen = 65535);
 
     pcap_t *GetPcapHandle();
 
@@ -28,7 +28,11 @@ public:
     QString GetDeviceName();
     qint32 GetDeviceIndex();
 
+    QString GetError();
+
 private:
+    QString error;
+
     pcap_t *pcapHandle;
     QString devName;
     qint32 devIndex;

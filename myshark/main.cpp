@@ -1,12 +1,18 @@
 #include "mainwindow.h"
-
+#include "./ui/devicelist.h"
 #include <QApplication>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-    //w.show();
-    return a.exec();
+    DeviceList deviceList;
+    if(deviceList.exec() == QDialog::Accepted){
+        MainWindow w;
+        w.show();
+        return a.exec();
+    }
+//    MainWindow w;
+//    w.show();
+//    return a.exec();
 }

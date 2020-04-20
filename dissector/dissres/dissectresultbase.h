@@ -20,6 +20,8 @@ public:
     void UpdateProtocolHeaderLengthCount(qint32 headerLength);
     void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength);
     void UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength);
+    bool ContainProtocol(QString proName);
+    QString GetTopProtocolName();
 
     void SetSummery(QString summery);
 

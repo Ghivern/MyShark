@@ -15,6 +15,7 @@ class Capturer:public QThread
     Q_OBJECT
 public:
     Capturer(QString devName);
+    Capturer(CapHandle *capHandle);
     ~Capturer();
     qint32 GetIntLinkType();
     QList<DissRes*>* GetDissResList();
@@ -35,6 +36,7 @@ private:
 
 signals:
     void onePacketCaptured(qint64 index);
+    void onePacketCaptured(DissectResultFrame *frame);
 
 public slots:
     void Start();

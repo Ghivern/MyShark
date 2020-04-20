@@ -21,16 +21,20 @@ SOURCES += \
     dissector/dissector.cpp \
     main.cpp \
     mainwindow.cpp \
+    ui/devicelist.cpp \
     units/caphandle.cpp
 
 HEADERS += \
     capturer/capturer.h \
     dissector/dissector.h \
+    #form.h \
     mainwindow.h \
     #../global/global.h \
-    units/caphandle.h \
+    ui/devicelist.h \
+    units/caphandle.h
 
 FORMS += \
+    devicelist.ui \
     mainwindow.ui
 
 LIBS += -lpcap
