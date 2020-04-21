@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QLabel>
 
 #include "capturer/capturer.h"
 #include "dissector/dissector.h"
@@ -36,6 +37,8 @@ private:
     Dissector *dissector;
     Loader *loader;
 
+    QLabel *status;
+
     enum COL_NAME_VAL{
         COL_NO,
         COL_TIME,
@@ -50,6 +53,8 @@ private:
     void setupSignal();
 
 
+    bool scrollToBottom;
+
 
 
 public slots:
@@ -57,5 +62,9 @@ public slots:
     void Print(qint64 index);
 
     void addToTable(DissectResultFrame *frame);
+private slots:
+    void on_actionStop_triggered();
+    void on_actionStart_triggered();
+    void on_actionRestart_triggered();
 };
 #endif // MAINWINDOW_H

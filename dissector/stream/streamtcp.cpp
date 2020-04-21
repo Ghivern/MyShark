@@ -15,9 +15,9 @@ StreamTcp::StreamTcp()
 qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *srcAddr, quint8 *dstAddr, qint32 addr_size, quint8 *srcPort, quint8 *dstPort, qint32 port_size){
     qint64 streamIndexPlusOne =  this->Add(dissectResultBase,srcAddr,dstAddr,addr_size,srcPort,dstPort,port_size);
 
-    quint32 seq = dissectResultBase->GetAdditionalVal("seq");
-    quint32 len = dissectResultBase->GetAdditionalVal("len");
-    quint32 ack = dissectResultBase->GetAdditionalVal(ACK);
+    quint32 seq = dissectResultBase->GetAdditionalVal(TCP_SEQ_VAL);
+    quint32 len = dissectResultBase->GetAdditionalVal(TCP_PAYLOAD_LEN);
+    quint32 ack = dissectResultBase->GetAdditionalVal(TCP_ACK_VAL);
     quint64 index = dissectResultBase->GetIndex();
 
     const quint8 *data = NULL;
@@ -25,7 +25,7 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
     struct window_t window;
     if(!this->windows.contains(streamIndexPlusOne)){
         //qDebug() << "insert base seq" << seq;
-        if(dissectResultBase->GetAdditionalVal("issyn")){
+        if(dissectResultBase->GetAdditionalVal(TCP_ISSYN)){
             window.baseSeq = seq;
             window.maxSeq = seq + 1;
             this->windows.insert(streamIndexPlusOne,window);
@@ -39,7 +39,7 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
         }
     }else{
 
-        if(dissectResultBase->GetAdditionalVal(ISSYN)){
+        if(dissectResultBase->GetAdditionalVal(TCP_ISSYN)){
             (*this->windows.find(streamIndexPlusOne)).segmentList.clear();
             (*this->windows.find(streamIndexPlusOne)).baseSeq = seq;
             (*this->windows.find(streamIndexPlusOne)).maxSeq = seq + 1;
@@ -65,7 +65,7 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
             return streamIndexPlusOne;
 
         if( seq + len <= maxSeq ){
-            dissectResultBase->AddAdditional(SEGMENT_STATUS,TCP_A_RETRANSMISSION);
+            dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_RETRANSMISSION);
         }else{
             if(seq <= maxSeq){
                 struct segment_t segment;
@@ -74,16 +74,16 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
                 segment.index = index;
                 data = dissectResultBase->GetProtocolHeaderEndPtrByName("tcp");
                 if(this->acks.contains(-streamIndexPlusOne) && this->acks.value(-streamIndexPlusOne).length() >= 4)
-                     dissectResultBase->AddAdditional(SEGMENT_STATUS,TCP_A_FAST_RETRANSMISSION);
+                     dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_FAST_RETRANSMISSION);
                 if(seq < maxSeq){
-                    dissectResultBase->AddAdditional(VALIED_DATA_PTR,(void*)(data + maxSeq - seq));
+                    dissectResultBase->AddAdditional(TCP_VALIED_DATA_START_PTR,(void*)(data + maxSeq - seq));
                 }else{
-                    dissectResultBase->AddAdditional(VALIED_DATA_PTR,(void*)data);
+                    dissectResultBase->AddAdditional(TCP_VALIED_DATA_START_PTR,(void*)data);
                 }
                 if(this->windows.value(streamIndexPlusOne).segmentList.length() > 0)
-                    dissectResultBase->AddAdditional(PRE_SEGMENT,this->windows.value(streamIndexPlusOne).segmentList.last().index);
+                    dissectResultBase->AddAdditional(TCP_PRE_SEGMENT,this->windows.value(streamIndexPlusOne).segmentList.last().index);
                 else
-                    dissectResultBase->AddAdditional(PRE_SEGMENT,-1);
+                    dissectResultBase->AddAdditional(TCP_PRE_SEGMENT,-1);
                 (*this->windows.find(streamIndexPlusOne)).segmentList.append(segment);
                 (*this->windows.find(streamIndexPlusOne)).maxSeq = seq + len;
                 maxSeq = seq + len;
@@ -99,11 +99,11 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
                         data = base->GetProtocolHeaderEndPtrByName("tcp");
                         if(out_of_order_segment.seq <= maxSeq){
                             if(out_of_order_segment.seq < maxSeq){
-                                base->AddAdditional(VALIED_DATA_PTR,(void*)(data + maxSeq - out_of_order_segment.seq));
+                                base->AddAdditional(TCP_VALIED_DATA_START_PTR,(void*)(data + maxSeq - out_of_order_segment.seq));
                             }else{
-                                base->AddAdditional(VALIED_DATA_PTR,(void*)data);
+                                base->AddAdditional(TCP_VALIED_DATA_START_PTR,(void*)data);
                             }
-                            base->AddAdditional(PRE_SEGMENT,this->windows.value(streamIndexPlusOne).segmentList.last().index);
+                            base->AddAdditional(TCP_PRE_SEGMENT,this->windows.value(streamIndexPlusOne).segmentList.last().index);
                             (*this->windows.find(streamIndexPlusOne)).segmentList.append(out_of_order_segment);
                             maxSeq = out_of_order_segment.seq + out_of_order_segment.len;
                             (*this->windows.find(streamIndexPlusOne)).maxSeq = maxSeq;
@@ -121,7 +121,7 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
                 outOfOrderSegment.len = len;
                 outOfOrderSegment.seq = seq;
                 outOfOrderSegment.index = dissectResultBase->GetIndex();
-                dissectResultBase->AddAdditional(SEGMENT_STATUS,TCP_A_OUT_OF_ORDER);
+                dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_OUT_OF_ORDER);
                 (*this->windows.find(streamIndexPlusOne)).outOfOrderSegmentList.append(outOfOrderSegment);
             }
         }

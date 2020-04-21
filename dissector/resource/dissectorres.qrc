@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/ethernet">
+        <file>ethernet-addresses</file>
+        <file>ethernet-well-know-addresses</file>
+    </qresource>
+</RCC>

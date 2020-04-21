@@ -20,6 +20,8 @@ public:
     qint32 GetIntLinkType();
     QList<DissRes*>* GetDissResList();
 
+    qint64 GetCount();
+
     QList<DissectResultFrame*> testList;
     QList<DissectResultBase*> packetList;
 
@@ -41,6 +43,7 @@ signals:
 public slots:
     void Start();
     void Stop();
+    void Clear();
 };
 
 #endif // CAPTURER_H

@@ -87,7 +87,8 @@ HEADERS += \
     stream/streamtcp.h \
     units/bit.h \
     units/checksum.h \
-    units/device.h
+    units/device.h \
+    units/keys.h
 
 LIBS += -lpcap
 
@@ -101,6 +102,9 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    others/ethernet-addresses \
-    others/ethernet-well-know-addresses
+#DISTFILES += \
+#    others/ethernet-addresses \
+#    others/ethernet-well-know-addresses
+
+RESOURCES += \
+    resource/dissectorres.qrc

@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setupUi();
     this->setupSignal();
 
+    this->setWindowTitle(DeviceList::SelectedDevice);
+    this->ui->actionStart->setEnabled(false);
     capturer->Start();
 }
 
@@ -21,11 +23,15 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupUi(){
+    this->scrollToBottom = false;
     this->ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     this->ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     this->ui->lineEdit->setPlaceholderText("Display filter");
+
+    this->status = new QLabel("---------------------");
+    this->ui->statusbar->addWidget(status);
 }
 
 void MainWindow::setupSignal(){
@@ -97,9 +103,16 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->setItem(row,MainWindow::COL_LENGTH,item);
 
     //Summery
+    str.clear();
     str.append(frame->GetSummery());
     item = new QTableWidgetItem(str);
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
+
+    if(this->scrollToBottom)
+        this->ui->tableWidget->scrollToBottom();
+
+    this->status->clear();
+    this->status->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
 }
 
 void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
@@ -249,3 +262,29 @@ void MainWindow::Print(qint64 index){
 
 }
 
+
+void MainWindow::on_actionStop_triggered()
+{
+    this->ui->actionStart->setEnabled(true);
+    this->ui->actionStop->setEnabled(false);
+    this->ui->actionRestart->setEnabled(false);
+    this->capturer->Stop();
+}
+
+void MainWindow::on_actionStart_triggered()
+{
+    for(qint32 index = this->ui->tableWidget->rowCount() - 1; index >=0; index--)
+        this->ui->tableWidget->removeRow(index);
+    this->ui->treeWidget->clear();
+    this->ui->textEdit->clear();
+    this->ui->actionStart->setEnabled(false);
+    this->ui->actionStop->setEnabled(true);
+    this->ui->actionRestart->setEnabled(true);
+    this->capturer->start();
+}
+
+void MainWindow::on_actionRestart_triggered()
+{
+    this->ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    this->scrollToBottom = true;
+}

@@ -3,7 +3,8 @@
 
 using namespace tcp_ip_protocol_family;
 
-const QString DissectResultLinkLayer::relative_dir = "../others/";
+//const QString DissectResultLinkLayer::relative_dir = "../others/";
+const QString DissectResultLinkLayer::relative_dir = ":/ethernet/";
 const QString DissectResultLinkLayer::ethernet_address_file_path = relative_dir + "ethernet-addresses";
 const QString DissectResultLinkLayer::ethernet_well_know_address_file_path = relative_dir + "ethernet-well-know-addresses";
 
@@ -50,8 +51,6 @@ void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, 
 void* DissectResultLinkLayer::GetNextLayer(){
     return this->protocol_family_network_layer;
 }
-
-
 
 /*
  * 获取协议首部字段位置或值的方法

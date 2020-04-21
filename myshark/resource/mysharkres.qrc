@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/icos">
+        <file>restart.ico</file>
+        <file>start.ico</file>
+        <file>stop.ico</file>
+    </qresource>
+</RCC>

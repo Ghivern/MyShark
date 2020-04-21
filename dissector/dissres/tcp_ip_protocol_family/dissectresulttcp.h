@@ -3,6 +3,8 @@
 
 #include "arpa/inet.h"
 
+//#include "../../units/keys.h"
+
 #include "../../stream/stream.h"
 #include "../../stream/streamtcp.h"
 
@@ -14,7 +16,9 @@
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
  *Source Port                    | Destination Port              |
  * ---------------------------------------------------------------
- *Sequence Number                |  Acknowledgement Number       |
+ *Sequence Number                                                |
+ * ---------------------------------------------------------------
+ *Acknowledgement Number                                         |
  * ---------------------------------------------------------------
  * Data  |Reserved   |U|A|P|R|S|F|   Window                      |
  * Offset|           |R|C|S|S|Y|I|                               |
@@ -28,6 +32,8 @@
  *----------------------------------------------------------------
  *
  */
+
+
  /* Pseudo Header for Ipv4 Format as follow
  * --------------|---------------|---------------|----------------
  * Source Address                                                |
@@ -58,6 +64,28 @@
 
 
 
+
+/*0                   1          |        2                   3
+ *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+ *Source Port                    | Destination Port              |
+ * ---------------------------------------------------------------
+ *Sequence Number                                                |
+ * ---------------------------------------------------------------
+ *Acknowledgement Number                                         |
+ * ---------------------------------------------------------------
+ * Data  |Reserved   |U|A|P|R|S|F|   Window                      |
+ * Offset|           |R|C|S|S|Y|I|                               |
+ *       |           |G|K|H|T|N|N|                               |
+ * ---------------------------------------------------------------
+ * Checksum                      |     Urgent Point              |
+ * ---------------------------------------------------------------
+ * Options    .  Padding                                         |
+ * ---------------------------------------------------------------
+ * data ...                                                      |
+ *----------------------------------------------------------------
+ *
+ */
 namespace tcp_ip_protocol_family {
 
 class DissectResultTcp:public DissectResultCommonStream
@@ -81,11 +109,13 @@ public:
 
     void* GetNextLayer();
 
+    /*处理端口号*/
     quint8* GetSourcePortPtr();
     quint16 GetSourcePort();
     quint8* GetDestinationPortPtr();
     quint16 GetDestinationPort();
 
+    /*处理Seq和Ack*/
     quint32 GetSeq();
     quint32 GetRelativeSeq();
     quint32 GetAck();
@@ -95,6 +125,7 @@ public:
     quint8 GetOffset();
     quint32 GetPayloadLen();
 
+    /*Flags*/
     bool URG();
     bool ACK();
     bool PSH();
@@ -102,16 +133,23 @@ public:
     bool SYN();
     bool FIN();
 
+    /*Window*/
     quint8* GetWindowPtr();
     quint16 GetWindow();
 
+    /*Checksum*/
     QString GetChecksumStr();
 
+    /*Urgent Point*/
     quint16 GetUrgentPoint();
 
+    /*分析Seq/Ack*/
     QString GetSegmentStatusStr();
 
-    /*从DissectResultBase的保留字段获取数据*/
+    /*从DissectResultBase的保留字段获取数据，
+    *取得分片的前一分片的包Index，若无前一个分片，或此分片长度为0，
+    * 返回-1
+    */
     qint64 GetPrevious();
 
 
@@ -121,7 +159,9 @@ private:
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      *Source Port                    | Destination Port              |
      * ---------------------------------------------------------------
-     *Sequence Number                |  Acknowledgement Number       |
+     *Sequence Number                                                |
+     * ---------------------------------------------------------------
+     *Acknowledgement Number                                         |
      * ---------------------------------------------------------------
      * Data  |Reserved   |U|A|P|R|S|F|   Window                      |
      * Offset|           |R|C|S|S|Y|I|                               |

@@ -26,16 +26,16 @@ void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWO
     switch (type) {
         case NETWORKLAYER_IPV4_TYPE_TCP:
         {
-        this->dissectResultBase->AddAdditional("pseudoHeader",this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_TCP));
-        dissectResultBase->AddAdditional("tcp_total_len",this->GetTotalLength() - this->GetHeaderLength() * 4);
-        dissectResultBase->AddAdditional("srcAddr",header->srcaddr);
-        dissectResultBase->AddAdditional("dstAddr",header->dstaddr);
-        dissectResultBase->AddAdditional("addrLen",NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
+        this->dissectResultBase->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_TCP));
+        dissectResultBase->AddAdditional(TCP_TOTAL_LEN,this->GetTotalLength() - this->GetHeaderLength() * 4);
+        dissectResultBase->AddAdditional(IP_SOURCE_ADDRESS_PTR,header->srcaddr);
+        dissectResultBase->AddAdditional(IP_DESTINATION_ADDRESS_PTR,header->dstaddr);
+        dissectResultBase->AddAdditional(IP_ADDRESS_LENGTH,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
         this->protocol_family_transport_layer = (void*)(new DissectResultTcp(dissectResultBase));
         break;
         }
     case NETWORKLAYER_IPV4_TYPE_UDP:
-        this->dissectResultBase->AddAdditional("pseudoHeader",this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
+        this->dissectResultBase->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
         this->protocol_family_transport_layer = (void*)(new DissectResultUdp(dissectResultBase));
         break;
     }

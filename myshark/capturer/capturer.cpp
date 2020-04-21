@@ -33,12 +33,17 @@ QList<DissRes*>* Capturer::GetDissResList(){
     return this->dissResList;
 }
 
+qint64 Capturer::GetCount(){
+    return this->testList.length();
+}
+
 void Capturer::run(){
     const uchar *raw;
     struct pcap_pkthdr *pkthdr;
     qint64 index = 0;
     qint32 res;
-    while(!this->stop){
+    this->stop = false;
+    while(true){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
             DissRes *dissRes;
             switch (this->capHandle->GetLinkType()) {
@@ -72,6 +77,8 @@ void Capturer::run(){
         }else{
             qDebug() << "Other error";
         }
+        if(this->stop)
+            return;
     }
 }
 
@@ -82,5 +89,9 @@ void Capturer::Start(){
 }
 
 void Capturer::Stop(){
-    this->stop = false;
+    this->stop = true;
+}
+
+void Capturer::Clear(){
+    this->testList.clear();
 }

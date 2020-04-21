@@ -4,28 +4,12 @@
 #include <QStack>
 
 #include "stream.h"
+#include "../units/keys.h"
 
-
-const QString DISSECT_RESULT_BASE_LIST  = "dissect_result_base_list";
-const QString SEQ = "seq";
-const QString ACK = "ack";
-const QString LEN = "len";
-const QString ISURG = "isurg";
-const QString ISACK = "isack";
-const QString ISPSH = "ispsh";
-const QString ISRST = "isrst";
-const QString ISFIN = "isfin";
-const QString ISSYN = "issyn";
-
-const QString PRE_SEGMENT = "pre_seqment";
-const QString VALIED_DATA_PTR = "valied_data_ptr";
-const QString SEGMENT_STATUS = "segment_status";
 
 class StreamTcp:public Stream
 {
 public:
-
-
 
     enum TCP_SEGMENT_STATUS{
         TCP_A_RETRANSMISSION = 0x0001,

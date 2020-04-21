@@ -6,6 +6,7 @@
 
 #include "../converter.h"
 #include "../../units/bit.h"
+#include "../../units/keys.h"
 
 #include "../dissectresultcommonstream.h"
 #include "../dissectresultbase.h"
