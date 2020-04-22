@@ -20,9 +20,18 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
     quint32 ack = dissectResultBase->GetAdditionalVal(TCP_ACK_VAL);
     quint64 index = dissectResultBase->GetIndex();
 
+    qint16 window_multiplier = dissectResultBase->GetAdditionalVal(TCP_WINDOW_MULTIPLIER);
+
     const quint8 *data = NULL;
 
     struct window_t window;
+    if(!this->windows.contains(streamIndexPlusOne))
+        window.windowMultiplier = (window_multiplier == 0 ? 1:qAbs(window_multiplier));
+    else
+        if(window_multiplier != -1)
+            (*this->windows.find(streamIndexPlusOne)).windowMultiplier = (window_multiplier == 0 ? 1 : window_multiplier);
+
+
     if(!this->windows.contains(streamIndexPlusOne)){
         //qDebug() << "insert base seq" << seq;
         if(dissectResultBase->GetAdditionalVal(TCP_ISSYN)){
@@ -130,9 +139,9 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
 }
 
 quint32 StreamTcp::GetBaseSeq(qint64 streamIndexPlusOne){
-    if(!this->windows.contains(streamIndexPlusOne)){
-        //qDebug() << "Base seq不存在";
-        return -1;
-    }
     return (*this->windows.find(streamIndexPlusOne)).baseSeq;
+}
+
+quint16 StreamTcp::GetWindowMultiplier(qint64 streamIndexPlusOne){
+    return this->windows.value(streamIndexPlusOne).windowMultiplier;
 }

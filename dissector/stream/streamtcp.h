@@ -2,6 +2,7 @@
 #define STREAMTCP_H
 
 #include <QStack>
+#include <QtMath>
 
 #include "stream.h"
 #include "../units/keys.h"
@@ -34,6 +35,7 @@ public:
     StreamTcp();
     qint64 AddWithWindow(DissectResultBase *dissectResultBase,quint8 *srcAddr,quint8 *dstAddr,qint32 addr_size,quint8 *srcPort,quint8 *dstPort,qint32 port_size = 2);
     quint32 GetBaseSeq(qint64 streamIndexPlusOne);
+    quint16 GetWindowMultiplier(qint64 streamIndexPlusOne);
 
 private:
 
@@ -48,6 +50,7 @@ private:
         QList<segment_t> outOfOrderSegmentList;
         quint32 maxSeq;
         quint32 baseSeq;
+        qint16 windowMultiplier;
     };
 
     /*streamIndexPlusOne --> window*/

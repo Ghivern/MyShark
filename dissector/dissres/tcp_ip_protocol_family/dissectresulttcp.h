@@ -1,9 +1,12 @@
 #ifndef DISSECTRESULTTCP_H
 #define DISSECTRESULTTCP_H
 
+#include <QtMath>
+
 #include "arpa/inet.h"
 
 //#include "../../units/keys.h"
+#include "../converter.h"
 
 #include "../../stream/stream.h"
 #include "../../stream/streamtcp.h"
@@ -101,11 +104,29 @@ public:
         TRANSPORTLAYER_TCP_FIELD_LENGTH_CHECKSUM = 2,
         TRANSPORTLAYER_TCP_FIELD_LENGTH_URGENTPOINT = 2,
 
-        TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 16
+        TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 20
     };
 
+    enum TCP_OPTION{
+        TCP_OPTION_END_OF_OPTION = 0,
+        TCP_OPTION_NO_OPERATION = 1,
+        TCP_OPTION_MAXIMUM_SEGMENT_SIZE = 2,
+        TCP_OPTION_WINDOW_SCALE_OPTION = 3,
+        TCP_OPTION_SACK_PERMITTED_OPTION = 4,
+        TCP_OPTION_SACK_OPTION_FORMAT = 5,
+        TCP_OPTION_TIMESTAMPS_OPTION = 8
+    };
+
+//    enum TCP_OPTION_LENGTH:quint8{
+//        TCP_OPTION_LENGTH_MAXIMUM_SEGMENT_SIZE = 4,
+//        TCP_OPTION_LENGTH_WINDOW_SCALE_OPTION = 3,
+//        TCP_OPTION_LENGTH_SACK_PERMITTED_OPTION = 2,
+//        TCP_OPTION_LENGTH_SACK_OPTION_FORMAT = 8,
+//        TRANSPORTLAYER_TCP_FIELD_LENGTH_TIMESTAMPS_OPTION = 10
+//    };
+
     DissectResultTcp(DissectResultBase *dissectResultBase);
-    void AddNextLayer(DissectResultBase *dissectResultBase);
+
 
     void* GetNextLayer();
 
@@ -136,12 +157,24 @@ public:
     /*Window*/
     quint8* GetWindowPtr();
     quint16 GetWindow();
+    quint32 GetCalculatedWindow();
 
     /*Checksum*/
     QString GetChecksumStr();
 
     /*Urgent Point*/
     quint16 GetUrgentPoint();
+
+    /*Options*/
+    /*
+     *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
+     */
+    qint32 GetOptionPtrByIndex(quint8 *kind,quint8 *length,const quint8 **ptr,qint32 index);
+    qint32 GetOptionMaximumSegmentSize();
+    qint16 GetOptionWindowScale(); //Window scale最大为14
+    qint16 GetOptionWindowMultiplier();
+    qint64 GetOptionTimestampValue();
+    qint64 GetOptionTimestampEchoReply();
 
     /*分析Seq/Ack*/
     QString GetSegmentStatusStr();
@@ -176,6 +209,16 @@ private:
      *
      */
 
+    void addNextLayer(DissectResultBase *dissectResultBase);
+
+    /*Options*/
+    /*
+     *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
+     */
+    void dealTcpOptions();
+    qint32 getOptionIndex(enum TCP_OPTION option);
+
+
     struct header_t{
         quint8 srcPort[TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT];
         quint8 dstPort[TRANSPORTLAYER_TCP_FIELD_LENGTH_DESTINATION_PORT];
@@ -187,11 +230,21 @@ private:
         quint8 urgentPoint[TRANSPORTLAYER_TCP_FIELD_LENGTH_URGENTPOINT];
     };
 
+    /*For Tcp Options*/
+    /* |Kind | Length | Content |
+     *  Length = Kind_len + Length_len + Content_len
+     */
+    struct option_dsc_t{
+        const quint8 *ptr; /*内容部分的开始*/
+        quint8 kind;
+        quint8 length;
+    };
+
     static StreamTcp stream;
 
-    qint32 total_length;
-
     struct header_t *header;
+    QHash<qint32,struct option_dsc_t> options_dsc;
+
     DissectResultBase *dissectResultBase;
     void *protocol_family_application_layer;
 };

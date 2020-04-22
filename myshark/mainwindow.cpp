@@ -215,6 +215,7 @@ void MainWindow::Print(qint64 index){
                  //<< "r-ack:" << tcp->GetRelativeAck()
                  << "pre:" <<((tcp->GetPrevious() == -1)?"无":QString("%1").arg(tcp->GetPrevious()))
                  << "status:" << tcp->GetSegmentStatusStr()
+                 << "max-segment:" << tcp->GetOptionMaximumSegmentSize()
                     ;
          qDebug() << "----------------------------------------------------------------------------------------------------------------------------------------------";
         break;
