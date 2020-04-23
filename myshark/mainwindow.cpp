@@ -105,7 +105,7 @@ void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
 /*用于测试的，暂时性的*/
 void MainWindow::Print(qint64 index){
     //测试DissectResultFrame
-    DissectResultFrame *frame = this->capturer->testList.at(index);
+    DissectResultFrame *frame = this->capturer->GetDissectResultFrameByIndex(index);
 //    qDebug() << "Frame->"
 //             << "Index:" <<frame->GetIndex()
 //             << "Time:" << QString::asprintf("%.9f",frame->GetRelativeTimeSinceFirstPacket())
@@ -250,13 +250,35 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->displayProportion->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
 }
 
+void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
+    QTreeWidgetItem *item = nullptr;
+    while (node != nullptr) {
+        item = new QTreeWidgetItem();
+        item->setText(0,node->GetMsg());
+        if(parent != nullptr)
+            parent->addChild(item);
+        else
+            this->ui->treeWidget->addTopLevelItem(item);
+        if(node->GetNextLevel() != nullptr)
+            this->ergoditTree(item,node->GetNextLevel());
+        node = node->GetNext();
+    }
+}
+
+void MainWindow::addToTree(qint64 index){
+     ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),nullptr);
+     ProTreeNode *node = maker->GetProTree()->GetHeader();
+     this->ui->treeWidget->clear();
+     this->ergoditTree(nullptr,node);
+}
+
+
 void MainWindow::addToRawDataPanel(qint64 index){
-    const quint8* ptr = this->capturer->testList.at(index)->GetData();
+    const quint8* ptr = this->capturer->GetDissectResultFrameByIndex(index)->GetData();
     const quint8* line = nullptr;
-    qint32 capLen = this->capturer->testList.at(index)->GetCapLen();
+    qint32 capLen = this->capturer->GetDissectResultFrameByIndex(index)->GetCapLen();
     QString text;
     qint32 rowCount = 0;
-    //QTableWidgetItem *item;
 
     this->ui->rawDataPanel->clearContents();
     this->ui->rawDataPanel->setRowCount(0);
@@ -270,7 +292,6 @@ void MainWindow::addToRawDataPanel(qint64 index){
 
     for(qint32 row =0; row < rowCount; row++){
         line = ptr + row * 16;
-
         for(qint32 col = 0; col < rawDataPanelRowCount; col++){
             text.clear();
             if( col == 8 || col == 17 ){
@@ -326,5 +347,7 @@ void MainWindow::on_actionRestart_triggered()
 void MainWindow::on_tableWidget_cellClicked(int row, int column)
 {
     Q_UNUSED(column)
-    this->addToRawDataPanel(this->ui->tableWidget->item(row,COL_NO)->text().toULongLong());
+    qint64 index = this->ui->tableWidget->item(row,COL_NO)->text().toULongLong();
+    this->addToRawDataPanel(index);
+    this->addToTree(index);
 }

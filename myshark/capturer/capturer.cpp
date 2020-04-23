@@ -34,7 +34,15 @@ QList<DissRes*>* Capturer::GetDissResList(){
 }
 
 qint64 Capturer::GetCount(){
-    return this->testList.length();
+    return this->dissectResultFrameList.length();
+}
+
+DissectResultFrame* Capturer::GetDissectResultFrameByIndex(qint64 index){
+    return this->dissectResultFrameList.at(index);
+}
+
+CapHandle* Capturer::GetCapHandle(){
+    return this->capHandle;
 }
 
 void Capturer::run(){
@@ -50,7 +58,7 @@ void Capturer::run(){
             case 1:
             {
                 dissRes = new DissResEth(index);
-                this->testList.append(new DissectResultFrame(raw,pkthdr,index,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY));
+                this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY));
                 break;
             }
             default:
@@ -64,7 +72,7 @@ void Capturer::run(){
             this->mutex->lock();
             this->dissResList->append(dissRes);
             this->mutex->unlock();
-            emit onePacketCaptured(this->testList.at(index));
+            emit onePacketCaptured(this->dissectResultFrameList.at(index));
             emit onePacketCaptured(index);
             //qDebug() << "Capturer : capture one packet successfully";
             index++;
@@ -93,5 +101,5 @@ void Capturer::Stop(){
 }
 
 void Capturer::Clear(){
-    this->testList.clear();
+    this->dissectResultFrameList.clear();
 }

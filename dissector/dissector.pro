@@ -25,7 +25,12 @@ SOURCES += \
     dissectors/dissectoreth/dissectorip.cpp \
     dissectors/dissectoreth/dissectortcp.cpp \
     dissectors/dissectoreth/dissectorudp.cpp \
-    dissres/converter.cpp \
+    dissectors/frame.cpp \
+    dissectors/protreemaker.cpp \
+    dissectors/tcp_ip_protocol_family/ipv4.cpp \
+    dissectors/tcp_ip_protocol_family/linklayer.cpp \
+    dissectors/tcpipprotocolfamily.cpp \
+    dissres/Converter.cpp \
     dissres/dissectresultbase.cpp \
     dissres/dissectresultcommonstream.cpp \
     dissres/dissectresutltframe.cpp \
@@ -62,6 +67,11 @@ HEADERS += \
     dissectors/dissectoreth/dissectortcp.h \
     dissectors/dissectoreth/dissectorudp.h \
     dissectors/dissectoreth/eth_header.h \
+    dissectors/frame.h \
+    dissectors/protreemaker.h \
+    dissectors/tcp_ip_protocol_family/ipv4.h \
+    dissectors/tcp_ip_protocol_family/linklayer.h \
+    dissectors/tcpipprotocolfamily.h \
     dissres/converter.h \
     dissres/dissectresultbase.h \
     dissres/dissectresultcommonstream.h \

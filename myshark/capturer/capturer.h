@@ -22,8 +22,10 @@ public:
 
     qint64 GetCount();
 
-    QList<DissectResultFrame*> testList;
-    QList<DissectResultBase*> packetList;
+    CapHandle* GetCapHandle();
+    DissectResultFrame* GetDissectResultFrameByIndex(qint64 index);
+
+
 
 protected:
     void run() Q_DECL_OVERRIDE;
@@ -34,7 +36,7 @@ private:
     QMutex *mutex;
     bool stop;
 
-
+    QList<DissectResultFrame*> dissectResultFrameList;
 
 signals:
     void onePacketCaptured(qint64 index);

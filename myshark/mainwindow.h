@@ -4,11 +4,16 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QLabel>
 
 #include "capturer/capturer.h"
 #include "dissector/dissector.h"
 #include "../dissector/units/device.h"
+
+/*Dissectors -- for 测试*/
+#include "../dissector/dissectors/protreemaker.h"
 
 
 //ui
@@ -65,6 +70,8 @@ public slots:
 
 private slots:
     void addToTable(DissectResultFrame *frame);
+    void ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node);
+    void addToTree(qint64 index);
     void addToRawDataPanel(qint64 index);
 
     void on_actionStop_triggered();

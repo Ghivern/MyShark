@@ -83,6 +83,7 @@ public:
     QString GetTypeStr();
     QString GetTypeName();
 
+
     /*处理FCS*/
     bool HaveFCS();
     const quint8* GetFCSPtr();
