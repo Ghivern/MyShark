@@ -30,7 +30,7 @@ SOURCES += \
     dissectors/tcp_ip_protocol_family/ipv4.cpp \
     dissectors/tcp_ip_protocol_family/linklayer.cpp \
     dissectors/tcpipprotocolfamily.cpp \
-    dissres/Converter.cpp \
+    dissres/converter.cpp \
     dissres/dissectresultbase.cpp \
     dissres/dissectresultcommonstream.cpp \
     dissres/dissectresutltframe.cpp \
