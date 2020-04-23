@@ -90,37 +90,28 @@ void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
     }
 }
 
-/*用于测试的，暂时性的*/
-void MainWindow::StartCapture(QListWidgetItem *item){
-    //ui->interfaceListWidget->hide();
-    this->capturer = new Capturer(item->text());
-    this->dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
-    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
-    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
-    this->capturer->start();
+///*用于测试的，暂时性的*/
+//void MainWindow::StartCapture(QListWidgetItem *item){
+//    //ui->interfaceListWidget->hide();
+//    this->capturer = new Capturer(item->text());
+//    this->dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+//    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
+//    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
+//    this->capturer->start();
 
-    qDebug() << "选中的DeviceName: " << item->text();
-}
+//    qDebug() << "选中的DeviceName: " << item->text();
+//}
 
 /*用于测试的，暂时性的*/
 void MainWindow::Print(qint64 index){
-//    DissResEth *res = (DissResEth*)(this->dissector->GetDissResByIndex(index));
-//    qDebug() << res->GetNo()
-//             << ""  << res->GetTimeSinceFirstPacket()
-//             << ""  << res->GetTopProtocol()
-//             << ""  << res->GetStrSrc()
-//             << ""  << res->GetStrDst()
-//             << ""  << res->GetCapLen()
-//             << ""  << res->GetTopProtocol()
-//             << ""  << res->GetSrcPort()
-//             << ""  << res->GetDstPort()
-//             << ""  << res->GetMsg();
+    //测试DissectResultFrame
     DissectResultFrame *frame = this->capturer->testList.at(index);
 //    qDebug() << "Frame->"
 //             << "Index:" <<frame->GetIndex()
 //             << "Time:" << QString::asprintf("%.9f",frame->GetRelativeTimeSinceFirstPacket())
 //             << "CapLen" << frame->GetCapLen();
 
+    //测试DissectResultLinklayer
 //    qDebug() << "LinkLayer->"
 //             << "Stream:" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetStreamIndex()
 //             << "o-Stream:" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetOriginalStreamIndex()
@@ -137,9 +128,8 @@ void MainWindow::Print(qint64 index){
 //             << "c-FCS:" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetCalculatedFCSStr()
              ;
 
-    switch (*(quint16*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypePtr()) {
-    case tcp_ip_protocol_family::DissectResultLinkLayer::LINKLAYER_TYPE_IPV4:
-    {
+    //测试DissectResultIpv4
+    if( *(quint16*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypePtr() == tcp_ip_protocol_family::DissectResultLinkLayer::LINKLAYER_TYPE_IPV4){
         tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
 //        qDebug() << "Ipv4->"
 //                 << "Stream:" << ipv4->GetStreamIndex()
@@ -156,12 +146,9 @@ void MainWindow::Print(qint64 index){
 //                 << "MF:" << ipv4->MF_meaning()
 //                 << "Fragment:" << ipv4->GetFragmentOffset()
 //                 ;
-
-        switch (ipv4->GetType()) {
-        case tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_TYPE_TCP:
-        {
-        tcp_ip_protocol_family::DissectResultTcp *tcp = (tcp_ip_protocol_family::DissectResultTcp*)ipv4->GetNextLayer();
-        qDebug() << "Tcp->"
+        if(ipv4->GetType() == tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_TYPE_TCP){
+            tcp_ip_protocol_family::DissectResultTcp *tcp = (tcp_ip_protocol_family::DissectResultTcp*)ipv4->GetNextLayer();
+            qDebug() << "Tcp->"
                  << "index:" << frame->GetIndex()
                  << "o-stream:" << tcp->GetOriginalStreamIndex()
                  << "srcPort:" << tcp->GetSourcePort()
@@ -176,27 +163,14 @@ void MainWindow::Print(qint64 index){
                  << "status:" << tcp->GetSegmentStatusStr()
                  << "max-segment:" << tcp->GetOptionMaximumSegmentSize()
                     ;
-         qDebug() << "----------------------------------------------------------------------------------------------------------------------------------------------";
-        break;
+        }else{
+            //qDebug() << "未处理的运输层协议，协议号为" << ipv4->GetType();
         }
-        default:
-//            qDebug() << "未处理->"
-//                     << "还没有处理的协议"
-                     ;
-        }
-
-        break;
-    }
-    default:
-//        qDebug() << "未处理->"
-//                 << "还没有处理的协议"
-//                 << "协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr()
-//                 << "协议名为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeName()
-                    ;
-
+    }else{
+        //qDebug() << "未处理的网络层协议，协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr();
     }
 
-   // qDebug() << "----------------------------------------------------------------------------------------------------------------------------------------------";
+qDebug() << "----------------------------------------------------------------------------------------------------------------------------------------------";
 
 //    Info *info = new Info(0,1);  //devIndex , linktype
 //    ProTree *proTree = this->dissector->GetLoader()->GetDissector(capturer->GetIntLinkType())->Dissect(
@@ -206,8 +180,6 @@ void MainWindow::Print(qint64 index){
 //                );
 //    this->PrintProTree(proTree->GetHeader());
 //    delete info;
-
-
 
 }
 
@@ -219,8 +191,8 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->insertRow(row);
 
     //No.
-    str.append(QString("%1").arg(frame->GetIndex()));
-    item = new QTableWidgetItem(str);
+    item = new QTableWidgetItem();
+    item->setData(Qt::DisplayRole,frame->GetIndex());
     this->ui->tableWidget->setItem(row,MainWindow::COL_NO,item);
 
     //Time
@@ -261,9 +233,8 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->setItem(row,MainWindow::COL_PROTOCOL,item);
 
     //Length
-    str.clear();
-    str.append(QString("%1").arg(frame->GetCapLen()));
-    item = new QTableWidgetItem(str);
+    item = new QTableWidgetItem();
+    item->setData(Qt::DisplayRole,frame->GetCapLen());
     this->ui->tableWidget->setItem(row,MainWindow::COL_LENGTH,item);
 
     //Summery

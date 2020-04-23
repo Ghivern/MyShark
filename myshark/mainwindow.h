@@ -28,7 +28,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
 
 private:
     void setupUi();
@@ -60,13 +59,9 @@ private:
     const qint32 rawDataPanelRowCount = 34;
 
 
-
-
-
-
 public slots:
-    void StartCapture(QListWidgetItem *item);
     void Print(qint64 index);
+    void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
 
 private slots:
     void addToTable(DissectResultFrame *frame);
