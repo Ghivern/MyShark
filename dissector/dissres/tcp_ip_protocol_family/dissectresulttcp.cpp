@@ -39,7 +39,6 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                   .arg(this->GetWindow())
                                   .arg(this->GetCalculatedWindow())
                                   );
-    //qDebug() << "streamIndexPlusOne = " << this->streamIndexPlusOne;
 }
 
 
@@ -164,10 +163,42 @@ qint64 DissectResultTcp::GetOptionTimestampEchoReply(){
     return -1;
 }
 
+qint8 DissectResultTcp::GetOptionSackPermitted(){
+    qint32 index = this->getOptionIndex(TCP_OPTION_SACK_PERMITTED_OPTION);
+    if(index != -1)
+        return 1;
+    return -1;
+}
+
+QList<quint32> DissectResultTcp::GetOptionSacks(){
+    qint32 index = this->getOptionIndex(TCP_OPTION_SACK_OPTION_FORMAT);
+    QList<quint32> sacks;
+    if(index != -1){
+        quint8 length = this->options_dsc.value(index).length;
+        const quint32 *ptr = (quint32*)this->options_dsc.value(index).ptr;
+        for(quint8 i = 0; i < (length -2)/4; i++)
+            sacks.append(ptr[i]);
+    }
+    return sacks;
+}
+
+QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
+    qint32 index = this->getOptionIndex(TCP_OPTION_SACK_OPTION_FORMAT);
+    QList<quint32> sacks;
+    if(index != -1){
+        quint8 length = this->options_dsc.value(index).length;
+        const quint32 *ptr = (quint32*)this->options_dsc.value(index).ptr;
+        for(quint8 i = 0; i < (length -2)/4; i++)
+            sacks.append(ptr[i] - stream.GetBaseSeq(this->streamIndexPlusOne));
+    }
+    return sacks;
+}
+
 /*
 * 从DissectResultBase的保留字段获取数据，
-*分析Seq/Ack
 */
+
+/*分析Seq/Ack*/
 QString DissectResultTcp::GetSegmentStatusStr(){
     qint32 status = this->dissectResultBase->GetAdditionalVal(TCP_STATUS);
     if(status == -1)
@@ -184,9 +215,8 @@ QString DissectResultTcp::GetSegmentStatusStr(){
     }
 }
 
-/*从DissectResultBase的保留字段获取数据，
-*取得分片的前一分片的包Index，若无前一个分片，或此分片长度为0，
-* 返回-1
+/*
+*取得分片的前一分片的包Index，若无前一个分片，或此分片长度为0，返回-1
 */
 qint64 DissectResultTcp::GetPrevious(){
     return this->dissectResultBase->GetAdditionalVal(TCP_PRE_SEGMENT);

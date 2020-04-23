@@ -175,6 +175,9 @@ public:
     qint16 GetOptionWindowMultiplier();
     qint64 GetOptionTimestampValue();
     qint64 GetOptionTimestampEchoReply();
+    qint8 GetOptionSackPermitted();
+    QList<quint32> GetOptionSacks();
+    QList<quint32> GetOptionRelativeSacks();
 
     /*分析Seq/Ack*/
     QString GetSegmentStatusStr();
