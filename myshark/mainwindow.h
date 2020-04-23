@@ -3,7 +3,7 @@
 
 
 #include <QMainWindow>
-#include <QListWidgetItem>
+#include <QTableWidgetItem>
 #include <QLabel>
 
 #include "capturer/capturer.h"
@@ -31,14 +31,20 @@ public:
     void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
 
 private:
+    void setupUi();
+    void setupSignal();
+
     Ui::MainWindow *ui;
 
     Capturer *capturer;
     Dissector *dissector;
     Loader *loader;
 
-    QLabel *status;
+    /*StatuBar*/
+    QLabel *displayProportion;
 
+    /*tableWidget*/
+    bool scrollToBottom;
     enum COL_NAME_VAL{
         COL_NO,
         COL_TIME,
@@ -49,11 +55,12 @@ private:
         COL_INFO
     };
 
-    void setupUi();
-    void setupSignal();
+    /*rawDataPanel*/
+    /* |8|1|8|1|16 */
+    const qint32 rawDataPanelRowCount = 34;
 
 
-    bool scrollToBottom;
+
 
 
 
@@ -61,10 +68,13 @@ public slots:
     void StartCapture(QListWidgetItem *item);
     void Print(qint64 index);
 
-    void addToTable(DissectResultFrame *frame);
 private slots:
+    void addToTable(DissectResultFrame *frame);
+    void addToRawDataPanel(qint64 index);
+
     void on_actionStop_triggered();
     void on_actionStart_triggered();
     void on_actionRestart_triggered();
+    void on_tableWidget_cellClicked(int row, int column);
 };
 #endif // MAINWINDOW_H
