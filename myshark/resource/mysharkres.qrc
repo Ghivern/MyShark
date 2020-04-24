@@ -3,5 +3,8 @@
         <file>restart.ico</file>
         <file>start.ico</file>
         <file>stop.ico</file>
+        <file>defaultTextSize.ico</file>
+        <file>enlargeTextSize.ico</file>
+        <file>shrinkTextSize.ico</file>
     </qresource>
 </RCC>

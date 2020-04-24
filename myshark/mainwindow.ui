@@ -50,6 +50,11 @@
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QTableWidget" name="tableWidget">
+       <property name="font">
+        <font>
+         <family>Ubuntu</family>
+        </font>
+       </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
@@ -124,6 +129,13 @@
        </column>
       </widget>
       <widget class="QTableWidget" name="rawDataPanel">
+       <property name="font">
+        <font>
+         <family>Ubuntu Mono</family>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="showGrid">
         <bool>false</bool>
        </property>
@@ -162,6 +174,12 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuStatistics">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <addaction name="menuStatistics"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -187,6 +205,12 @@
    <addaction name="actionStop"/>
    <addaction name="actionRestart"/>
    <addaction name="separator"/>
+   <addaction name="actionScrollToLastLine"/>
+   <addaction name="separator"/>
+   <addaction name="actionEnlargeTextSize"/>
+   <addaction name="actionShrinkTextSize"/>
+   <addaction name="actionDefaultTextSize"/>
+   <addaction name="actionResizeTableWidgetTOFitContents"/>
   </widget>
   <action name="actionStart">
    <property name="icon">
@@ -225,6 +249,61 @@
    </property>
    <property name="toolTip">
     <string>Restart current capture</string>
+   </property>
+  </action>
+  <action name="actionEnlargeTextSize">
+   <property name="icon">
+    <iconset resource="resource/mysharkres.qrc">
+     <normaloff>:/icos/enlargeTextSize.ico</normaloff>:/icos/enlargeTextSize.ico</iconset>
+   </property>
+   <property name="text">
+    <string>EnlargeTextSize</string>
+   </property>
+   <property name="toolTip">
+    <string>Enalrge the main window text size</string>
+   </property>
+  </action>
+  <action name="actionShrinkTextSize">
+   <property name="icon">
+    <iconset resource="resource/mysharkres.qrc">
+     <normaloff>:/icos/shrinkTextSize.ico</normaloff>:/icos/shrinkTextSize.ico</iconset>
+   </property>
+   <property name="text">
+    <string>ShrinkTextSize</string>
+   </property>
+   <property name="toolTip">
+    <string>Shrink the main window text size</string>
+   </property>
+  </action>
+  <action name="actionDefaultTextSize">
+   <property name="icon">
+    <iconset resource="resource/mysharkres.qrc">
+     <normaloff>:/icos/defaultTextSize.ico</normaloff>:/icos/defaultTextSize.ico</iconset>
+   </property>
+   <property name="text">
+    <string>DefaultTextSize</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the main window text size to default</string>
+   </property>
+  </action>
+  <action name="actionScrollToLastLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>ScrollToLastLine</string>
+   </property>
+   <property name="toolTip">
+    <string>Scroll to last line</string>
+   </property>
+  </action>
+  <action name="actionResizeTableWidgetTOFitContents">
+   <property name="text">
+    <string>ResizeTableWidgetTOFitContents</string>
+   </property>
+   <property name="toolTip">
+    <string>Resize packets list columns to fit contents</string>
    </property>
   </action>
  </widget>

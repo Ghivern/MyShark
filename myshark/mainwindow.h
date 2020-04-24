@@ -7,6 +7,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QLabel>
+#include <QScrollBar>
+#include <QWheelEvent>
 
 #include "capturer/capturer.h"
 #include "dissector/dissector.h"
@@ -38,6 +40,8 @@ private:
     void setupUi();
     void setupSignal();
 
+    bool eventFilter(QObject *target, QEvent *event);
+
     Ui::MainWindow *ui;
 
     Capturer *capturer;
@@ -61,7 +65,8 @@ private:
 
     /*rawDataPanel*/
     /* |8|1|8|1|16 */
-    const qint32 rawDataPanelRowCount = 34;
+    const qint32 rawDataPanelColCount = 34;
+    const qint32 defaultTextSize = 11;
 
 
 public slots:
@@ -74,9 +79,15 @@ private slots:
     void addToTree(qint64 index);
     void addToRawDataPanel(qint64 index);
 
+    void on_tableWidget_cellClicked(int row, int column);
+
     void on_actionStop_triggered();
     void on_actionStart_triggered();
     void on_actionRestart_triggered();
-    void on_tableWidget_cellClicked(int row, int column);
+    void on_actionEnlargeTextSize_triggered();
+    void on_actionShrinkTextSize_triggered();
+    void on_actionDefaultTextSize_triggered();
+    void on_actionScrollToLastLine_triggered(bool checked);
+    void on_actionResizeTableWidgetTOFitContents_triggered();
 };
 #endif // MAINWINDOW_H

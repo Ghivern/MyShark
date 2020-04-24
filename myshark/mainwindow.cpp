@@ -23,30 +23,32 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupUi(){
+    /*Font*/
+    QFont font = this->ui->tableWidget->font();
+    QFontMetrics fontMetrics(font);
+
     /*TableWidget*/
     this->scrollToBottom = false;
     this->ui->tableWidget->verticalHeader()->setVisible(false);
     this->ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     this->ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    this->ui->tableWidget->verticalHeader()->setMinimumSectionSize(0);
+    this->ui->tableWidget->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+
+    /*TreeWidget*/
 
     /*RawDataPanel*/
     this->ui->rawDataPanel->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->rawDataPanel->verticalHeader()->setVisible(true);
-    this->ui->rawDataPanel->horizontalHeader()->setVisible(false);
+    this->ui->rawDataPanel->horizontalHeader()->hide();
     this->ui->rawDataPanel->setGridStyle(Qt::PenStyle::NoPen);
-    /*|8|1|8|1|16|*/
-    this->ui->rawDataPanel->setColumnCount(rawDataPanelRowCount);
-    QStringList rawDataPanelHHeaders;
-    for(qint32 i = 0; i < rawDataPanelRowCount; i++)
-        rawDataPanelHHeaders.append(".");
-    this->ui->rawDataPanel->setHorizontalHeaderLabels(rawDataPanelHHeaders);
-    this->ui->rawDataPanel->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    this->ui->rawDataPanel->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    QFont rawDataPanelfont = this->ui->rawDataPanel->font();
-    rawDataPanelfont.setPointSize(10);
-    this->ui->rawDataPanel->setFont(rawDataPanelfont);
+    this->ui->rawDataPanel->verticalHeader()->setMinimumSectionSize(0);
+    this->ui->rawDataPanel->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+
+    this->ui->rawDataPanel->setColumnCount(rawDataPanelColCount);
+    this->ui->rawDataPanel->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
 
     /*Display filter*/
@@ -67,8 +69,25 @@ void MainWindow::setupSignal(){
     connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
     connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
 
+    /*安装事件过滤器*/
+    this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
 
     connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+}
+
+/*事件过滤器*/
+bool MainWindow::eventFilter(QObject *target, QEvent *event){
+    if (target == this->ui->tableWidget->verticalScrollBar()){
+        if(event->type() == QEvent::Wheel)
+        {
+            QWheelEvent *wheelEvent = (QWheelEvent*)event;
+            if (wheelEvent->delta() > 0) {
+                this->scrollToBottom  = false;
+                this->ui->actionScrollToLastLine->setChecked(false);
+            }
+        }
+    }
+    return QMainWindow::eventFilter(target, event);
 }
 
 /*用于测试的，暂时性的*/
@@ -292,7 +311,7 @@ void MainWindow::addToRawDataPanel(qint64 index){
 
     for(qint32 row =0; row < rowCount; row++){
         line = ptr + row * 16;
-        for(qint32 col = 0; col < rawDataPanelRowCount; col++){
+        for(qint32 col = 0; col < rawDataPanelColCount; col++){
             text.clear();
             if( col == 8 || col == 17 ){
                 ;
@@ -316,6 +335,14 @@ void MainWindow::addToRawDataPanel(qint64 index){
         }
     }
 
+}
+
+void MainWindow::on_tableWidget_cellClicked(int row, int column)
+{
+    Q_UNUSED(column)
+    qint64 index = this->ui->tableWidget->item(row,COL_NO)->text().toULongLong();
+    this->addToRawDataPanel(index);
+    this->addToTree(index);
 }
 
 
@@ -342,15 +369,75 @@ void MainWindow::on_actionStart_triggered()
 
 void MainWindow::on_actionRestart_triggered()
 {
-    this->ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    this->scrollToBottom = true;
+
 }
 
 
-void MainWindow::on_tableWidget_cellClicked(int row, int column)
+/*控制MainWindow的字体大小*/
+void MainWindow::on_actionEnlargeTextSize_triggered()
 {
-    Q_UNUSED(column)
-    qint64 index = this->ui->tableWidget->item(row,COL_NO)->text().toULongLong();
-    this->addToRawDataPanel(index);
-    this->addToTree(index);
+    QFont font(this->ui->tableWidget->font());
+    font.setPointSize(font.pointSize() + 1);
+    QFontMetrics fontMetrics(font);
+
+    this->ui->tableWidget->setFont(font);
+    this->ui->tableWidget->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+
+    this->ui->treeWidget->setFont(font);
+
+    this->ui->rawDataPanel->setFont(font);
+    this->ui->rawDataPanel->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+}
+
+void MainWindow::on_actionShrinkTextSize_triggered()
+{
+    QFont font(this->ui->tableWidget->font());
+    if(font.pointSize() > 1)
+        font.setPointSize(font.pointSize() - 1);
+    QFontMetrics fontMetrics(font);
+
+    this->ui->tableWidget->setFont(font);
+    this->ui->tableWidget->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+
+    this->ui->treeWidget->setFont(font);
+
+    this->ui->rawDataPanel->setFont(font);
+    this->ui->rawDataPanel->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+}
+
+void MainWindow::on_actionDefaultTextSize_triggered()
+{
+    QFont font(this->ui->tableWidget->font());
+    font.setPointSize(this->defaultTextSize);
+    QFontMetrics fontMetrics(font);
+
+    QFont equalWidthFont(this->ui->rawDataPanel->font());
+    equalWidthFont.setPointSize(this->defaultTextSize);
+    QFontMetrics equalWidthFontMetrics(equalWidthFont);
+
+    this->ui->tableWidget->setFont(font);
+    this->ui->tableWidget->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+
+    this->ui->treeWidget->setFont(font);
+
+    this->ui->rawDataPanel->setFont(equalWidthFont);
+    this->ui->rawDataPanel->verticalHeader()->setDefaultSectionSize(equalWidthFontMetrics.height());
+    for(qint32 index = 0; index < rawDataPanelColCount; index++){
+        if( index < 18 )
+            this->ui->rawDataPanel->horizontalHeader()->resizeSection(index,equalWidthFont.pointSize() * 2);
+        else
+            this->ui->rawDataPanel->horizontalHeader()->resizeSection(index,equalWidthFont.pointSize());
+    }
+}
+
+void MainWindow::on_actionScrollToLastLine_triggered(bool checked)
+{
+    this->scrollToBottom = checked;
+    if(checked)
+        this->ui->tableWidget->scrollToBottom();
+}
+
+void MainWindow::on_actionResizeTableWidgetTOFitContents_triggered()
+{
+    this->ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
