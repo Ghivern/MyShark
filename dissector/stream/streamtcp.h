@@ -8,27 +8,63 @@
 #include "../units/keys.h"
 
 
+#define TCP_A_RETRANSMISSION  0x0001
+#define TCP_A_LOST_PACKET  0x0002
+#define TCP_A_ACK_LOST_PACKET 0x0004
+#define TCP_A_KEEP_ALIVE  0x0008
+#define TCP_A_DUPLICATE_ACK  0x0010
+#define TCP_A_ZERO_WINDOW  0x0020
+#define TCP_A_ZERO_WINDOW_PROBE  0x0040
+#define TCP_A_ZERO_WINDOW_PROBE_ACK  0x0080
+#define TCP_A_KEEP_ALIVE_ACK  0x0100
+#define TCP_A_OUT_OF_ORDER  0x0200
+#define TCP_A_FAST_RETRANSMISSION  0x0400
+#define TCP_A_WINDOW_SCALE_UPDATE  0x0800
+#define TCP_A_WINDOW_FULL  0x1000
+#define TCP_A_REUSED_PORTS  0x2000
+#define TCP_A_SPURIOUS_RETRANSMISSION  0x4000
+
+
+const QHash<qint32,QString> tcp_segment_status_vals =
+{
+    {TCP_A_RETRANSMISSION,              "[Retransmission]"},
+    {TCP_A_LOST_PACKET,                 "[Lost Packet]"},
+    {TCP_A_ACK_LOST_PACKET,             "[Ack Lost Packet]"},
+    {TCP_A_KEEP_ALIVE,                  "[Keep Alive]"},
+    {TCP_A_DUPLICATE_ACK,               "[Duplicate Ack]"},
+    {TCP_A_ZERO_WINDOW,                 "[Zero Window]"},
+    {TCP_A_ZERO_WINDOW_PROBE,           "[Zero Window Probe]"},
+    {TCP_A_ZERO_WINDOW_PROBE_ACK,       "[Zero Window Probe Ack]"},
+    {TCP_A_KEEP_ALIVE_ACK,              "[Keep Alive Ack]"},
+    {TCP_A_OUT_OF_ORDER,                "[Out Of Order]"},
+    {TCP_A_FAST_RETRANSMISSION,         "[Fase Retransmission]"},
+    {TCP_A_WINDOW_SCALE_UPDATE,         "[Window Scale Update]"},
+    {TCP_A_WINDOW_FULL,                 "[Window Full]"},
+    {TCP_A_REUSED_PORTS,                "[Reused Ports]"},
+    {TCP_A_SPURIOUS_RETRANSMISSION,     "[Spurious Restrasmission]"}
+};
+
 class StreamTcp:public Stream
 {
 public:
 
-    enum TCP_SEGMENT_STATUS{
-        TCP_A_RETRANSMISSION = 0x0001,
-        TCP_A_LOST_PACKET  =0x0002,
-        TCP_A_ACK_LOST_PACKET =0x0004,
-        TCP_A_KEEP_ALIVE = 0x0008,
-        TCP_A_DUPLICATE_ACK = 0x0010,
-        TCP_A_ZERO_WINDOW = 0x0020,
-        TCP_A_ZERO_WINDOW_PROBE = 0x0040,
-        TCP_A_ZERO_WINDOW_PROBE_ACK = 0x0080,
-        TCP_A_KEEP_ALIVE_ACK = 0x0100,
-        TCP_A_OUT_OF_ORDER = 0x0200,
-        TCP_A_FAST_RETRANSMISSION = 0x0400,
-        TCP_A_WINDOW_UPDATE = 0x0800,
-        TCP_A_WINDOW_FULL = 0x1000,
-        TCP_A_REUSED_PORTS = 0x2000,
-        TCP_A_SPURIOUS_RETRANSMISSION = 0x4000
-    };
+//    enum TCP_SEGMENT_STATUS{
+//        TCP_A_RETRANSMISSION = 0x0001,
+//        TCP_A_LOST_PACKET  =0x0002,
+//        TCP_A_ACK_LOST_PACKET =0x0004,
+//        TCP_A_KEEP_ALIVE = 0x0008,
+//        TCP_A_DUPLICATE_ACK = 0x0010,
+//        TCP_A_ZERO_WINDOW = 0x0020,
+//        TCP_A_ZERO_WINDOW_PROBE = 0x0040,
+//        TCP_A_ZERO_WINDOW_PROBE_ACK = 0x0080,
+//        TCP_A_KEEP_ALIVE_ACK = 0x0100,
+//        TCP_A_OUT_OF_ORDER = 0x0200,
+//        TCP_A_FAST_RETRANSMISSION = 0x0400,
+//        TCP_A_WINDOW_UPDATE = 0x0800,
+//        TCP_A_WINDOW_FULL = 0x1000,
+//        TCP_A_REUSED_PORTS = 0x2000,
+//        TCP_A_SPURIOUS_RETRANSMISSION = 0x4000
+//    };
 
 
 

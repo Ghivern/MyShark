@@ -2,6 +2,7 @@
 
 Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkLayer *dissectResultLinklayer,void *reserves)
 {
+    Q_UNUSED(reserves)
         /*LinkLayer处理代码*/
         Q_UNUSED(dissectResultLinklayer)
         proTree->AddItem("frame","linklayer summery"); // -

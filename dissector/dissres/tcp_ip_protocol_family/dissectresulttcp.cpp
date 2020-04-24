@@ -30,7 +30,8 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                          ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
                          );
     dissectResultBase->SetSummery(QString("%1 -> %2").arg(this->GetSourcePort()).arg(this->GetDestinationPort()));
-    dissectResultBase->SetSummery(QString("Window scale:%1 maxSeg:%2 tval:%3 ter:%4 %5 win:%6 c-win:%7")
+    dissectResultBase->SetSummery(QString("%1 Window scale:%2 maxSeg:%3 tval:%4 ter:%5 %6 win:%7 c-win:%8")
+                                  .arg(this->GetSegmentStatusStr())
                                   .arg(this->GetOptionWindowScale())
                                   .arg(this->GetOptionMaximumSegmentSize())
                                   .arg(this->GetOptionTimestampValue())
@@ -38,6 +39,14 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                   .arg(this->SYN()?"SYN":"")
                                   .arg(this->GetWindow())
                                   .arg(this->GetCalculatedWindow())
+                                  );
+    dissectResultBase->SetSummery(QString("%1 %2 -> %3 seq:%4 nextSeq:%5 ack:%6")
+                                       .arg(this->GetSegmentStatusStr())
+                                       .arg(this->GetSourcePort())
+                                       .arg(this->GetDestinationPort())
+                                       .arg(this->GetRelativeSeq())
+                                       .arg(this->GetRelativeSeq() + this->GetPayloadLen())
+                                       .arg(this->GetRelativeAck())
                                   );
 }
 
@@ -202,17 +211,8 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
 QString DissectResultTcp::GetSegmentStatusStr(){
     qint32 status = this->dissectResultBase->GetAdditionalVal(TCP_STATUS);
     if(status == -1)
-        return "normal";
-    switch (status) {
-    case StreamTcp::TCP_A_OUT_OF_ORDER:
-        return "out of order";
-    case StreamTcp::TCP_A_RETRANSMISSION:
-        return "retransmission";
-    case StreamTcp::TCP_A_FAST_RETRANSMISSION:
-        return "fast retransmission";
-    default:
-        return "normal";
-    }
+        return "";
+    return tcp_segment_status_vals.value(status);
 }
 
 /*

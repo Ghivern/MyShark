@@ -2,6 +2,7 @@
 
 Ipv4::Ipv4(ProTree *proTree,tcp_ip_protocol_family::DissectResultIpv4 *dissectResultIpv4,void *reserves)
 {
+    Q_UNUSED(reserves)
         /*Ipv4处理代码*/
         Q_UNUSED(dissectResultIpv4)
         proTree->AddItem("frame","ipv4 summery"); // -

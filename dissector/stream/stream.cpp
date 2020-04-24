@@ -33,6 +33,16 @@ qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 
         else
             new_index_streamIndex.streamIndexPlusOne = this->maxStreamIndexPlusOne++;
         this->streamHash.insert(md5,new_index_streamIndex);
+        this->md5Hash.insert(new_index_streamIndex.streamIndexPlusOne,md5);
         return new_index_streamIndex.streamIndexPlusOne;
+    }
+}
+
+QList<quint64> Stream::GetPacketsIndexListByStream(qint64 streamIndexPlusOne){
+    if(!this->md5Hash.contains(streamIndexPlusOne)){
+        QList<quint64> emptyList;
+        return emptyList;
+    }else{
+        return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).indexes;
     }
 }

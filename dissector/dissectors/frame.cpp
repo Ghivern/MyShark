@@ -3,6 +3,7 @@
 
 Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reserves)
 {
+    Q_UNUSED(reserves)
         /*Frame处理代码*/
         Q_UNUSED(dissectResultFrame)
         proTree->AddItem("frame","frame summery"); //-

@@ -296,14 +296,17 @@ void MainWindow::addToRawDataPanel(qint64 index){
             text.clear();
             if( col == 8 || col == 17 ){
                 ;
-            }else if( col < 18 ){
+            }else if( col < 8 ){
                 if( row * 16 + col + 1 > capLen )
-                    continue;
+                    break;
                 text.append(QString::asprintf("%02x",line[col]));
+            }else if( col < 17){
+                if( row * 16 + col > capLen )
+                    break;
+                text.append(QString::asprintf("%02x",line[col - 1]));
             }else{
-                if( row * 16 + col -17 > capLen ){
-                    continue;
-                }
+                if( row * 16 + col - 17 > capLen )
+                    break;
                 if(isprint(line[col - 18]))
                     text.append(QString::asprintf("%c",line[col - 18]));
                 else

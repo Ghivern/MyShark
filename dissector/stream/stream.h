@@ -19,6 +19,10 @@ public:
      */
     qint64 Add(DissectResultBase *dissectResultBase,quint8 *srcAddr,quint8 *dstAddr,qint32 addr_size,quint8 *srcPort = NULL,quint8 *dstPort = NULL,qint32 port_size = 2);
 
+    /*统计Conversion时使用*/
+    QList<quint64> GetPacketsIndexListByStream(qint64 streamIndexPlusOne);
+
+
 private:
     struct indexes_streamIndex{
       QList<quint64> indexes;
@@ -28,6 +32,9 @@ private:
 
     qint64 maxStreamIndexPlusOne;
     QHash<QByteArray,struct indexes_streamIndex> streamHash;
+
+    /*用于统计,通过流号找到地址的Md5,进而找到indexes_streamIndex结构体*/
+    QHash<qint64,QByteArray> md5Hash;
 };
 
 #endif // STREAM_H
