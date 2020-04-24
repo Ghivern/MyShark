@@ -298,11 +298,11 @@ void MainWindow::addToRawDataPanel(qint64 index){
                 ;
             }else if( col < 8 ){
                 if( row * 16 + col + 1 > capLen )
-                    break;
+                    continue;
                 text.append(QString::asprintf("%02x",line[col]));
             }else if( col < 17){
                 if( row * 16 + col > capLen )
-                    break;
+                    continue;
                 text.append(QString::asprintf("%02x",line[col - 1]));
             }else{
                 if( row * 16 + col - 17 > capLen )
