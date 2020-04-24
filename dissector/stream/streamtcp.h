@@ -23,6 +23,7 @@
 #define TCP_A_WINDOW_FULL  0x1000
 #define TCP_A_REUSED_PORTS  0x2000
 #define TCP_A_SPURIOUS_RETRANSMISSION  0x4000
+#define TCP_A_PREVIOUS_SEGMENT_NOT_CAPTURED 0x8000
 
 
 const QHash<qint32,QString> tcp_segment_status_vals =
@@ -41,7 +42,8 @@ const QHash<qint32,QString> tcp_segment_status_vals =
     {TCP_A_WINDOW_SCALE_UPDATE,         "[Window Scale Update]"},
     {TCP_A_WINDOW_FULL,                 "[Window Full]"},
     {TCP_A_REUSED_PORTS,                "[Reused Ports]"},
-    {TCP_A_SPURIOUS_RETRANSMISSION,     "[Spurious Restrasmission]"}
+    {TCP_A_SPURIOUS_RETRANSMISSION,     "[Spurious Restrasmission]"},
+    {TCP_A_PREVIOUS_SEGMENT_NOT_CAPTURED, "[Tcp Previous Segment Not Captured]"}
 };
 
 class StreamTcp:public Stream
@@ -74,6 +76,10 @@ public:
     quint16 GetWindowMultiplier(qint64 streamIndexPlusOne);
 
 private:
+    bool dealBaseSeq(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
+    void addSegmentToWindow(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
+    qint32 addSegmentFromOutOfOrderListToWindow(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
+    void addSegmentToOutOfOrderList(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
 
     struct segment_t{
       quint32 seq;
