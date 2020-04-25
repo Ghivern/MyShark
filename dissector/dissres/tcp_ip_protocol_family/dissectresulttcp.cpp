@@ -17,6 +17,7 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     this->dealTcpOptions();
 
     dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
+    dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
     dissectResultBase->AddAdditional(TCP_SEQ_VAL,this->GetSeq());
     dissectResultBase->AddAdditional(TCP_ACK_VAL,this->GetAck());
     dissectResultBase->AddAdditional(TCP_PAYLOAD_LEN,this->GetPayloadLen());
@@ -40,13 +41,14 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                   .arg(this->GetWindow())
                                   .arg(this->GetCalculatedWindow())
                                   );
-    dissectResultBase->SetSummery(QString("%1 %2 -> %3 seq:%4 nextSeq:%5 ack:%6")
+    dissectResultBase->SetSummery(QString("%1 %2 %3 -> %4 seq:%5 nextSeq:%6 ack:%7")
                                        .arg(this->GetSegmentStatusStr())
+                                       .arg(this->SYN() ? "SYN":"")
                                        .arg(this->GetSourcePort())
                                        .arg(this->GetDestinationPort())
                                        .arg(this->GetRelativeSeq())
                                        .arg(this->GetRelativeSeq() + this->GetPayloadLen())
-                                       .arg(this->GetRelativeAck())
+                                       .arg(this->ACK() ? this->GetRelativeAck() : 0)
                                   );
 }
 
@@ -95,6 +97,20 @@ quint32 DissectResultTcp::GetPayloadLen(){
 }
 
 /*Flags*/
+
+/* ---------------------------------------------------------------
+* Data  |Reserved   |U|A|P|R|S|F|   Window                      |
+* Offset|           |R|C|S|S|Y|I|                               |
+*       |           |G|K|H|T|N|N|                               |
+* ---------------------------------------------------------------
+*/
+bool DissectResultTcp::ACK(){
+    if(((this->header->offset_reserved_flags[1] & 0x10) >> 4) == 1)
+        return true;
+    else
+        return false;
+}
+
 bool DissectResultTcp::SYN(){
     if(((this->header->offset_reserved_flags[1] & 0x02) >> 1) == 1)
         return true;

@@ -22,20 +22,20 @@ qint64 StreamTcp::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *sr
 
     this->dealBaseSeq(dissectResultBase,streamIndexPlusOne);
 
-
-    /*处理Ack*/
-    if(this->acks.contains(ack)){
-        (*this->acks.find(ack)).append(index);
-    }else{
-        QList<quint64> packetList;
-        packetList.append(index);
-        this->acks.insert(ack,packetList);
-    }
-
-    if(len == 0)
+    if(len == 0){
+        if( this->windows.value(streamIndexPlusOne).acks.contains(ack) ){
+            (*(*this->windows.find(streamIndexPlusOne)).acks.find(ack)).append(ack);
+            if( this->windows.value(streamIndexPlusOne).acks.value(ack).length() >= 3)
+                dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_DUPLICATE_ACK);
+        }else{
+            QList<quint64> packetList;
+            packetList.append(index);
+            (*this->windows.find(streamIndexPlusOne)).acks.insert(streamIndexPlusOne,packetList);
+        }
         return streamIndexPlusOne;
-    else
+    }else{
         this->addSegmentToWindow(dissectResultBase,streamIndexPlusOne);
+    }
 
 
     return streamIndexPlusOne;
@@ -82,19 +82,18 @@ bool StreamTcp::dealBaseSeq(DissectResultBase *dissectResultBase,qint64 streamIn
         this->windows.insert(streamIndexPlusOne,window);
         this->windows.insert(-streamIndexPlusOne,contrary_window);
     }else{
-        if( (SYN && ACK) || (SYN && !ACK) ){ /*前两次握手*/
+        if(SYN && ACK){ /*第二次握手*/
             (*this->windows.find(streamIndexPlusOne)).baseSeq = seq;
             (*this->windows.find(streamIndexPlusOne)).maxSeq = seq + 1;
             (*this->windows.find(streamIndexPlusOne)).windowMultiplier = qAbs(windowMultiplier);
-            if(SYN && !ACK){ /*重新连接，清理窗口*/
-                (*this->windows.find(streamIndexPlusOne)).segmentList.clear();
-                (*this->windows.find(streamIndexPlusOne)).outOfOrderSegmentList.clear();
-                return true;
-            }
-        }else{    /*正常数据交互*/
+        }else if(SYN && !ACK){ /*重新连接，清理窗口*/
+            (*this->windows.find(streamIndexPlusOne)).segmentList.clear();
+            (*this->windows.find(streamIndexPlusOne)).outOfOrderSegmentList.clear();
+            return true;
+        }else{
             if(windowMultiplier != -1){  /*Window Scale变化*/
-                (*this->windows.find(streamIndexPlusOne)).windowMultiplier = qAbs(windowMultiplier);
-                dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_WINDOW_SCALE_UPDATE);
+            (*this->windows.find(streamIndexPlusOne)).windowMultiplier = qAbs(windowMultiplier);
+            dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_WINDOW_SCALE_UPDATE);
             }
         }
     }
@@ -117,6 +116,7 @@ void StreamTcp::addSegmentToWindow(DissectResultBase *dissectResultBase, qint64 
             segment.seq = seq;
             segment.len = payloadLen;
             segment.index = dissectResultBase->GetIndex();
+            (*this->windows.find(streamIndexPlusOne)).maxSeq = nextAck;
 
             if(!this->windows.value(streamIndexPlusOne).segmentList.isEmpty())
                 dissectResultBase->AddAdditional(TCP_PRE_SEGMENT,this->windows.value(streamIndexPlusOne).segmentList.last().index);
@@ -125,15 +125,19 @@ void StreamTcp::addSegmentToWindow(DissectResultBase *dissectResultBase, qint64 
 
             (*this->windows.find(streamIndexPlusOne)).segmentList.append(segment);
 
-            (*this->windows.find(streamIndexPlusOne)).maxSeq = nextAck;
-
-            if( this->addSegmentFromOutOfOrderListToWindow(dissectResultBase,streamIndexPlusOne) > 0 ) /*从失序片段中寻找可以连接的分片*/
-                dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_OUT_OF_ORDER);
+            if( this->addSegmentFromOutOfOrderListToWindow(dissectResultBase,streamIndexPlusOne) > 0 ){ /*从失序片段中寻找可以连接的分片*/
+                    dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_OUT_OF_ORDER);
+            }else{
+                if( this->windows.value(-streamIndexPlusOne).acks.contains(seq)
+                        && this->windows.value(-streamIndexPlusOne).acks.value(seq).length() >= 3 )
+                    dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_FAST_RETRANSMISSION);
+            }
         }else{   /* seq > maxSeq: May Previous Segment not captured*/
             this->addSegmentToOutOfOrderList(dissectResultBase,streamIndexPlusOne);
         }
     }
 }
+
 
 /*返回重组成功的个数*/
 qint32 StreamTcp::addSegmentFromOutOfOrderListToWindow(DissectResultBase *dissectResultBase, qint64 streamIndexPlusOne){
@@ -151,7 +155,7 @@ qint32 StreamTcp::addSegmentFromOutOfOrderListToWindow(DissectResultBase *dissec
         payloadLen = base->GetAdditionalVal(TCP_PAYLOAD_LEN);
         nextAck = seq + payloadLen;
         if( nextAck <= maxSeq ){
-            dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_RETRANSMISSION);
+            //dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_RETRANSMISSION);
             forRemove.push(index);
         }else{
             if( seq <= maxSeq ){
@@ -188,7 +192,8 @@ void StreamTcp::addSegmentToOutOfOrderList(DissectResultBase *dissectResultBase,
 
     quint32 temp_seq = 0;
     quint32 temp_payloadLen = 0;
-    qint32 index;
+
+    bool previousNotCaptured = true;
 
     segment_t segment;
     segment.len = payloadLen;
@@ -197,14 +202,37 @@ void StreamTcp::addSegmentToOutOfOrderList(DissectResultBase *dissectResultBase,
     if(this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.isEmpty()){
         dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_PREVIOUS_SEGMENT_NOT_CAPTURED);
     }else{
-        for(index = 0; index < this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.length(); index++){
+        for(qint32 index = 0; index < this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.length(); index++){
             temp_seq = this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.at(index).seq;
             temp_payloadLen = this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.at(index).len;
-            if(seq >= temp_seq && seq <= temp_seq + temp_payloadLen )
-                break;
+
+            if( seq >= temp_seq && seq <= temp_seq + temp_payloadLen ){  /*重传或者失序*/
+                previousNotCaptured = false;
+                if( seq + payloadLen <= this->getSeriesSegmentMaxCalculateSeq(temp_seq,temp_payloadLen,streamIndexPlusOne)){
+                    dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_RETRANSMISSION);
+                    return;
+                }else{
+                    dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_OUT_OF_ORDER);
+                }
+            }
         }
-        if(index == this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.length())
+
+        if( previousNotCaptured )
             dissectResultBase->AddAdditional(TCP_STATUS,TCP_A_PREVIOUS_SEGMENT_NOT_CAPTURED);
     }
     (*this->windows.find(streamIndexPlusOne)).outOfOrderSegmentList.append(segment);
+}
+
+quint32 StreamTcp::getSeriesSegmentMaxCalculateSeq(quint32 seq, quint32 payloadLen,qint64 streamIndexPlusOne){
+    quint32 temp_seq;
+    quint32 temp_payloadLen;
+    quint32 maxCalculateSeq = seq + payloadLen;
+    for(qint32 index = 0; index < this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.length(); index++){
+        temp_seq = this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.at(index).seq;
+        temp_payloadLen = this->windows.value(streamIndexPlusOne).outOfOrderSegmentList.at(index).len;
+        if( maxCalculateSeq >= temp_seq && maxCalculateSeq < temp_seq + temp_payloadLen ){
+            maxCalculateSeq = temp_seq + temp_payloadLen;
+        }
+    }
+    return maxCalculateSeq;
 }

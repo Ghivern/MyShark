@@ -80,6 +80,7 @@ private:
     void addSegmentToWindow(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
     qint32 addSegmentFromOutOfOrderListToWindow(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
     void addSegmentToOutOfOrderList(DissectResultBase *dissectResultBase,qint64 streamIndexPlusOne);
+    quint32 getSeriesSegmentMaxCalculateSeq(quint32 seq,quint32 payloadLen,qint64 streamIndexPlusOne);
 
     struct segment_t{
       quint32 seq;
@@ -93,13 +94,14 @@ private:
         quint32 maxSeq;
         quint32 baseSeq;
         qint16 windowMultiplier;
+        QHash<quint16,QList<quint64>> acks;
     };
 
     /*streamIndexPlusOne --> window*/
     QHash<qint64,struct window_t> windows;
 
     /*ack --> packet List*/
-    QHash<quint16,QList<quint64>> acks;
+    //QHash<quint16,QList<quint64>> acks;
 };
 
 #endif // STREAMTCP_H
