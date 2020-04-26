@@ -158,7 +158,7 @@ void DissectResultBase::RemoveAdditionalPtr(QString name){
 
 qint64 DissectResultBase::GetAdditionalVal(QString name){
     if(!this->reserve_val.contains(name))
-        return -1;
+        return 0;
     return this->reserve_val.value(name);
 }
 

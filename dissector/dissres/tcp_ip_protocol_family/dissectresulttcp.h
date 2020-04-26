@@ -9,7 +9,9 @@
 #include "../converter.h"
 
 #include "../../stream/stream.h"
-#include "../../stream/streamtcp.h"
+//#include "../../stream/streamtcp.h"
+
+#include "../../stream/streamtcp2.h"
 
 #include "../dissectresultbase.h"
 #include "../dissectresultcommonstream.h"
@@ -243,7 +245,9 @@ private:
         quint8 length;
     };
 
-    static StreamTcp stream;
+    //static StreamTcp stream;
+
+    static StreamTcp2 stream2;
 
     struct header_t *header;
     QHash<qint32,struct option_dsc_t> options_dsc;

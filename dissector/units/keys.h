@@ -26,6 +26,7 @@ const QString TCP_WINDOW_MULTIPLIER = "tcp_window_multiplier";
 
 const QString TCP_PRE_SEGMENT = "tcp_pre_seqment";
 const QString TCP_STATUS = "tcp_status";
+const QString TCP_STATUS2 = "tcp_status2";
 const QString TCP_VALIED_DATA_START_PTR ="tcp_valied_data_start_ptr";
 
 

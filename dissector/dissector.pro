@@ -52,6 +52,7 @@ SOURCES += \
     stream/streamitem.cpp \
     stream/streamrecorder.cpp \
     stream/streamtcp.cpp \
+    stream/streamtcp2.cpp \
     units/bit.cpp \
     units/checksum.cpp \
     units/device.cpp
@@ -95,6 +96,7 @@ HEADERS += \
     stream/streamitem.h \
     stream/streamrecorder.h \
     stream/streamtcp.h \
+    stream/streamtcp2.h \
     units/bit.h \
     units/checksum.h \
     units/device.h \

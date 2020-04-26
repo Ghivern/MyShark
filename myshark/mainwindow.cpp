@@ -276,9 +276,10 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
 
     //背景色
-    if( frame->GetDissectResultBase()->GetAdditionalVal(TCP_STATUS) != -1){
+    if( frame->GetDissectResultBase()->GetAdditionalVal(TCP_STATUS2) != 0){
         this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
-    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISSYN) == 1){
+    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISSYN) == 1
+             || frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISFIN) == 1){
         this->setTableWidgetColor(row,0xAAAAAA);
     }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISRST) == 1){
         this->setTableWidgetColor(row,0xA21919);

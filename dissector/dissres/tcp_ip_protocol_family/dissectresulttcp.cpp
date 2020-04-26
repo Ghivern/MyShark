@@ -3,7 +3,9 @@
 
 using namespace tcp_ip_protocol_family;
 
-StreamTcp DissectResultTcp::stream;
+//StreamTcp DissectResultTcp::stream;
+
+StreamTcp2 DissectResultTcp::stream2;
 
 DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
 {
@@ -17,14 +19,23 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     this->dealTcpOptions();
 
     dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
-    dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
     dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);
+    dissectResultBase->AddAdditional(TCP_ISFIN,this->FIN()?1:0);
+    dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
     dissectResultBase->AddAdditional(TCP_SEQ_VAL,this->GetSeq());
     dissectResultBase->AddAdditional(TCP_ACK_VAL,this->GetAck());
     dissectResultBase->AddAdditional(TCP_PAYLOAD_LEN,this->GetPayloadLen());
     dissectResultBase->AddAdditional(TCP_WINDOW,this->GetWindow());
     dissectResultBase->AddAdditional(TCP_WINDOW_MULTIPLIER,this->GetOptionWindowMultiplier());
-    this->streamIndexPlusOne = stream.AddWithWindow(dissectResultBase
+//    this->streamIndexPlusOne = stream.AddWithWindow(dissectResultBase
+//                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_SOURCE_ADDRESS_PTR)
+//                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_DESTINATION_ADDRESS_PTR)
+//                         ,dissectResultBase->GetAdditionalVal(IP_ADDRESS_LENGTH)
+//                         ,this->GetSourcePortPtr()
+//                         ,this->GetDestinationPortPtr()
+//                         ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
+//                         );
+    this->streamIndexPlusOne = stream2.AddWithWindow(dissectResultBase
                          ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_SOURCE_ADDRESS_PTR)
                          ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_DESTINATION_ADDRESS_PTR)
                          ,dissectResultBase->GetAdditionalVal(IP_ADDRESS_LENGTH)
@@ -43,14 +54,26 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                   .arg(this->GetWindow())
                                   .arg(this->GetCalculatedWindow())
                                   );
-    dissectResultBase->SetSummery(QString("%1 %2 %3 -> %4 seq:%5 nextSeq:%6 ack:%7")
+    QString flag;
+    if(this->SYN())
+        flag.append("SYN-");
+    if(this->ACK())
+        flag.append("ACK-");
+    if(this->RST())
+        flag.append("RST-");
+    if(this->FIN())
+        flag.append("FIN");
+    dissectResultBase->SetSummery(QString("%1 %2 %3 -> %4 str:%5 r-seq:%6 seq:%7")
                                        .arg(this->GetSegmentStatusStr())
-                                       .arg(this->SYN() ? "SYN":"")
+                                       .arg(flag)
                                        .arg(this->GetSourcePort())
                                        .arg(this->GetDestinationPort())
+                                       .arg(this->GetOriginalStreamIndex())
                                        .arg(this->GetRelativeSeq())
-                                       .arg(this->GetRelativeSeq() + this->GetPayloadLen())
-                                       .arg(this->ACK() ? this->GetRelativeAck() : 0)
+                                       .arg(this->GetSeq())
+                                       //.arg(this->GetRelativeSeq() + this->GetPayloadLen())
+                                       //.arg(this->ACK() ? this->GetRelativeAck() : 0)
+                                       //.arg(this->GetWindow())
                                   );
 }
 
@@ -78,7 +101,9 @@ quint32 DissectResultTcp::GetSeq(){
 }
 
 quint32 DissectResultTcp::GetRelativeSeq(){
-    return this->GetSeq() - DissectResultTcp::stream.GetBaseSeq(this->streamIndexPlusOne);
+    if( DissectResultTcp::stream2.GetBaseSeq(streamIndexPlusOne) == 0)
+        qDebug() << "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊";
+    return this->GetSeq() - DissectResultTcp::stream2.GetBaseSeq(this->streamIndexPlusOne);
 }
 
 quint32 DissectResultTcp::GetAck(){
@@ -86,7 +111,7 @@ quint32 DissectResultTcp::GetAck(){
 }
 
 quint32 DissectResultTcp::GetRelativeAck(){
-    return this->GetAck() - DissectResultTcp::stream.GetBaseSeq(-this->streamIndexPlusOne);
+    return this->GetAck() - DissectResultTcp::stream2.GetBaseSeq(-this->streamIndexPlusOne);
 }
 
 /*处理首部长度和负载长度*/
@@ -144,7 +169,7 @@ quint16 DissectResultTcp::GetWindow(){
 }
 
 quint32 DissectResultTcp::GetCalculatedWindow(){
-    return this->GetWindow() * stream.GetWindowMultiplier(streamIndexPlusOne);
+    return this->GetWindow() * stream2.GetWindowMultiplier(streamIndexPlusOne);
 }
 
 /*Checksum*/
@@ -230,7 +255,7 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
         quint8 length = this->options_dsc.value(index).length;
         const quint32 *ptr = (quint32*)this->options_dsc.value(index).ptr;
         for(quint8 i = 0; i < (length -2)/4; i++)
-            sacks.append(ptr[i] - stream.GetBaseSeq(this->streamIndexPlusOne));
+            sacks.append(ptr[i] - stream2.GetBaseSeq(this->streamIndexPlusOne));
     }
     return sacks;
 }
@@ -259,17 +284,31 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
 
 /*分析Seq/Ack*/
 QString DissectResultTcp::GetSegmentStatusStr(){
-    qint32 status = this->dissectResultBase->GetAdditionalVal(TCP_STATUS);
-    if(status == -1)
-        return "";
+    qint32 status = this->dissectResultBase->GetAdditionalVal(TCP_STATUS2);
+    QString str = "";
+
+    if( status & TCP_A_ZERO_WINDOW_PROBE )
+        str.append(tcp_segment_status_vals.value(TCP_A_ZERO_WINDOW_PROBE)).append("-");
+
+    if( status & TCP_A_ZERO_WINDOW )
+        str.append(tcp_segment_status_vals.value(TCP_A_ZERO_WINDOW)).append("-");
+
+    if( status & TCP_A_LOST_PACKET )
+        str.append(tcp_segment_status_vals.value(TCP_A_LOST_PACKET)).append("-");
+
+    if( status & TCP_A_KEEP_ALIVE )
+        str.append(tcp_segment_status_vals.value(TCP_A_KEEP_ALIVE)).append("-");
+
     if( status & TCP_A_WINDOW_UPDATE )
-        return tcp_segment_status_vals.value(TCP_A_WINDOW_UPDATE);
-    else if( status & TCP_A_ZERO_WINDOW )
-        return tcp_segment_status_vals.value(TCP_A_ZERO_WINDOW);
-    else if( status & TCP_A_WINDOW_FULL )
-        return tcp_segment_status_vals.value(TCP_A_WINDOW_FULL);
-    else
-        return "";
+        str.append(tcp_segment_status_vals.value(TCP_A_WINDOW_UPDATE)).append("-");
+
+    if( status & TCP_A_WINDOW_FULL )
+        str.append(tcp_segment_status_vals.value(TCP_A_WINDOW_FULL)).append("-");
+
+    if( status & TCP_A_KEEP_ALIVE_ACK )
+        str.append(tcp_segment_status_vals.value(TCP_A_KEEP_ALIVE_ACK)).append("-");
+
+    return str;
 }
 
 /*
