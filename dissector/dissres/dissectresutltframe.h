@@ -41,7 +41,7 @@ public:
     qint32 GetLen();
     qint32 GetProtocolHeaderLengthCount();
 
-
+    DissectResultBase *GetDissectResultBase();
     void* GetProtocolFamilyBaseLayer();
     /*定制化方法，获得特定类型的指针*/
     tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();

@@ -20,6 +20,7 @@ const QString TCP_ISPSH = "tcp_ispsh";
 const QString TCP_ISRST = "tcp_isrst";
 const QString TCP_ISFIN = "tcp_isfin";
 const QString TCP_ISSYN = "tcp_issyn";
+const QString TCP_WINDOW = "tcp_window";
 const QString TCP_WINDOW_MULTIPLIER = "tcp_window_multiplier";
 
 

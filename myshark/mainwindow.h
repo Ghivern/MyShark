@@ -40,6 +40,9 @@ private:
     void setupUi();
     void setupSignal();
 
+    void setTableWidgetColor(qint32 row,quint32 background, quint32 text);
+    void setTableWidgetColor(qint32 row,quint32 background);
+
     bool eventFilter(QObject *target, QEvent *event);
 
     Ui::MainWindow *ui;
@@ -53,6 +56,7 @@ private:
 
     /*tableWidget*/
     bool scrollToBottom;
+    const qint32 tableWidgetColCount = 7;
     enum COL_NAME_VAL{
         COL_NO,
         COL_TIME,

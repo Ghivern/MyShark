@@ -18,9 +18,11 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
 
     dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
     dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
+    dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);
     dissectResultBase->AddAdditional(TCP_SEQ_VAL,this->GetSeq());
     dissectResultBase->AddAdditional(TCP_ACK_VAL,this->GetAck());
     dissectResultBase->AddAdditional(TCP_PAYLOAD_LEN,this->GetPayloadLen());
+    dissectResultBase->AddAdditional(TCP_WINDOW,this->GetWindow());
     dissectResultBase->AddAdditional(TCP_WINDOW_MULTIPLIER,this->GetOptionWindowMultiplier());
     this->streamIndexPlusOne = stream.AddWithWindow(dissectResultBase
                          ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_SOURCE_ADDRESS_PTR)
@@ -113,6 +115,20 @@ bool DissectResultTcp::ACK(){
 
 bool DissectResultTcp::SYN(){
     if(((this->header->offset_reserved_flags[1] & 0x02) >> 1) == 1)
+        return true;
+    else
+        return false;
+}
+
+bool DissectResultTcp::RST(){
+    if(((this->header->offset_reserved_flags[1] & 0x04) >> 2) == 1)
+        return true;
+    else
+        return false;
+}
+
+bool DissectResultTcp::FIN(){
+    if(((this->header->offset_reserved_flags[1] & 0x01) >> 0) == 1)
         return true;
     else
         return false;
@@ -223,12 +239,37 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
 * 从DissectResultBase的保留字段获取数据，
 */
 
+//#define TCP_A_RETRANSMISSION  0x0001
+//#define TCP_A_LOST_PACKET  0x0002
+//#define TCP_A_ACK_LOST_PACKET 0x0004
+//#define TCP_A_KEEP_ALIVE  0x0008
+//#define TCP_A_DUPLICATE_ACK  0x0010
+//#define TCP_A_ZERO_WINDOW  0x0020
+//#define TCP_A_ZERO_WINDOW_PROBE  0x0040
+//#define TCP_A_ZERO_WINDOW_PROBE_ACK  0x0080
+//#define TCP_A_KEEP_ALIVE_ACK  0x0100
+//#define TCP_A_OUT_OF_ORDER  0x0200
+//#define TCP_A_FAST_RETRANSMISSION  0x0400
+//#define TCP_A_WINDOW_UPDATE  0x0800
+//#define TCP_A_WINDOW_FULL  0x1000
+//#define TCP_A_REUSED_PORTS  0x2000
+//#define TCP_A_SPURIOUS_RETRANSMISSION  0x4000
+//#define TCP_A_PREVIOUS_SEGMENT_NOT_CAPTURED 0x8000
+
+
 /*分析Seq/Ack*/
 QString DissectResultTcp::GetSegmentStatusStr(){
     qint32 status = this->dissectResultBase->GetAdditionalVal(TCP_STATUS);
     if(status == -1)
         return "";
-    return tcp_segment_status_vals.value(status);
+    if( status & TCP_A_WINDOW_UPDATE )
+        return tcp_segment_status_vals.value(TCP_A_WINDOW_UPDATE);
+    else if( status & TCP_A_ZERO_WINDOW )
+        return tcp_segment_status_vals.value(TCP_A_ZERO_WINDOW);
+    else if( status & TCP_A_WINDOW_FULL )
+        return tcp_segment_status_vals.value(TCP_A_WINDOW_FULL);
+    else
+        return "";
 }
 
 /*

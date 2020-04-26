@@ -83,6 +83,10 @@ qint32 DissectResultFrame::GetProtocolHeaderLengthCount(){
     return this->dissectResultBase->GetProtocolHeaderLengthCount();
 }
 
+DissectResultBase* DissectResultFrame::GetDissectResultBase(){
+    return this->dissectResultBase;
+}
+
 void* DissectResultFrame::GetProtocolFamilyBaseLayer(){
     return this->protocol_family_base_layer;
 }

@@ -75,6 +75,19 @@ void MainWindow::setupSignal(){
     connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
 }
 
+void MainWindow::setTableWidgetColor(qint32 row,quint32 background, quint32 text){
+    for(qint32 col = 0; col < this->tableWidgetColCount; col++){
+        this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
+        this->ui->tableWidget->item(row,col)->setForeground(QColor(text));
+    }
+}
+
+void MainWindow::setTableWidgetColor(qint32 row, quint32 background){
+    for(qint32 col = 0; col < this->tableWidgetColCount; col++){
+        this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
+    }
+}
+
 /*事件过滤器*/
 bool MainWindow::eventFilter(QObject *target, QEvent *event){
     if (target == this->ui->tableWidget->verticalScrollBar()){
@@ -261,6 +274,18 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     str.append(frame->GetSummery());
     item = new QTableWidgetItem(str);
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
+
+    //背景色
+    if( frame->GetDissectResultBase()->GetAdditionalVal(TCP_STATUS) != -1){
+        this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
+    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISSYN) == 1){
+        this->setTableWidgetColor(row,0xAAAAAA);
+    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISRST) == 1){
+        this->setTableWidgetColor(row,0xA21919);
+    }else{
+        this->setTableWidgetColor(row,0xD5D5D5);
+    }
+
 
     if(this->scrollToBottom)
         this->ui->tableWidget->scrollToBottom();

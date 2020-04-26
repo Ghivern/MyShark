@@ -19,7 +19,7 @@
 #define TCP_A_KEEP_ALIVE_ACK  0x0100
 #define TCP_A_OUT_OF_ORDER  0x0200
 #define TCP_A_FAST_RETRANSMISSION  0x0400
-#define TCP_A_WINDOW_SCALE_UPDATE  0x0800
+#define TCP_A_WINDOW_UPDATE  0x0800
 #define TCP_A_WINDOW_FULL  0x1000
 #define TCP_A_REUSED_PORTS  0x2000
 #define TCP_A_SPURIOUS_RETRANSMISSION  0x4000
@@ -39,7 +39,7 @@ const QHash<qint32,QString> tcp_segment_status_vals =
     {TCP_A_KEEP_ALIVE_ACK,              "[Keep Alive Ack]"},
     {TCP_A_OUT_OF_ORDER,                "[Out Of Order]"},
     {TCP_A_FAST_RETRANSMISSION,         "[Fase Retransmission]"},
-    {TCP_A_WINDOW_SCALE_UPDATE,         "[Window Scale Update]"},
+    {TCP_A_WINDOW_UPDATE,               "[Window Update]"},
     {TCP_A_WINDOW_FULL,                 "[Window Full]"},
     {TCP_A_REUSED_PORTS,                "[Reused Ports]"},
     {TCP_A_SPURIOUS_RETRANSMISSION,     "[Spurious Restrasmission]"},
@@ -91,9 +91,21 @@ private:
     struct window_t{
         QList<segment_t> segmentList;
         QList<segment_t> outOfOrderSegmentList;
-        quint32 maxSeq;
         quint32 baseSeq;
+
+        quint32 maxSeq;
+        quint32 maxSeqToBeAcked;
+
         qint16 windowMultiplier;
+        qint32 windowVal;
+
+        quint32 lastAck;
+
+        qint64 lastFragmentStatus;
+
+        qint32 dupPacketNum;
+        qint64 dupFrame;
+
         QHash<quint16,QList<quint64>> acks;
     };
 

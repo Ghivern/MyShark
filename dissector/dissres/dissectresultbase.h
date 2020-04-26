@@ -42,6 +42,7 @@ public:
     void AddAdditional(QString name,qint64 val);
     void AddAdditional(QString name,void *ptr,qint32 dataLen = 1);
     void AddAdditional(QString name,qint64 val,void *ptr,qint32 dataLen = 1);
+    void OrToAddition(QString name,qint64 val);
     void RemoveAdditional(QString name);
     void RemoveAdditionalVal(QString name);
     void RemoveAdditionalPtr(QString name);

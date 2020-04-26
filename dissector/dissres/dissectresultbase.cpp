@@ -140,6 +140,14 @@ void DissectResultBase::RemoveAdditional(QString name){
     this->reserve_val.remove(name);
 }
 
+void DissectResultBase::OrToAddition(QString name, qint64 val){
+    if( !this->reserve_val.contains(name) ){
+        this->reserve_val.insert(name,val);
+    }else{
+        (*this->reserve_val.find(name)) = this->reserve_val.value(name) | val;
+    }
+}
+
 void DissectResultBase::RemoveAdditionalVal(QString name){
     this->reserve_val.remove(name);
 }
