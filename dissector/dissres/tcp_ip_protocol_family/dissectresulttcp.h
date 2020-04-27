@@ -175,8 +175,8 @@ public:
     qint32 GetOptionMaximumSegmentSize();
     qint16 GetOptionWindowScale(); //Window scale最大为14
     qint16 GetOptionWindowMultiplier();
-    qint64 GetOptionTimestampValue();
-    qint64 GetOptionTimestampEchoReply();
+    quint32 GetOptionTimestampValue();
+    quint32 GetOptionTimestampEchoReply();
     qint8 GetOptionSackPermitted();
     QList<quint32> GetOptionSacks();
     QList<quint32> GetOptionRelativeSacks();

@@ -35,6 +35,7 @@ void MainWindow::setupUi(){
     this->ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->tableWidget->verticalHeader()->setMinimumSectionSize(0);
     this->ui->tableWidget->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+    this->ui->tableWidget->setColumnWidth(tableWidgetColCount - 1,1000);
 
     /*TreeWidget*/
 
@@ -276,13 +277,17 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
 
     //背景色
-    if( frame->GetDissectResultBase()->GetAdditionalVal(TCP_STATUS2) != 0){
-        this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
-    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISSYN) == 1
-             || frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISFIN) == 1){
-        this->setTableWidgetColor(row,0xAAAAAA);
-    }else if(frame->GetDissectResultBase()->GetAdditionalVal(TCP_ISRST) == 1){
-        this->setTableWidgetColor(row,0xA21919);
+    if( frame->GetDissectResultBase()->ReserveTcpContain(TCP_INFO)){
+        const TcpInfo tcpInfo = frame->GetDissectResultBase()->GetAdditional(TCP_INFO);
+        if( tcpInfo.status ){
+            this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
+        }else if( tcpInfo.SYN || tcpInfo.FIN ){
+            this->setTableWidgetColor(row,0xAAAAAA);
+        }else if( tcpInfo.RST ){
+            this->setTableWidgetColor(row,0xA21919);
+        }else{
+            this->setTableWidgetColor(row,0xD5D5D5);
+        }
     }else{
         this->setTableWidgetColor(row,0xD5D5D5);
     }

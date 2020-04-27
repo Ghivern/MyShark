@@ -5,6 +5,7 @@
 #include <QHash>
 
 #include "pcap.h"
+#include "../units/tcpinfo.h"
 
 
 
@@ -49,6 +50,10 @@ public:
     qint64 GetAdditionalVal(QString name);
     void* GetAdditionalPtr(QString name,qint32 *len = NULL);
 
+    bool ReserveTcpContain(QString name);
+    void AddAdditional(QString name,TcpInfo &tcpInfo);
+    TcpInfo& GetAdditional(QString name);
+
 
 
 private:
@@ -79,6 +84,8 @@ private:
      */
     QHash<QString,struct reserve> reserve_ptr;
     QHash<QString,qint64> reserve_val;
+
+    QHash<QString,TcpInfo> reserve_tcp;
 };
 
 #endif // DISSECTRESULTBASE_H

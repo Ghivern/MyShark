@@ -55,7 +55,8 @@ SOURCES += \
     stream/streamtcp2.cpp \
     units/bit.cpp \
     units/checksum.cpp \
-    units/device.cpp
+    units/device.cpp \
+    units/tcpinfo.cpp
 
 HEADERS += \
     dissector_global.h \
@@ -100,7 +101,8 @@ HEADERS += \
     units/bit.h \
     units/checksum.h \
     units/device.h \
-    units/keys.h
+    units/keys.h \
+    units/tcpinfo.h
 
 LIBS += -lpcap
 

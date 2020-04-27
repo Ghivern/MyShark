@@ -169,3 +169,15 @@ void* DissectResultBase::GetAdditionalPtr(QString name, qint32 *len){
         *len = this->reserve_ptr.value(name).len;
     return this->reserve_ptr.value(name).ptr;
 }
+
+bool DissectResultBase::ReserveTcpContain(QString name){
+    return this->reserve_tcp.contains(name);
+}
+
+void DissectResultBase::AddAdditional(QString name, TcpInfo &tcpInfo){
+    this->reserve_tcp.insert(name,tcpInfo);
+}
+
+TcpInfo& DissectResultBase::GetAdditional(QString name){
+    return *this->reserve_tcp.find(name);
+}

@@ -10,6 +10,8 @@ const QString DISSECT_RESULT_BASE_LIST  = "dissect_result_base_list";
 
 
 /*For Tcp*/
+const QString TCP_INFO = "tcp_info";
+
 const QString TCP_SEQ_VAL = "tcp_seq_val";
 const QString TCP_ACK_VAL = "tcp_ack_val";
 const QString TCP_PAYLOAD_LEN = "tcp_payload_len";
@@ -21,7 +23,10 @@ const QString TCP_ISRST = "tcp_isrst";
 const QString TCP_ISFIN = "tcp_isfin";
 const QString TCP_ISSYN = "tcp_issyn";
 const QString TCP_WINDOW = "tcp_window";
+const QString TCP_WINDOW_SCALE = "tcp_window_scale";
 const QString TCP_WINDOW_MULTIPLIER = "tcp_window_multiplier";
+const QString TCP_DUPACK_NUM = "tcp_dupack_num";
+const QString TCP_DUPACK_FRAME = "tcp_dupack_frame";
 
 
 const QString TCP_PRE_SEGMENT = "tcp_pre_seqment";

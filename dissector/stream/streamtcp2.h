@@ -31,9 +31,9 @@ const QHash<qint32,QString> tcp_segment_status_vals =
 {
     {TCP_A_RETRANSMISSION,              "[Retransmission]"},
     {TCP_A_LOST_PACKET,                 "[Previous segment not captured]"},
-    {TCP_A_ACK_LOST_PACKET,             "[Ack Lost Packet]"},
+    {TCP_A_ACK_LOST_PACKET,             "[ACKed unseen segment]"},
     {TCP_A_KEEP_ALIVE,                  "[Keep Alive]"},
-    {TCP_A_DUPLICATE_ACK,               "[Duplicate Ack]"},
+    {TCP_A_DUPLICATE_ACK,               "[Duplicate Ack %1#%2]"},
     {TCP_A_ZERO_WINDOW,                 "[Zero Window]"},
     {TCP_A_ZERO_WINDOW_PROBE,           "[Zero Window Probe]"},
     {TCP_A_ZERO_WINDOW_PROBE_ACK,       "[Zero Window Probe Ack]"},
@@ -72,8 +72,16 @@ public:
             this->maxSeqToBeAcked = 0;
 
             this->lastAck = 0;
+            this->lastAckTime.tv_sec = 0;
+            this->lastAckTime.tv_usec = 0;
+
+            this->first_rtt.tv_sec = 0;
+            this->first_rtt.tv_usec = 0;
+            this->haveFirstRrt = false;
 
             this->lastSegmentFlags = 0;
+
+            this->lastNonDupAck = 0;
             this->dupAckNum = 0;
          }
 
@@ -84,9 +92,14 @@ public:
 
          quint32 baseSeq;
          quint32 nextSeq;
+         timeval nextSeqTime;
          quint32 maxSeqToBeAcked;
 
          quint32 lastAck;
+         timeval lastAckTime;
+
+         timeval first_rtt;
+         bool haveFirstRrt;
 
          quint32 lastSegmentFlags;
 
