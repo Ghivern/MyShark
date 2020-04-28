@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle(DeviceList::SelectedDevice);
     this->ui->actionStart->setEnabled(false);
+
+    this->streamIndex = -1;
+
     capturer->Start();
 }
 
@@ -228,6 +231,15 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     item->setData(Qt::DisplayRole,frame->GetIndex());
     this->ui->tableWidget->setItem(row,MainWindow::COL_NO,item);
 
+    if( frame->ContainProtocol("tcp") )
+        item->setData(Qt::UserRole,qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1);
+    else
+        item->setData(Qt::UserRole,-1);
+
+    if( this->streamIndex != -1 && item->data(Qt::UserRole).toInt() != this->streamIndex){
+        this->ui->tableWidget->hideRow(row);
+    }
+
     //Time
     str.clear();
     str.append(QString::asprintf("%.8lf",frame->GetRelativeTimeSinceFirstPacket()));
@@ -316,7 +328,11 @@ void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
 }
 
 void MainWindow::addToTree(qint64 index){
-     ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),nullptr);
+     qint32 *interfaceId = new qint32(this->capturer->GetCapHandle()->GetDeviceIndex());
+     QString *interfaceName = new QString(this->capturer->GetCapHandle()->GetDeviceName());
+     QList<void*> *reserve = new QList<void*> {interfaceId,interfaceName};
+
+     ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),reserve);
      ProTreeNode *node = maker->GetProTree()->GetHeader();
      this->ui->treeWidget->clear();
      this->ergoditTree(nullptr,node);
@@ -471,4 +487,20 @@ void MainWindow::on_actionScrollToLastLine_triggered(bool checked)
 void MainWindow::on_actionResizeTableWidgetTOFitContents_triggered()
 {
     this->ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::on_pushButton_filter_clicked()
+{
+    if( this->ui->lineEdit->text().isEmpty() ){
+        this->streamIndex = -1;
+    }else{
+        this->streamIndex = this->ui->lineEdit->text().toInt();
+        for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
+            if( this->ui->tableWidget->item(index,COL_NO)->data(Qt::UserRole).toInt() == this->streamIndex ){
+                this->ui->tableWidget->showRow(index);
+            }else{
+                this->ui->tableWidget->hideRow(index);
+            }
+        }
+    }
 }

@@ -45,6 +45,8 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     tcpInfo.echoReplayTime.tv_usec = 0;
     dissectResultBase->AddAdditional(TCP_INFO,tcpInfo);
 
+
+
 //    this->streamIndexPlusOne = stream.AddWithWindow(dissectResultBase
 //                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_SOURCE_ADDRESS_PTR)
 //                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_DESTINATION_ADDRESS_PTR)
@@ -61,6 +63,9 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                          ,this->GetDestinationPortPtr()
                          ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
                          );
+
+    dissectResultBase->AddAdditional(TCP_STREAM,this->streamIndexPlusOne);
+
     dissectResultBase->SetSummery(QString("%1 -> %2").arg(this->GetSourcePort()).arg(this->GetDestinationPort()));
     dissectResultBase->SetSummery(QString("%1 Window scale:%2 maxSeg:%3 tval:%4 ter:%5 %6 win:%7 c-win:%8")
                                   .arg(this->GetSegmentStatusStr())

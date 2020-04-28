@@ -72,6 +72,9 @@ private:
     const qint32 rawDataPanelColCount = 34;
     const qint32 defaultTextSize = 11;
 
+    /*暂时用于存储过滤器需要的StreamIndex*/
+    qint64 streamIndex;
+
 
 public slots:
     void Print(qint64 index);
@@ -93,5 +96,6 @@ private slots:
     void on_actionDefaultTextSize_triggered();
     void on_actionScrollToLastLine_triggered(bool checked);
     void on_actionResizeTableWidgetTOFitContents_triggered();
+    void on_pushButton_filter_clicked();
 };
 #endif // MAINWINDOW_H
