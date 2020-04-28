@@ -9,6 +9,7 @@ StreamTcp2 DissectResultTcp::stream2;
 
 DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
 {
+    this->protocol_family_application_layer = nullptr;
     this->dissectResultBase = dissectResultBase;
 
     dissectResultBase->PushToProtocolList("tcp",TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH);
@@ -97,8 +98,13 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                        .arg(this->GetPayloadLen())
                                        .arg(this->GetWindow())
                                   );
+
+    this->addNextLayer(dissectResultBase);
 }
 
+void* DissectResultTcp::GetNextLayer(){
+    return this->protocol_family_application_layer;
+}
 
 /*处理端口号*/
 quint8* DissectResultTcp::GetSourcePortPtr(){
@@ -117,14 +123,18 @@ quint16 DissectResultTcp::GetDestinationPort(){
     return ntohs(*(quint16*)header->dstPort);
 }
 
+quint16 DissectResultTcp::GetServPort(){
+    return this->GetSourcePort() > this->GetDestinationPort() ? this->GetDestinationPort() : this->GetSourcePort();
+}
+
 /*处理Seq和Ack*/
 quint32 DissectResultTcp::GetSeq(){
     return ntohl(*(quint32*)this->header->seq);
 }
 
 quint32 DissectResultTcp::GetRelativeSeq(){
-    if( DissectResultTcp::stream2.GetBaseSeq(streamIndexPlusOne) == 0)
-        qDebug() << "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊";
+//    if( DissectResultTcp::stream2.GetBaseSeq(streamIndexPlusOne) == 0)
+//        qDebug() << "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊";
     return this->GetSeq() - DissectResultTcp::stream2.GetBaseSeq(this->streamIndexPlusOne);
 }
 
@@ -374,6 +384,29 @@ qint64 DissectResultTcp::GetPrevious(){
 
 
 /*Private*/
+
+void DissectResultTcp::addNextLayer(DissectResultBase *dissectResultBase){
+    quint16 srcPort = this->GetSourcePort();
+    quint16 dstPort = this->GetDestinationPort();
+    quint32 segLen = this->GetPayloadLen();
+    quint16 servPort = srcPort < dstPort ? srcPort : dstPort;
+
+    if( segLen > 0 ){
+        switch (servPort) {
+        case TRANSPORTLAYER_TCP_SERV::HTTP:
+        {
+            this->protocol_family_application_layer = (void*)(new DissectResultHttp(dissectResultBase));
+            break;
+        }
+        default:
+            this->dissectResultBase->SetSummery(this->dissectResultBase->GetSummery().append(QString("未处理用用层类型: %1")
+                                                .arg(this->GetServPort())
+                                                ));
+            this->protocol_family_application_layer = nullptr;
+            break;
+        }
+    }
+}
 
 /*Tcp Options*/
 void DissectResultTcp::dealTcpOptions(){

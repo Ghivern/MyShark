@@ -579,6 +579,9 @@ void MainWindow::on_pushButton_filter_clicked()
 {
     if( this->ui->lineEdit->text().isEmpty() ){
         this->streamIndex = -1;
+        for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
+            this->ui->tableWidget->showRow(index);
+        }
     }else{
         this->streamIndex = this->ui->lineEdit->text().toInt();
         for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){

@@ -16,6 +16,8 @@
 #include "../dissectresultbase.h"
 #include "../dissectresultcommonstream.h"
 
+#include "../dissectresulthttp.h"
+
 /*0                   1          |        2                   3
  *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -109,6 +111,10 @@ public:
         TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 20
     };
 
+    enum TRANSPORTLAYER_TCP_SERV{
+        HTTP = 80
+    };
+
     enum TCP_OPTION{
         TCP_OPTION_END_OF_OPTION = 0,
         TCP_OPTION_NO_OPERATION = 1,
@@ -137,6 +143,7 @@ public:
     quint16 GetSourcePort();
     quint8* GetDestinationPortPtr();
     quint16 GetDestinationPort();
+    quint16 GetServPort();   //就是获取较小的端口号
 
     /*处理Seq和Ack*/
     quint32 GetSeq();

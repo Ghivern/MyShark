@@ -44,7 +44,12 @@ void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, 
         this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase));
         break;
     default:
+    {
+        this->dissectResultBase->SetSummery(QString("未处理链路层类型: %1")
+                                            .arg(this->GetTypeStr())
+                                            );
         this->protocol_family_network_layer = NULL;
+    }
     }
 }
 

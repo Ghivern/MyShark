@@ -14,7 +14,7 @@ void DissectResultBase::PushToProtocolList(QString protocolName, qint32 protocol
     position_t position;
     if(this->protocolList.isEmpty())
         position.start = 0;
-            else
+    else
         position.start = this->protocolPositionHash.value(this->protocolList.last()).end;
     position.end = position.start + protocolHeaderLength;
     this->protocolPositionHash.insert(protocolName,position);

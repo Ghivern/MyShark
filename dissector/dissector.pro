@@ -26,13 +26,18 @@ SOURCES += \
     dissectors/dissectoreth/dissectortcp.cpp \
     dissectors/dissectoreth/dissectorudp.cpp \
     dissectors/frame.cpp \
+    dissectors/http.cpp \
     dissectors/protreemaker.cpp \
+    dissectors/tcp_ip_protocol_family/arp.cpp \
     dissectors/tcp_ip_protocol_family/ipv4.cpp \
     dissectors/tcp_ip_protocol_family/linklayer.cpp \
+    dissectors/tcp_ip_protocol_family/tcp.cpp \
+    dissectors/tcp_ip_protocol_family/udp.cpp \
     dissectors/tcpipprotocolfamily.cpp \
     dissres/converter.cpp \
     dissres/dissectresultbase.cpp \
     dissres/dissectresultcommonstream.cpp \
+    dissres/dissectresulthttp.cpp \
     dissres/dissectresutltframe.cpp \
     dissres/dissres.cpp \
     dissres/dissreseth.cpp \
@@ -70,13 +75,18 @@ HEADERS += \
     dissectors/dissectoreth/dissectorudp.h \
     dissectors/dissectoreth/eth_header.h \
     dissectors/frame.h \
+    dissectors/http.h \
     dissectors/protreemaker.h \
+    dissectors/tcp_ip_protocol_family/arp.h \
     dissectors/tcp_ip_protocol_family/ipv4.h \
     dissectors/tcp_ip_protocol_family/linklayer.h \
+    dissectors/tcp_ip_protocol_family/tcp.h \
+    dissectors/tcp_ip_protocol_family/udp.h \
     dissectors/tcpipprotocolfamily.h \
     dissres/converter.h \
     dissres/dissectresultbase.h \
     dissres/dissectresultcommonstream.h \
+    dissres/dissectresulthttp.h \
     dissres/dissectresutltframe.h \
     dissres/dissres.h \
     dissres/dissreseth.h \
