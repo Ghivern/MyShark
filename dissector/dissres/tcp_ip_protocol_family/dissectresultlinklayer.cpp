@@ -52,10 +52,11 @@ void* DissectResultLinkLayer::GetNextLayer(){
     return this->protocol_family_network_layer;
 }
 
-/*
- * 获取协议首部字段位置或值的方法
- */
+DissectResultBase* DissectResultLinkLayer::GetDissectResultBase(){
+    return this->dissectResultBase;
+}
 
+/*获取协议首部字段位置或值的方法*/
 const quint8* DissectResultLinkLayer::GetSourceAddressPtr(){
     return this->header->src;
 }
@@ -80,6 +81,7 @@ QString DissectResultLinkLayer::GetDestinationAddressStr(){
     return this->GetAddressStr(this->header->dst);
 }
 
+/*----处理LG/IG bit------*/
 bool DissectResultLinkLayer::SourceAddressIsGroup(){
     return this->IsGroupAddress(this->header->src);
 }
@@ -95,6 +97,55 @@ bool DissectResultLinkLayer::SourceAddressIsLocalAdministered(){
 bool DissectResultLinkLayer::DestinationAddressIsLocalAdministered(){
     return this->IsLocalAdministeredAddress(this->header->dst);
 }
+
+QString DissectResultLinkLayer::GetSourceAddressLGBitStr(){
+    return this->getAddressLGBbitStr(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressLGBit_meaning(){
+    return this->getAddressLGbit_meaning(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressLGBit_short_meaning(){
+    return this->getAddressLGbit_short_meaning(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressIGBitStr(){
+    return this->getAddressIGBitStr(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressIGBit_meaning(){
+    return  this->getAddressIGbit_meaning(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetSourceAddressIGBit_short_meaning(){
+    return this->getAddressIGbit_short_meaning(this->header->src);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressLGBitStr(){
+    return this->getAddressLGBbitStr(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressLGBit_meaning(){
+    return this->getAddressLGbit_meaning(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressLGBit_short_meaning(){
+    return this->getAddressLGbit_short_meaning(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressIGBitStr(){
+    return this->getAddressIGBitStr(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressIGBit_meaning(){
+    return this->getAddressIGbit_meaning(this->header->dst);
+}
+
+QString DissectResultLinkLayer::GetDestinationAddressIGBit_short_meaning(){
+    return this->getAddressIGbit_short_meaning(this->header->dst);
+}
+/* --- 处理IG/LG bit 结束*/
 
 const quint8* DissectResultLinkLayer::GetTypePtr(){
     return this->header->type;
@@ -199,7 +250,6 @@ QString DissectResultLinkLayer::GetCalculatedFCSStr(){
     return Converter::ConvertQuint8ArrayToHexStr((quint8*)&calculatedFCS,LINKLAYER_FIELD_LENGTH_FCS);
 }
 
-//Private
 
 QString DissectResultLinkLayer::GetAddressOriginalStr(quint8 *address){
     return Converter::ConvertQuint8ArrayToHexStr(address,LINKLAYER_FIELD_LENGTH_SRC_ADDR,":","");
@@ -272,6 +322,7 @@ QString DissectResultLinkLayer::GetAddressStr(quint8 *address){
     }
 }
 
+/*Private*/
 bool DissectResultLinkLayer::IsGroupAddress(const quint8 *address){
     if((address[0] & 0x01) == 0x01)
         return true;
@@ -284,4 +335,44 @@ bool DissectResultLinkLayer::IsLocalAdministeredAddress(const quint8 *address){
         return true;
     else
         return false;
+}
+
+/*第一个字节的倒数第二位*/
+QString DissectResultLinkLayer::getAddressLGBbitStr(const quint8 *address){
+    return QString(".... ..%1. .... .... .... ....")
+            .arg(this->IsLocalAdministeredAddress(address)?1:0);
+}
+
+QString DissectResultLinkLayer::getAddressLGbit_short_meaning(const quint8 *address){
+    if( this->IsLocalAdministeredAddress(address) )
+        return QString("Locally administered address");
+    else
+        return QString("Globally unique address");
+}
+
+QString DissectResultLinkLayer::getAddressLGbit_meaning(const quint8 *address){
+    if( this->IsLocalAdministeredAddress(address) )
+        return QString("This is not the factory default");
+    else
+        return QString("Factory default");
+}
+
+/*第一个字节的最后一位*/
+QString DissectResultLinkLayer::getAddressIGBitStr(const quint8 *address){
+    return QString(".... ...%1 .... .... .... ....")
+            .arg(this->IsGroupAddress(address)?1:0);
+}
+
+QString DissectResultLinkLayer::getAddressIGbit_meaning(const quint8 *address){
+    if( this->IsGroupAddress(address) )
+        return QString("Group address");
+    else
+        return QString("Individual address");
+}
+
+QString DissectResultLinkLayer::getAddressIGbit_short_meaning(const quint8 *address){
+    if( this->IsGroupAddress(address) )
+        return QString("multicast/broadcast");
+    else
+        return QString("nuicast");
 }

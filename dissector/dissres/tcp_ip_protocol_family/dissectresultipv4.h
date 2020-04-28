@@ -165,6 +165,7 @@ public:
     void AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
 
     void* GetNextLayer();
+    DissectResultBase* GetDissectResultBase();
 
 
     /*0                   1          |        2                   3

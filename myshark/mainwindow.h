@@ -42,6 +42,7 @@ private:
 
     void setTableWidgetColor(qint32 row,quint32 background, quint32 text);
     void setTableWidgetColor(qint32 row,quint32 background);
+    void clearRawDataPanelBackground(quint32 background);
 
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -86,7 +87,9 @@ private slots:
     void addToTree(qint64 index);
     void addToRawDataPanel(qint64 index);
 
+
     void on_tableWidget_cellClicked(int row, int column);
+    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
     void on_actionStop_triggered();
     void on_actionStart_triggered();

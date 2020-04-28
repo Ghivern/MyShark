@@ -60,10 +60,9 @@ public:
     void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type);
 
     void* GetNextLayer();
+    DissectResultBase* GetDissectResultBase();
 
-    /*
-     * 获取协议首部字段位置或值的方法
-     */
+    /*获取协议首部字段位置或值的方法*/
     const quint8* GetSourceAddressPtr();
     const quint8* GetDestinationAddressPtr();
     QString GetSourceAddressOriginalStr();
@@ -71,13 +70,24 @@ public:
     QString GetSourceAddressStr();
     QString GetDestinationAddressStr();
 
-    /*
-     * 处理MAC地址的I/G和G/L位
-     */
+    /*处理MAC地址的I/G和G/L位*/
     bool SourceAddressIsGroup();
     bool DestinationAddressIsGroup();
     bool SourceAddressIsLocalAdministered();
     bool DestinationAddressIsLocalAdministered();
+    QString GetSourceAddressLGBitStr();
+    QString GetSourceAddressLGBit_meaning();
+    QString GetSourceAddressLGBit_short_meaning();
+    QString GetSourceAddressIGBitStr();
+    QString GetSourceAddressIGBit_meaning();
+    QString GetSourceAddressIGBit_short_meaning();
+    QString GetDestinationAddressLGBitStr();
+    QString GetDestinationAddressLGBit_meaning();
+    QString GetDestinationAddressLGBit_short_meaning();
+    QString GetDestinationAddressIGBitStr();
+    QString GetDestinationAddressIGBit_meaning();
+    QString GetDestinationAddressIGBit_short_meaning();
+
 
     const quint8* GetTypePtr();
     QString GetTypeStr();
@@ -95,6 +105,14 @@ public:
 private:
     QString GetAddressOriginalStr(quint8 *address);
     QString GetAddressStr(quint8 *address);
+
+    /*处理IG和LG bit*/
+    QString getAddressLGBbitStr(const quint8 *address);
+    QString getAddressLGbit_short_meaning(const quint8 *address);
+    QString getAddressLGbit_meaning(const quint8 *address);
+    QString getAddressIGBitStr(const quint8 *address);
+    QString getAddressIGbit_short_meaning(const quint8 *address);
+    QString getAddressIGbit_meaning(const quint8 *address);
 
     /*
      * GroupAddress -> true -> 1; IndividualAddress ->false -> 0

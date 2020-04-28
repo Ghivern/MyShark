@@ -91,6 +91,14 @@ void ProTree::AddItem(QString protocol,QString msg,qint32 *start,float len,bool 
     }
 }
 
+void ProTree::AddCurrentLayerItem(QString protocol, QString msg, qint32 *start, float len, bool addStart){
+    this->AddItem(protocol,msg,start,len,addStart);
+}
+
+void ProTree::AddNextLayerItem(QString protocol, QString msg, qint32 *start, float len, bool addStart){
+    this->AddItem(protocol,msg,start,len,addStart,1);
+}
+
 //void ProTree::AddItemL(QString protocol,QString msg,qint32 start,float len,qint32 position){
 //    if(msg.length() != 0){
 //        ProTreeNode *newNode;

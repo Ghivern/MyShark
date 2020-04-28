@@ -79,16 +79,40 @@ void MainWindow::setupSignal(){
     connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
 }
 
-void MainWindow::setTableWidgetColor(qint32 row,quint32 background, quint32 text){
+void MainWindow::setTableWidgetColor(qint32 row,quint32 background, quint32 textColor){
     for(qint32 col = 0; col < this->tableWidgetColCount; col++){
-        this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
-        this->ui->tableWidget->item(row,col)->setForeground(QColor(text));
+        if( this->ui->tableWidget->item(row,col) ){
+            this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
+            this->ui->tableWidget->item(row,col)->setForeground(QColor(textColor));
+        }
     }
 }
 
 void MainWindow::setTableWidgetColor(qint32 row, quint32 background){
     for(qint32 col = 0; col < this->tableWidgetColCount; col++){
-        this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
+        if( this->ui->tableWidget->item(row,col) ){
+            this->ui->tableWidget->item(row,col)->setBackground(QColor(background));
+        }
+    }
+}
+
+void MainWindow::clearRawDataPanelBackground(quint32 background){
+    qint32 row,col;
+    for( row = 0; row < this->ui->rawDataPanel->rowCount() - 1; row++ ){
+        for( col = 0; col < this->ui->rawDataPanel->columnCount(); col++ ){
+            if( col != 17 )
+                this->ui->rawDataPanel->item(row,col)->setData(Qt::BackgroundRole,QColor(background));
+        }
+    }
+
+    for( col = 0; col < this->ui->rawDataPanel->columnCount(); col++ ){
+        if( !this->ui->rawDataPanel->item(row,col)->text().isEmpty() ){
+            this->ui->rawDataPanel->item(row,col)->setData(Qt::BackgroundRole,QColor(background));
+        }
+    }
+
+    if( !this->ui->rawDataPanel->item(row,9)->text().isEmpty() ){
+        this->ui->rawDataPanel->item(row,8)->setData(Qt::BackgroundRole,QColor(background));
     }
 }
 
@@ -308,6 +332,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     if(this->scrollToBottom)
         this->ui->tableWidget->scrollToBottom();
 
+    /*显示百分比*/
     this->displayProportion->clear();
     this->displayProportion->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
 }
@@ -317,6 +342,8 @@ void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
     while (node != nullptr) {
         item = new QTreeWidgetItem();
         item->setText(0,node->GetMsg());
+        item->setData(0,10001,node->GetStart());
+        item->setData(0,10002,node->GetEnd());
         if(parent != nullptr)
             parent->addChild(item);
         else
@@ -330,7 +357,8 @@ void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
 void MainWindow::addToTree(qint64 index){
      qint32 *interfaceId = new qint32(this->capturer->GetCapHandle()->GetDeviceIndex());
      QString *interfaceName = new QString(this->capturer->GetCapHandle()->GetDeviceName());
-     QList<void*> *reserve = new QList<void*> {interfaceId,interfaceName};
+     QString *linklayerTypeName = new QString(this->capturer->GetCapHandle()->GetLinkTypeName());
+     QList<void*> *reserve = new QList<void*> {interfaceId,interfaceName,linklayerTypeName};
 
      ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),reserve);
      ProTreeNode *node = maker->GetProTree()->GetHeader();
@@ -345,40 +373,66 @@ void MainWindow::addToRawDataPanel(qint64 index){
     qint32 capLen = this->capturer->GetDissectResultFrameByIndex(index)->GetCapLen();
     QString text;
     qint32 rowCount = 0;
+    QTableWidgetItem *item;
 
     this->ui->rawDataPanel->clearContents();
     this->ui->rawDataPanel->setRowCount(0);
-    for(qint32 i = 0; i < capLen; i++){
-        if(i % 16 == 0){
-            this->ui->rawDataPanel->insertRow(rowCount);
-            this->ui->rawDataPanel->setVerticalHeaderItem(rowCount, new QTableWidgetItem(QString::asprintf("%04x",rowCount)));
-            rowCount++;
-        }
+//    for(qint32 i = 0; i < capLen; i++){
+//        if(i % 16 == 0){
+//            this->ui->rawDataPanel->insertRow(rowCount);
+//            this->ui->rawDataPanel->setVerticalHeaderItem(rowCount, new QTableWidgetItem(QString::asprintf("%04x",rowCount)));
+//            rowCount++;
+//        }
+//    }
+
+    rowCount = (capLen % 16 == 0) ? capLen / 16 : capLen / 16 + 1;
+    for( qint32 i = 0; i < rowCount; i++ ){
+        this->ui->rawDataPanel->insertRow(i);
+        this->ui->rawDataPanel->setVerticalHeaderItem(i, new QTableWidgetItem(QString::asprintf("%04x",rowCount)));
     }
 
     for(qint32 row =0; row < rowCount; row++){
         line = ptr + row * 16;
+
         for(qint32 col = 0; col < rawDataPanelColCount; col++){
             text.clear();
+            item = new QTableWidgetItem(text);
+            this->ui->rawDataPanel->setItem(row,col,item);
             if( col == 8 || col == 17 ){
-                ;
+                if( col == 8 )
+                    item->setData(Qt::UserRole,row * 16 + col + 1);
+                else
+                    item->setData(Qt::UserRole, -1);
             }else if( col < 8 ){
-                if( row * 16 + col + 1 > capLen )
-                    continue;
+                if( row * 16 + col + 1 > capLen ){
+                    item->setData(Qt::UserRole,-1);
+                    goto finished;
+                }
+                    //continue;
+                item->setData(Qt::UserRole,row * 16 + col);
                 text.append(QString::asprintf("%02x",line[col]));
             }else if( col < 17){
-                if( row * 16 + col > capLen )
-                    continue;
+                if( row * 16 + col > capLen ){
+                    item->setData(Qt::UserRole,-1);
+                    goto finished;
+                }
+                    //continue;
+                item->setData(Qt::UserRole,row * 16 + col - 1);
                 text.append(QString::asprintf("%02x",line[col - 1]));
             }else{
-                if( row * 16 + col - 17 > capLen )
-                    break;
+                if( row * 16 + col - 17 > capLen ){
+                    item->setData(Qt::UserRole,-1);
+                    goto finished;
+                }
+                    //break;
+                item->setData(Qt::UserRole,row * 16 + col - 18);
                 if(isprint(line[col - 18]))
                     text.append(QString::asprintf("%c",line[col - 18]));
                 else
                     text.append(QString::asprintf("."));
             }
-            this->ui->rawDataPanel->setItem(row,col,new QTableWidgetItem(text));
+            finished:
+            item->setText(text);
         }
     }
 
@@ -392,7 +446,39 @@ void MainWindow::on_tableWidget_cellClicked(int row, int column)
     this->addToTree(index);
 }
 
+void MainWindow::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
+{
+    qint32 start = item->data(column,10001).toInt();
+    qint32 end = item->data(column,10002).toInt();
+    this->clearRawDataPanelBackground(0xffffff);
+    qDebug() << "start:" << start;
+    qDebug() << "end:" << end;
 
+    if( start == -1 || end == -1 )
+        return;
+
+    if( start == -2 || end == -2 ){
+        this->clearRawDataPanelBackground(0xff00cc);
+        return;
+    }
+
+    /*
+     *01234567 01234567 0123456701234567
+     */
+    qint32 startRow = start / 16;
+    qint32 endRow = end / 16;
+    qint32 no;
+    for( qint32 row = startRow; row <= endRow; row++ ){
+        for( qint32 col = 0; col < this->ui->rawDataPanel->columnCount(); col++){
+            no = this->ui->rawDataPanel->item(row,col)->data(Qt::UserRole).toInt();
+            if( no >= start && no <= end )
+                this->ui->rawDataPanel->item(row,col)->setBackground(QColor(0xff00cc));
+        }
+    }
+}
+
+
+/*工具栏相应方法*/
 void MainWindow::on_actionStop_triggered()
 {
     this->ui->actionStart->setEnabled(true);
@@ -504,3 +590,7 @@ void MainWindow::on_pushButton_filter_clicked()
         }
     }
 }
+
+
+
+

@@ -33,7 +33,9 @@ public:
     qint32 GetProtocolListLength();
     QString GetProtocolNameByIndex(qint32 index);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
+    qint64 GetProtocolHeaderStartPositionByName(QString protocolName);
     const quint8* GetProtocolHeaderEndPtrByName(QString protocolName);
+    qint64 GetProtocolHeaderEndPositionByName(QString protocolName);
     QString GetSummery();
 
     /*保留字段的操作*/

@@ -22,6 +22,8 @@ Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reser
                      .arg(dissectResultFrame->GetCapLen())
                      .arg(dissectResultFrame->GetCapLen() * 8)
                      .arg(interfaceId)
+                     ,-2
+                     ,-2
                      );  // -
     proTree->AddItem("frame",
                      QString("Interface Id: %1 ( %2 )")

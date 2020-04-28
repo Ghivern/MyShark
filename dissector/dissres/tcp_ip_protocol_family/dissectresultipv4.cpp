@@ -45,6 +45,9 @@ void* DissectResultIpv4::GetNextLayer(){
     return this->protocol_family_transport_layer;
 }
 
+DissectResultBase* DissectResultIpv4::GetDissectResultBase(){
+    return this->dissectResultBase;
+}
 
 /*
  *  以下均是解析Ipv4首部字段的方法,调用前提是，this->header已经被正确赋值

@@ -91,11 +91,25 @@ const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protoco
         return NULL;
 }
 
+qint64 DissectResultBase::GetProtocolHeaderStartPositionByName(QString protocolName){
+    if(this->protocolPositionHash.contains(protocolName))
+        return this->protocolPositionHash.value(protocolName).start;
+    else
+        return -1;
+}
+
 const quint8* DissectResultBase::GetProtocolHeaderEndPtrByName(QString protocolName){
     if(this->protocolPositionHash.contains(protocolName))
         return this->data + this->protocolPositionHash.value(protocolName).end;
     else
         return NULL;
+}
+
+qint64 DissectResultBase::GetProtocolHeaderEndPositionByName(QString protocolName){
+    if(this->protocolPositionHash.contains(protocolName))
+        return this->protocolPositionHash.value(protocolName).end;
+    else
+        return -1;
 }
 
 QString DissectResultBase::GetSummery(){
