@@ -14,8 +14,8 @@ class Capturer:public QThread
 {
     Q_OBJECT
 public:
-    Capturer(QString devName);
-    Capturer(CapHandle *capHandle);
+    Capturer(QString devName,QHash<QString,quint64>* dissectorOptions = nullptr);
+    Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions = nullptr);
     ~Capturer();
     qint32 GetIntLinkType();
     QList<DissRes*>* GetDissResList();
@@ -37,6 +37,8 @@ private:
     bool stop;
 
     QList<DissectResultFrame*> dissectResultFrameList;
+
+    QHash<QString,quint64>* dissectorOptions;
 
 signals:
     void onePacketCaptured(qint64 index);

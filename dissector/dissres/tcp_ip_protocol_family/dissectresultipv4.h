@@ -161,8 +161,8 @@ public:
         NETWORKLAYER_IPV4_TYPE_UDP = 17
     };
 
-    DissectResultIpv4(DissectResultBase *dissectResultBase);
-    void AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
+    DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves = nullptr);
+    void AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type,void *reserves = nullptr);
 
     void* GetNextLayer();
     DissectResultBase* GetDissectResultBase();

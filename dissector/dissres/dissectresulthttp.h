@@ -6,7 +6,7 @@
 class DissectResultHttp
 {
 public:
-    DissectResultHttp(DissectResultBase *dissectResultBase);
+    DissectResultHttp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 
     void* GetNextLayer();
     DissectResultBase* GetDissectResultBase();

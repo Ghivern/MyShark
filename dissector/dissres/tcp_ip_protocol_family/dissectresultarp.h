@@ -13,7 +13,7 @@ namespace tcp_ip_protocol_family {
 class DissectResultArp
 {
 public:
-    DissectResultArp(DissectResultBase *dissectResultBase);
+    DissectResultArp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 };
 
 }

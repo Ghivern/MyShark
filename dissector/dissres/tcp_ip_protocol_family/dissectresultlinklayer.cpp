@@ -14,7 +14,8 @@ QFile DissectResultLinkLayer::file_ethernet_well_know_address(ethernet_well_know
 
 Stream DissectResultLinkLayer::stream;
 
-DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase){
+DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves){
+    Q_UNUSED(reserves)
     this->haveFCS = true;
     this->protocol_family_network_layer = NULL;
     this->dissectResultBase = dissectResultBase;
@@ -29,19 +30,19 @@ DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultB
     dissectResultBase->AddAdditional("linklayer_have_fcs",LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN,(void*)&this->haveFCS);
 
     if(this->header != NULL)
-        this->AddNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type);
+        this->AddNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type,reserves);
 }
 
-void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type){
+void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves){
     switch(type){
     case LINKLAYER_TYPE_IPV4:
-        this->protocol_family_network_layer = (void*)(new DissectResultIpv4(dissectResultBase));
+        this->protocol_family_network_layer = (void*)(new DissectResultIpv4(dissectResultBase,reserves));
         break;
     case LINKLAYER_TYPE_IPV6:
-        this->protocol_family_network_layer = (void*)(new DissectResultIpv6(dissectResultBase));
+        this->protocol_family_network_layer = (void*)(new DissectResultIpv6(dissectResultBase,reserves));
         break;
     case LINKLAYER_TYPE_ARP:
-        this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase));
+        this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase,reserves));
         break;
     default:
     {

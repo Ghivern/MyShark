@@ -133,7 +133,7 @@ public:
 //        TRANSPORTLAYER_TCP_FIELD_LENGTH_TIMESTAMPS_OPTION = 10
 //    };
 
-    DissectResultTcp(DissectResultBase *dissectResultBase);
+    DissectResultTcp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 
 
     void* GetNextLayer();
@@ -221,7 +221,7 @@ private:
      *
      */
 
-    void addNextLayer(DissectResultBase *dissectResultBase);
+    void addNextLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 
     /*Options*/
     /*

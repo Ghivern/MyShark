@@ -4,8 +4,8 @@
 Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reserves)
 {
     QList<void*> *r = (QList<void*>*)reserves;
-    qint32 interfaceId = *(qint32*)r->at(0);
-    QString interfaceName(*(QString*)r->at(1));
+    qint32 interfaceId = *(qint32*)r->at(1);
+    QString interfaceName(*(QString*)r->at(2));
     Q_UNUSED(reserves)
         /*Frame处理代码*/
         Q_UNUSED(dissectResultFrame)

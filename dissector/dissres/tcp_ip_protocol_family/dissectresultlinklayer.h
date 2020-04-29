@@ -56,8 +56,8 @@ public:
       LINKLAYER_TYPE_ARP = 0x0608
     };
 
-    DissectResultLinkLayer(DissectResultBase *dissectResultBase);
-    void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type);
+    DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
+    void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves = nullptr);
 
     void* GetNextLayer();
     DissectResultBase* GetDissectResultBase();

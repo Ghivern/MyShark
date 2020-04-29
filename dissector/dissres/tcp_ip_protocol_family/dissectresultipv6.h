@@ -59,7 +59,7 @@ public:
         NETWORKLAYER_IPV6_EXPANDED_ENCAPSULATING_SECURITY_PAYLOAD = 50,
     };
 
-    DissectResultIpv6(DissectResultBase *dissectResultBase);
+    DissectResultIpv6(DissectResultBase *dissectResultBase,void *reserves = nullptr);
     void AddNextLayer(DissectResultBase *dissectResultBase,NETWORKLAYER_IPV6_PROTOCOL_TYPE type);
 
     void* GetNextLayer();

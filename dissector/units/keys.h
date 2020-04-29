@@ -11,6 +11,7 @@ const QString DISSECT_RESULT_BASE_LIST  = "dissect_result_base_list";
 
 /*For Tcp*/
 const QString TCP_INFO = "tcp_info";
+const QString TCP_INFO_PTR = "tcp_info_ptr";
 const QString TCP_STREAM = "tcp_stream";
 
 const QString TCP_SEQ_VAL = "tcp_seq_val";

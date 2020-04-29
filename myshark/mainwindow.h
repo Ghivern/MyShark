@@ -39,10 +39,13 @@ public:
 private:
     void setupUi();
     void setupSignal();
+    void setupDissectorOptions();
 
     void setTableWidgetColor(qint32 row,quint32 background, quint32 text);
     void setTableWidgetColor(qint32 row,quint32 background);
     void clearRawDataPanelBackground(quint32 background);
+
+    void addBackgroundToTableRow(DissectResultFrame *frame,qint32 row);
 
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -72,6 +75,9 @@ private:
     /* |8|1|8|1|16 */
     const qint32 rawDataPanelColCount = 34;
     const qint32 defaultTextSize = 11;
+
+    /*解析选项，用协议名作为Key*/
+    QHash<QString,quint64> *dissectorOptions;
 
     /*暂时用于存储过滤器需要的StreamIndex*/
     qint64 streamIndex;

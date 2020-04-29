@@ -1,17 +1,19 @@
 #include "capturer.h"
 
 
-Capturer::Capturer(QString devName)
+Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
 {
     this->capHandle = new CapHandle(devName);
     this->capHandle->ActivateHandleWithParas();
+    this->dissectorOptions = dissectorOptions;
     this->dissResList = new DissResList_t;
     this->mutex = new QMutex();
     this->stop = false;
 }
 
-Capturer::Capturer(CapHandle *capHandle){
+Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions){
     this->capHandle = capHandle;
+    this->dissectorOptions = dissectorOptions;
     this->dissResList = new DissResList_t;
     this->mutex = new QMutex();
     this->stop = false;
@@ -51,6 +53,7 @@ void Capturer::run(){
     qint64 index = 0;
     qint32 res;
     this->stop = false;
+    QList<void*> *reserves = new QList<void*> {dissectorOptions};
     while(true){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
             DissRes *dissRes;
@@ -58,7 +61,8 @@ void Capturer::run(){
             case 1:
             {
                 dissRes = new DissResEth(index);
-                this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY));
+                this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
+                    ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
                 break;
             }
             default:

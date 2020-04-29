@@ -37,7 +37,7 @@ namespace tcp_ip_protocol_family {
 class DissectResultUdp
 {
 public:
-    DissectResultUdp(DissectResultBase *dissectResultBase);
+    DissectResultUdp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 };
 
 }

@@ -3,7 +3,7 @@
 Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkLayer *dissectResultLinklayer,void *reserves)
 {
     QList<void*> *r = (QList<void*>*)reserves;
-    QString linklayerTypeName(*(QString*)r->at(2));
+    QString linklayerTypeName(*(QString*)r->at(3));
 
     Q_UNUSED(reserves)
         /*LinkLayer处理代码*/

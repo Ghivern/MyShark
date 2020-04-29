@@ -10,7 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     this->setupUi();
+    this->setupDissectorOptions(); //必须在setupSignal前面
     this->setupSignal();
+
 
     this->setWindowTitle(DeviceList::SelectedDevice);
     this->ui->actionStart->setEnabled(false);
@@ -66,7 +68,7 @@ void MainWindow::setupUi(){
 
 void MainWindow::setupSignal(){
     //connect(ui->interfaceListWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(StartCapture(QListWidgetItem *)));
-    capturer = new Capturer(DeviceList::capHandle);
+    capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
     dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
 
     /*原来用于测试的，是暂时性的*/
@@ -77,6 +79,12 @@ void MainWindow::setupSignal(){
     this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
 
     connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+}
+
+/*初始化解析选项*/
+void MainWindow::setupDissectorOptions(){
+    this->dissectorOptions = new QHash<QString,quint64>;
+    this->dissectorOptions->insert("tcp",5); //测试
 }
 
 void MainWindow::setTableWidgetColor(qint32 row,quint32 background, quint32 textColor){
@@ -113,6 +121,23 @@ void MainWindow::clearRawDataPanelBackground(quint32 background){
 
     if( !this->ui->rawDataPanel->item(row,9)->text().isEmpty() ){
         this->ui->rawDataPanel->item(row,8)->setData(Qt::BackgroundRole,QColor(background));
+    }
+}
+
+void MainWindow::addBackgroundToTableRow(DissectResultFrame *frame,qint32 row){
+    if( frame->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR) ){
+        TcpInfo *tcpInfo = (TcpInfo*)frame->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR);
+        if( tcpInfo->status ){
+            this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
+        }else if( tcpInfo->SYN || tcpInfo->FIN ){
+            this->setTableWidgetColor(row,0xAAAAAA);
+        }else if( tcpInfo->RST ){
+            this->setTableWidgetColor(row,0xA21919);
+        }else{
+            this->setTableWidgetColor(row,0xD5D5D5);
+        }
+    }else{
+        this->setTableWidgetColor(row,0xD5D5D5);
     }
 }
 
@@ -313,20 +338,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
 
     //背景色
-    if( frame->GetDissectResultBase()->ReserveTcpContain(TCP_INFO)){
-        const TcpInfo tcpInfo = frame->GetDissectResultBase()->GetAdditional(TCP_INFO);
-        if( tcpInfo.status ){
-            this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
-        }else if( tcpInfo.SYN || tcpInfo.FIN ){
-            this->setTableWidgetColor(row,0xAAAAAA);
-        }else if( tcpInfo.RST ){
-            this->setTableWidgetColor(row,0xA21919);
-        }else{
-            this->setTableWidgetColor(row,0xD5D5D5);
-        }
-    }else{
-        this->setTableWidgetColor(row,0xD5D5D5);
-    }
+    this->addBackgroundToTableRow(frame,row);
 
 
     if(this->scrollToBottom)
@@ -336,6 +348,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     this->displayProportion->clear();
     this->displayProportion->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
 }
+
 
 void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
     QTreeWidgetItem *item = nullptr;
@@ -358,7 +371,7 @@ void MainWindow::addToTree(qint64 index){
      qint32 *interfaceId = new qint32(this->capturer->GetCapHandle()->GetDeviceIndex());
      QString *interfaceName = new QString(this->capturer->GetCapHandle()->GetDeviceName());
      QString *linklayerTypeName = new QString(this->capturer->GetCapHandle()->GetLinkTypeName());
-     QList<void*> *reserve = new QList<void*> {interfaceId,interfaceName,linklayerTypeName};
+     QList<void*> *reserve = new QList<void*> {this->dissectorOptions,interfaceId,interfaceName,linklayerTypeName};
 
      ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),reserve);
      ProTreeNode *node = maker->GetProTree()->GetHeader();

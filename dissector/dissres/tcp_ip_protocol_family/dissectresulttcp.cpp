@@ -7,8 +7,9 @@ using namespace tcp_ip_protocol_family;
 
 StreamTcp2 DissectResultTcp::stream2;
 
-DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
+DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *reserves)
 {
+    Q_UNUSED(reserves)
     this->protocol_family_application_layer = nullptr;
     this->dissectResultBase = dissectResultBase;
 
@@ -18,6 +19,10 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     dissectResultBase->UpdateProtocolList("tcp",this->GetOffset() * 4);
 
     this->dealTcpOptions();
+
+    QList<void*> *list = (QList<void*>*)reserves;
+    QHash<QString,quint64> *hash = (QHash<QString,quint64>*)list->at(0);
+    qDebug() << "Tcp的测试选项" << hash->value("tcp");
 
     dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
     dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);
@@ -45,6 +50,23 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
     tcpInfo.echoReplayTime.tv_sec = (__time_t)this->GetOptionTimestampEchoReply();
     tcpInfo.echoReplayTime.tv_usec = 0;
     dissectResultBase->AddAdditional(TCP_INFO,tcpInfo);
+
+    TcpInfo *tcpInfo_ptr = new TcpInfo;
+    tcpInfo_ptr->SYN = this->SYN();
+    tcpInfo_ptr->FIN = this->FIN();
+    tcpInfo_ptr->RST = this->RST();
+    tcpInfo_ptr->ACK = this->ACK();
+    tcpInfo_ptr->ack = this->GetAck();
+    tcpInfo_ptr->seq = this->GetSeq();
+    tcpInfo_ptr->segLen = this->GetPayloadLen();
+    tcpInfo_ptr->windowVal = this->GetWindow();
+    tcpInfo_ptr->windowSclae = this->GetOptionWindowScale();
+    tcpInfo_ptr->time.tv_sec = this->dissectResultBase->GetPkthdr()->ts.tv_sec;
+    tcpInfo_ptr->time.tv_usec = this->dissectResultBase->GetPkthdr()->ts.tv_usec;
+    tcpInfo_ptr->echoReplayTime.tv_sec = (__time_t)this->GetOptionTimestampEchoReply();
+    tcpInfo_ptr->echoReplayTime.tv_usec = 0;
+    dissectResultBase->AddAdditional(TCP_INFO_PTR,(void*)tcpInfo_ptr);
+
 
 
 
@@ -99,7 +121,7 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase)
                                        .arg(this->GetWindow())
                                   );
 
-    this->addNextLayer(dissectResultBase);
+    this->addNextLayer(dissectResultBase,reserves);
 }
 
 void* DissectResultTcp::GetNextLayer(){
@@ -317,7 +339,7 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
 
 /*分析Seq/Ack*/
 QString DissectResultTcp::GetSegmentStatusStr(){
-    qint32 status = this->dissectResultBase->GetAdditional(TCP_INFO).status;
+    qint32 status = ((TcpInfo*)this->dissectResultBase->GetAdditionalPtr(TCP_INFO_PTR))->status;
     QString str = "";
 
     if( status & TCP_A_ZERO_WINDOW_PROBE )
@@ -385,7 +407,7 @@ qint64 DissectResultTcp::GetPrevious(){
 
 /*Private*/
 
-void DissectResultTcp::addNextLayer(DissectResultBase *dissectResultBase){
+void DissectResultTcp::addNextLayer(DissectResultBase *dissectResultBase,void *reserves){
     quint16 srcPort = this->GetSourcePort();
     quint16 dstPort = this->GetDestinationPort();
     quint32 segLen = this->GetPayloadLen();
@@ -395,7 +417,7 @@ void DissectResultTcp::addNextLayer(DissectResultBase *dissectResultBase){
         switch (servPort) {
         case TRANSPORTLAYER_TCP_SERV::HTTP:
         {
-            this->protocol_family_application_layer = (void*)(new DissectResultHttp(dissectResultBase));
+            this->protocol_family_application_layer = (void*)(new DissectResultHttp(dissectResultBase,reserves));
             break;
         }
         default:

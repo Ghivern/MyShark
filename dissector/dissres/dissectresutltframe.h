@@ -21,7 +21,9 @@ public:
         TCP_IP_PROTOCOL_FAMILY = 1
     }PROTOCOL_FAMILY_TYPE;
 
-    DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index,PROTOCOL_FAMILY_TYPE protocol_family_type = PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY);
+    DissectResultFrame(const quint8 *data, const pcap_pkthdr *pkthdr, qint64 index
+                       ,PROTOCOL_FAMILY_TYPE protocol_family_type = PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY
+                       ,void *reserves = nullptr);
     ~DissectResultFrame();
 
     /*Set方法*/

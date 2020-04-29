@@ -4,7 +4,8 @@ using namespace tcp_ip_protocol_family;
 
 Stream DissectResultIpv4::stream;
 
-DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
+DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves){
+    Q_UNUSED(reserves)
     this->protocol_family_transport_layer = NULL;
     this->dissectResultBase = dissectResultBase;
     dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_FIELD_LENGTH_TEMP_TOTAL_LEN);
@@ -14,7 +15,7 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
         dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength() * 4);
         this->streamIndexPlusOne = DissectResultIpv4::stream.Add(dissectResultBase,header->srcaddr,header->dstaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
 
-        this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type);
+        this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type,reserves);
     }
 
     if(dissectResultBase->GetPkthdr()->caplen - dissectResultBase->GetAdditionalVal("linklayer_have_fcs") - this->GetTotalLength() < 4)
@@ -22,7 +23,9 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase){
     dissectResultBase->RemoveAdditional("linklayer_have_fcs");
 }
 
-void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
+void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase
+                                     , NETWORKLAYER_IPV4_PROTOCOL_TYPE type
+                                     ,void *reserves){
     switch (type) {
     case NETWORKLAYER_IPV4_TYPE_TCP:
     {
@@ -31,13 +34,13 @@ void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase, NETWO
         dissectResultBase->AddAdditional(IP_SOURCE_ADDRESS_PTR,header->srcaddr);
         dissectResultBase->AddAdditional(IP_DESTINATION_ADDRESS_PTR,header->dstaddr);
         dissectResultBase->AddAdditional(IP_ADDRESS_LENGTH,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
-        this->protocol_family_transport_layer = (void*)(new DissectResultTcp(dissectResultBase));
+        this->protocol_family_transport_layer = (void*)(new DissectResultTcp(dissectResultBase,reserves));
         break;
     }
     case NETWORKLAYER_IPV4_TYPE_UDP:
     {
         this->dissectResultBase->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
-        this->protocol_family_transport_layer = (void*)(new DissectResultUdp(dissectResultBase));
+        this->protocol_family_transport_layer = (void*)(new DissectResultUdp(dissectResultBase,reserves));
         break;
     }
     default:
