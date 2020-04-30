@@ -1,8 +1,16 @@
 TEMPLATE = subdirs
 
-CONFIG += ordered \
+CONFIG += ordered \ \
+    qt \
+    qt \
+    qt \
+    qt
 
 SUBDIRS += \
     dissector \
     myshark
+
+
+QT += widgets
+
 

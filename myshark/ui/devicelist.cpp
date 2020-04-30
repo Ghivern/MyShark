@@ -3,6 +3,7 @@
 
 #include "../../dissector/units/device.h"
 
+#include "dissectoroptions.h"
 
 #include <QListWidgetItem>
 #include <QMessageBox>
@@ -62,4 +63,10 @@ void DeviceList::on_buttonBox_accepted()
         QMessageBox::critical(this,"Error","please select a device!");
     else
         this->UpdateSelectedDevice(item);
+}
+
+void DeviceList::on_pushButton_options_clicked()
+{
+    DissectorOptions dp;
+    dp.exec();
 }

@@ -22,20 +22,28 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     ui/devicelist.cpp \
+    ui/dissectoroptions.cpp \
+    ui/widgets/arp.cpp \
+    ui/widgets/ether.cpp \
     units/caphandle.cpp
 
 HEADERS += \
     capturer/capturer.h \
     dissector/dissector.h \
-    #form.h \
     mainwindow.h \
-    #../global/global.h \
     ui/devicelist.h \
-    units/caphandle.h
+    ui/dissectoroptions.h \
+    ui/widgets/arp.h \
+    ui/widgets/ether.h \
+    units/caphandle.h \
+
 
 FORMS += \
-    devicelist.ui \
-    mainwindow.ui
+    ui/devicelist.ui \
+    mainwindow.ui \
+    ui/dissectoroptions.ui \
+    ui/widgets/arp.ui \
+    ui/widgets/ether.ui
 
 LIBS += -lpcap
 LIBS += -L../lib -ldissector

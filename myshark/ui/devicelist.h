@@ -30,6 +30,7 @@ private slots:
     void UpdateSelectedDevice(QListWidgetItem *item);
 
     void on_buttonBox_accepted();
+    void on_pushButton_options_clicked();
 };
 
 #endif // DEVICELIST_H

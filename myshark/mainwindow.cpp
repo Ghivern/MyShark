@@ -3,14 +3,14 @@
 #include "../dissector/dissres/dissectresutltframe.h"
 #include "../dissector/dissres/tcp_ip_protocol_family/dissectresultlinklayer.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
     this->setupUi();
-    this->setupDissectorOptions(); //必须在setupSignal前面
+    this->dissectorOptions = dissectorOptions; //必须在setupSignal前面
     this->setupSignal();
 
 

@@ -33,7 +33,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
