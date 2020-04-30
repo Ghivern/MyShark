@@ -224,8 +224,32 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuDissect">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionDissector_options"/>
+   </widget>
+   <widget class="QMenu" name="menuCpature">
+    <property name="title">
+     <string>Cpature</string>
+    </property>
+    <addaction name="actionStart"/>
+    <addaction name="actionStop"/>
+    <addaction name="actionRestart"/>
+   </widget>
+   <widget class="QMenu" name="menuStatics">
+    <property name="title">
+     <string>Statistics</string>
+    </property>
    </widget>
    <addaction name="menuStatistics"/>
+   <addaction name="menuDissect"/>
+   <addaction name="menuCpature"/>
+   <addaction name="menuStatics"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -337,6 +361,10 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="resource/mysharkres.qrc">
+     <normaloff>:/icos/scroll_to_bottom.ico</normaloff>:/icos/scroll_to_bottom.ico</iconset>
+   </property>
    <property name="text">
     <string>ScrollToLastLine</string>
    </property>
@@ -345,11 +373,20 @@
    </property>
   </action>
   <action name="actionResizeTableWidgetTOFitContents">
+   <property name="icon">
+    <iconset resource="resource/mysharkres.qrc">
+     <normaloff>:/icos/fit_content.ico</normaloff>:/icos/fit_content.ico</iconset>
+   </property>
    <property name="text">
     <string>ResizeTableWidgetTOFitContents</string>
    </property>
    <property name="toolTip">
     <string>Resize packets list columns to fit contents</string>
+   </property>
+  </action>
+  <action name="actionDissector_options">
+   <property name="text">
+    <string>Dissectors options</string>
    </property>
   </action>
  </widget>

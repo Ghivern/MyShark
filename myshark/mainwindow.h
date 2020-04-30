@@ -20,6 +20,7 @@
 
 //ui
 #include "./ui/devicelist.h"
+#include "./ui/dissectoroptions.h"
 
 
 
@@ -106,5 +107,6 @@ private slots:
     void on_actionScrollToLastLine_triggered(bool checked);
     void on_actionResizeTableWidgetTOFitContents_triggered();
     void on_pushButton_filter_clicked();
+    void on_actionDissector_options_triggered();
 };
 #endif // MAINWINDOW_H

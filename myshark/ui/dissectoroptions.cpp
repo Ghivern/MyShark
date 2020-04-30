@@ -8,7 +8,7 @@
 /*默认选项,所有处理的协议均要添加*/
 QHash<QString,quint64>* DissectorOptions::dissectorOptions = new QHash<QString,quint64>
       {
-            {"ether",5}
+            {"ether",0}
             ,{"arp",6}
             ,{"ipv4",7}
             ,{"tcp",100}
@@ -40,7 +40,7 @@ void DissectorOptions::setupWidget(){
     this->Vlayout = new QVBoxLayout;
     this->ui->widget->setLayout(Vlayout);
 
-    this->ether = new Ether;
+    this->ether = new Ether(this->dissectorOptions->value("ether"));
     this->arp = new Arp;
 
     this->Vlayout->addWidget(ether);
@@ -64,4 +64,16 @@ void DissectorOptions::on_listWidget_itemClicked(QListWidgetItem *item)
     }else if( item->text() == "arp" ){
         this->arp->show();
     }
+}
+
+void DissectorOptions::on_pushButton_ok_clicked()
+{
+    (*this->dissectorOptions->find("ether")) = this->ether->Result();
+
+    this->accept();
+}
+
+void DissectorOptions::on_pushButton_cancel_clicked()
+{
+    this->reject();
 }

@@ -610,3 +610,10 @@ void MainWindow::on_pushButton_filter_clicked()
 
 
 
+
+/*菜单栏*/
+void MainWindow::on_actionDissector_options_triggered()
+{
+    DissectorOptions dp;
+    dp.exec();
+}

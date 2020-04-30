@@ -14,6 +14,9 @@
 #include "dissectresultipv6.h"
 #include "dissectresultarp.h"
 
+/*解析器选项*/
+#define ETHERNET_VALIDATE_FCS 0X0001
+
 /*0                   1                   2                   3
  *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
