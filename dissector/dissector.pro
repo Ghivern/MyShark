@@ -26,18 +26,20 @@ SOURCES += \
     dissectors/dissectoreth/dissectortcp.cpp \
     dissectors/dissectoreth/dissectorudp.cpp \
     dissectors/frame.cpp \
-    dissectors/http.cpp \
+#    dissectors/http.cpp \
     dissectors/protreemaker.cpp \
     dissectors/tcp_ip_protocol_family/arp.cpp \
     dissectors/tcp_ip_protocol_family/ipv4.cpp \
     dissectors/tcp_ip_protocol_family/linklayer.cpp \
     dissectors/tcp_ip_protocol_family/tcp.cpp \
     dissectors/tcp_ip_protocol_family/udp.cpp \
+    dissectors/tcp_ip_protocol_family/http.cpp \
     dissectors/tcpipprotocolfamily.cpp \
-    dissres/converter.cpp \
+#    dissres/converter.cpp \
+    dissres/dissectresult.cpp \
     dissres/dissectresultbase.cpp \
     dissres/dissectresultcommonstream.cpp \
-    dissres/dissectresulthttp.cpp \
+#    dissres/dissectresulthttp.cpp \
     dissres/dissectresutltframe.cpp \
     dissres/dissres.cpp \
     dissres/dissreseth.cpp \
@@ -47,6 +49,7 @@ SOURCES += \
     dissres/tcp_ip_protocol_family/dissectresultlinklayer.cpp \
     dissres/tcp_ip_protocol_family/dissectresulttcp.cpp \
     dissres/tcp_ip_protocol_family/dissectresultudp.cpp \
+    dissres/tcp_ip_protocol_family/dissectresulthttp.cpp \
     info/info.cpp \
     info/infoeth.cpp \
     loader.cpp \
@@ -60,6 +63,7 @@ SOURCES += \
     stream/streamtcp2.cpp \
     units/bit.cpp \
     units/checksum.cpp \
+    units/converter.cpp \
     units/device.cpp \
     units/tcpinfo.cpp
 
@@ -75,18 +79,19 @@ HEADERS += \
     dissectors/dissectoreth/dissectorudp.h \
     dissectors/dissectoreth/eth_header.h \
     dissectors/frame.h \
-    dissectors/http.h \
     dissectors/protreemaker.h \
     dissectors/tcp_ip_protocol_family/arp.h \
     dissectors/tcp_ip_protocol_family/ipv4.h \
     dissectors/tcp_ip_protocol_family/linklayer.h \
     dissectors/tcp_ip_protocol_family/tcp.h \
     dissectors/tcp_ip_protocol_family/udp.h \
+    dissectors/tcp_ip_protocol_family/http.h \
     dissectors/tcpipprotocolfamily.h \
-    dissres/converter.h \
+#    dissres/converter.h \
+    dissres/dissectresult.h \
     dissres/dissectresultbase.h \
     dissres/dissectresultcommonstream.h \
-    dissres/dissectresulthttp.h \
+#    dissres/dissectresulthttp.h \
     dissres/dissectresutltframe.h \
     dissres/dissres.h \
     dissres/dissreseth.h \
@@ -96,12 +101,12 @@ HEADERS += \
     dissres/tcp_ip_protocol_family/dissectresultlinklayer.h \
     dissres/tcp_ip_protocol_family/dissectresulttcp.h \
     dissres/tcp_ip_protocol_family/dissectresultudp.h \
+    dissres/tcp_ip_protocol_family/dissectresulthttp.h \
     info/info.h \
     info/infoeth.h \
     loader.h \
     protree/protree.h \
     protree/protreenode.h \
-    \ \
     stream/stream.h \
     stream/streamindex.h \
     stream/streamitem.h \
@@ -110,6 +115,7 @@ HEADERS += \
     stream/streamtcp2.h \
     units/bit.h \
     units/checksum.h \
+    units/converter.h \
     units/device.h \
     units/keys.h \
     units/tcpinfo.h

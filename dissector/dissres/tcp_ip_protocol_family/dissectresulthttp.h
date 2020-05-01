@@ -1,7 +1,7 @@
 #ifndef DISSECTRESULTHTTP_H
 #define DISSECTRESULTHTTP_H
 
-#include "dissectresultbase.h"
+#include "../dissectresultbase.h"
 
 class DissectResultHttp
 {

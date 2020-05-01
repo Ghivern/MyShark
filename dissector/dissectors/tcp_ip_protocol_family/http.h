@@ -1,8 +1,8 @@
 #ifndef HTTP_H
 #define HTTP_H
 
-#include "../protree/protree.h"
-#include "../dissres/dissectresutltframe.h"
+#include "../../protree/protree.h"
+#include "../../dissres/dissectresutltframe.h"
 
 class Http
 {

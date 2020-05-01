@@ -4,18 +4,23 @@ using namespace tcp_ip_protocol_family;
 
 Stream DissectResultIpv4::stream;
 
-DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves){
+DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves)
+        :DissectResult(dissectResultBase)
+{
     Q_UNUSED(reserves)
-    this->protocol_family_transport_layer = NULL;
-    this->dissectResultBase = dissectResultBase;
+//    this->protocol_family_transport_layer = NULL;
+//    this->SetDissectResultBase(dissectResultBase);
+//    this->dissectResultBase = dissectResultBase;
     dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_FIELD_LENGTH_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ipv4");
     if(this->header != NULL){
         dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength() * 4);
         dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength() * 4);
-        this->streamIndexPlusOne = DissectResultIpv4::stream.Add(dissectResultBase,header->srcaddr,header->dstaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
+        this->SetStremIndexPlusOne( DissectResultIpv4::stream
+                                    .Add(dissectResultBase,header->srcaddr,header->dstaddr
+                                         ,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR));
 
-        this->AddNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type,reserves);
+        this->addNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type,reserves);
     }
 
     if(dissectResultBase->GetPkthdr()->caplen - dissectResultBase->GetAdditionalVal("linklayer_have_fcs") - this->GetTotalLength() < 4)
@@ -23,43 +28,15 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *
     dissectResultBase->RemoveAdditional("linklayer_have_fcs");
 }
 
-void DissectResultIpv4::AddNextLayer(DissectResultBase *dissectResultBase
-                                     , NETWORKLAYER_IPV4_PROTOCOL_TYPE type
-                                     ,void *reserves){
-    switch (type) {
-    case NETWORKLAYER_IPV4_TYPE_TCP:
-    {
-        this->dissectResultBase->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_TCP));
-        dissectResultBase->AddAdditional(TCP_TOTAL_LEN,this->GetTotalLength() - this->GetHeaderLength() * 4);
-        dissectResultBase->AddAdditional(IP_SOURCE_ADDRESS_PTR,header->srcaddr);
-        dissectResultBase->AddAdditional(IP_DESTINATION_ADDRESS_PTR,header->dstaddr);
-        dissectResultBase->AddAdditional(IP_ADDRESS_LENGTH,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
-        this->protocol_family_transport_layer = (void*)(new DissectResultTcp(dissectResultBase,reserves));
-        break;
-    }
-    case NETWORKLAYER_IPV4_TYPE_UDP:
-    {
-        this->dissectResultBase->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
-        this->protocol_family_transport_layer = (void*)(new DissectResultUdp(dissectResultBase,reserves));
-        break;
-    }
-    default:
-    {
-        this->dissectResultBase->SetSummery(QString("未处理网络层类型: %1")
-                                            .arg(this->GetType())
-                                            );
-        this->protocol_family_transport_layer = nullptr;
-    }
-    }
-}
 
-void* DissectResultIpv4::GetNextLayer(){
-    return this->protocol_family_transport_layer;
-}
 
-DissectResultBase* DissectResultIpv4::GetDissectResultBase(){
-    return this->dissectResultBase;
-}
+//void* DissectResultIpv4::GetNextLayer(){
+//    return this->protocol_family_transport_layer;
+//}
+
+//DissectResultBase* DissectResultIpv4::GetDissectResultBase(){
+//    return this->dissectResultBase;
+//}
 
 /*
  *  以下均是解析Ipv4首部字段的方法,调用前提是，this->header已经被正确赋值
@@ -266,6 +243,36 @@ QString DissectResultIpv4::GetDestinationAddressStr(){
 }
 
 /*Private*/
+void DissectResultIpv4::addNextLayer(DissectResultBase *dissectResultBase
+                                     , NETWORKLAYER_IPV4_PROTOCOL_TYPE type
+                                     ,void *reserves){
+    switch (type) {
+    case NETWORKLAYER_IPV4_TYPE_TCP:
+    {
+        this->GetDissectResultBase()->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_TCP));
+        dissectResultBase->AddAdditional(TCP_TOTAL_LEN,this->GetTotalLength() - this->GetHeaderLength() * 4);
+        dissectResultBase->AddAdditional(IP_SOURCE_ADDRESS_PTR,header->srcaddr);
+        dissectResultBase->AddAdditional(IP_DESTINATION_ADDRESS_PTR,header->dstaddr);
+        dissectResultBase->AddAdditional(IP_ADDRESS_LENGTH,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
+        this->SetNextLayer( (void*)(new DissectResultTcp(dissectResultBase,reserves)));
+        break;
+    }
+    case NETWORKLAYER_IPV4_TYPE_UDP:
+    {
+        this->GetDissectResultBase()->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
+        this->SetNextLayer( (void*)(new DissectResultUdp(dissectResultBase,reserves)));
+        break;
+    }
+    default:
+    {
+        this->GetDissectResultBase()->SetSummery(QString("未处理网络层类型: %1")
+                                            .arg(this->GetType())
+                                            );
+        this->SetNextLayer();
+    }
+    }
+}
+
 quint8* DissectResultIpv4::producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
     quint8 *pseudoHeader = (quint8*)malloc(this->pseudoHeaderLen);
     memcpy(pseudoHeader,this->header->srcaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2);

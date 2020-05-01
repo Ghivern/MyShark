@@ -27,7 +27,7 @@ private:
     void setupSignal();
 
 private slots:
-    void UpdateSelectedDevice(QListWidgetItem *item);
+    void updateSelectedDevice(QListWidgetItem *item);
 
     void on_buttonBox_accepted();
     void on_pushButton_options_clicked();

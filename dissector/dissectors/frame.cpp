@@ -16,7 +16,7 @@ Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reser
 
     proTree->AddItem("frame",
                      QString("Frame %1: %2 bytes on wire (%3 bits), %4 bytes captured (%5 bits) on interface %6")
-                     .arg(dissectResultFrame->GetIndex())
+                     .arg(dissectResultFrame->GetDissectResultBase()->GetIndex())
                      .arg(dissectResultFrame->GetLen())
                      .arg(dissectResultFrame->GetLen() * 8)
                      .arg(dissectResultFrame->GetCapLen())

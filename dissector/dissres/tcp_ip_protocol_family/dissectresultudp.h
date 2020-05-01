@@ -1,6 +1,7 @@
 #ifndef DISSECTRESULTUDP_H
 #define DISSECTRESULTUDP_H
 
+#include "../dissectresult.h"
 #include "../dissectresultbase.h"
 
 /*0              |    1          |        2      |             3
@@ -34,7 +35,7 @@
 
 namespace tcp_ip_protocol_family {
 
-class DissectResultUdp
+class DissectResultUdp:public DissectResult
 {
 public:
     DissectResultUdp(DissectResultBase *dissectResultBase,void *reserves = nullptr);

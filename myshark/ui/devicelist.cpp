@@ -9,6 +9,9 @@
 #include <QMessageBox>
 #include <QDebug>
 
+QString DeviceList::SelectedDevice = "";
+CapHandle* DeviceList::capHandle = nullptr;
+
 DeviceList::DeviceList(QWidget *parent)
         :QDialog(parent)
         ,ui(new Ui::DeviceList)
@@ -23,9 +26,6 @@ DeviceList::~DeviceList(){
     delete this->ui;
 }
 
-QString DeviceList::SelectedDevice = "";
-CapHandle* DeviceList::capHandle = nullptr;
-
 void DeviceList::setupDeviceList(){
     Device device;
     QListWidgetItem *item;
@@ -37,10 +37,10 @@ void DeviceList::setupDeviceList(){
 }
 
 void DeviceList::setupSignal(){
-    connect(this->ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(UpdateSelectedDevice(QListWidgetItem*)));
+    connect(this->ui->listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(updateSelectedDevice(QListWidgetItem*)));
 }
 
-void DeviceList::UpdateSelectedDevice(QListWidgetItem *item){
+void DeviceList::updateSelectedDevice(QListWidgetItem *item){
     DeviceList::SelectedDevice.clear();
     DeviceList::SelectedDevice.append(item->text());
     DeviceList::capHandle = new CapHandle(item->text());
@@ -62,7 +62,7 @@ void DeviceList::on_buttonBox_accepted()
     if(item == nullptr)
         QMessageBox::critical(this,"Error","please select a device!");
     else
-        this->UpdateSelectedDevice(item);
+        this->updateSelectedDevice(item);
 }
 
 void DeviceList::on_pushButton_options_clicked()

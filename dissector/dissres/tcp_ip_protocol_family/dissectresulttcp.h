@@ -6,7 +6,7 @@
 #include "arpa/inet.h"
 
 //#include "../../units/keys.h"
-#include "../converter.h"
+#include "../../units/converter.h"
 
 #include "../../stream/stream.h"
 //#include "../../stream/streamtcp.h"
@@ -14,9 +14,10 @@
 #include "../../stream/streamtcp2.h"
 
 #include "../dissectresultbase.h"
+#include "../dissectresult.h"
 #include "../dissectresultcommonstream.h"
 
-#include "../dissectresulthttp.h"
+#include "./dissectresulthttp.h"
 
 /*0                   1          |        2                   3
  *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -95,7 +96,7 @@
  */
 namespace tcp_ip_protocol_family {
 
-class DissectResultTcp:public DissectResultCommonStream
+class DissectResultTcp:public DissectResult
 {
 public:
     enum TRANSPORTLAYER_TCP_FIELD_LENGTH{
@@ -111,10 +112,6 @@ public:
         TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 20
     };
 
-    enum TRANSPORTLAYER_TCP_SERV{
-        HTTP = 80
-    };
-
     enum TCP_OPTION{
         TCP_OPTION_END_OF_OPTION = 0,
         TCP_OPTION_NO_OPERATION = 1,
@@ -124,6 +121,12 @@ public:
         TCP_OPTION_SACK_OPTION_FORMAT = 5,
         TCP_OPTION_TIMESTAMPS_OPTION = 8
     };
+
+    enum TRANSPORTLAYER_TCP_SERV{
+        HTTP = 80
+    };
+
+
 
 //    enum TCP_OPTION_LENGTH:quint8{
 //        TCP_OPTION_LENGTH_MAXIMUM_SEGMENT_SIZE = 4,
@@ -136,7 +139,7 @@ public:
     DissectResultTcp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 
 
-    void* GetNextLayer();
+//    void* GetNextLayer();
 
     /*处理端口号*/
     quint8* GetSourcePortPtr();
@@ -220,17 +223,6 @@ private:
      *----------------------------------------------------------------
      *
      */
-
-    void addNextLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
-
-    /*Options*/
-    /*
-     *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
-     */
-    void dealTcpOptions();
-    qint32 getOptionIndex(enum TCP_OPTION option);
-
-
     struct header_t{
         quint8 srcPort[TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT];
         quint8 dstPort[TRANSPORTLAYER_TCP_FIELD_LENGTH_DESTINATION_PORT];
@@ -252,15 +244,28 @@ private:
         quint8 length;
     };
 
+
+    void addNextLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
+
+    /*Options*/
+    /*
+     *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
+     */
+    void dealTcpOptions();
+    qint32 getOptionIndex(enum TCP_OPTION option);
+
+
     //static StreamTcp stream;
 
     static StreamTcp2 stream2;
 
     struct header_t *header;
+
+    //记录存在的Tcp选项
     QHash<qint32,struct option_dsc_t> options_dsc;
 
-    DissectResultBase *dissectResultBase;
-    void *protocol_family_application_layer;
+//    DissectResultBase *dissectResultBase;
+//    void *protocol_family_application_layer;
 };
 
 }

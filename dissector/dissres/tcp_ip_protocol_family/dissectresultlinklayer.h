@@ -6,9 +6,11 @@
 #include <QTextStream>
 #include <arpa/inet.h>
 
-#include "../converter.h"
+#include "../../units/converter.h"
 
 #include "../dissectresultcommonstream.h"
+
+#include "../dissectresult.h"
 #include "../dissectresultbase.h"
 #include "dissectresultipv4.h"
 #include "dissectresultipv6.h"
@@ -41,7 +43,7 @@
 
 namespace tcp_ip_protocol_family {
 
-class DissectResultLinkLayer:public DissectResultCommonStream
+class DissectResultLinkLayer:public DissectResult
 {
 public:
     enum LINKLAYER_FIELD_LENGTH{
@@ -53,17 +55,17 @@ public:
         LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN = 14
     };
 
+    /*凡是为了标识包字段的多字节数据，均定义为网络字节序*/
     enum LINKLAYER_PROTOCOL_TYPE{
-      LINKLAYER_TYPE_IPV4 = 0x0008,   // 0x0800的网络字节序
+      LINKLAYER_TYPE_IPV4 = 0x0008,
       LINKLAYER_TYPE_IPV6 = 0xdd86,
       LINKLAYER_TYPE_ARP = 0x0608
     };
 
     DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
-    void AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves = nullptr);
 
-    void* GetNextLayer();
-    DissectResultBase* GetDissectResultBase();
+//    void* GetNextLayer();
+//    DissectResultBase* GetDissectResultBase();
 
     /*获取协议首部字段位置或值的方法*/
     const quint8* GetSourceAddressPtr();
@@ -96,7 +98,6 @@ public:
     QString GetTypeStr();
     QString GetTypeName();
 
-
     /*处理FCS*/
     bool HaveFCS();
     const quint8* GetFCSPtr();
@@ -106,8 +107,23 @@ public:
     QString GetCalculatedFCSStr();
 
 private:
-    QString GetAddressOriginalStr(quint8 *address);
-    QString GetAddressStr(quint8 *address);
+    struct header_t{
+        quint8 dst[LINKLAYER_FIELD_LENGTH_DES_ADDR];
+        quint8 src[LINKLAYER_FIELD_LENGTH_SRC_ADDR];
+        quint8 type[LINKLAYER_FIELD_LENGTH_TYPE];
+    };
+
+    void addNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves = nullptr);
+
+    QString getAddressOriginalStr(quint8 *address);
+    QString getAddressStr(quint8 *address);
+
+    /*
+     * GroupAddress -> true -> 1; IndividualAddress ->false -> 0
+     * LocalAdministeredAddress -> true -> 1; GlobalUniqueAddress -> false -> 0
+     */
+    bool isGroupAddress(const quint8 *address);
+    bool isLocalAdministeredAddress(const quint8 *address);
 
     /*处理IG和LG bit*/
     QString getAddressLGBbitStr(const quint8 *address);
@@ -116,19 +132,6 @@ private:
     QString getAddressIGBitStr(const quint8 *address);
     QString getAddressIGbit_short_meaning(const quint8 *address);
     QString getAddressIGbit_meaning(const quint8 *address);
-
-    /*
-     * GroupAddress -> true -> 1; IndividualAddress ->false -> 0
-     * LocalAdministeredAddress -> true -> 1; GlobalUniqueAddress -> false -> 0
-     */
-    bool IsGroupAddress(const quint8 *address);
-    bool IsLocalAdministeredAddress(const quint8 *address);
-
-    struct header_t{
-        quint8 dst[LINKLAYER_FIELD_LENGTH_DES_ADDR];
-        quint8 src[LINKLAYER_FIELD_LENGTH_SRC_ADDR];
-        quint8 type[LINKLAYER_FIELD_LENGTH_TYPE];
-    };
 
     /*解析MAC的OUI或者熟知MAC地址*/
     static const QString relative_dir;
@@ -147,9 +150,9 @@ private:
 
     /*解析结果的基本元素*/
     struct header_t *header;
-    DissectResultBase *dissectResultBase;
+//    DissectResultBase *dissectResultBase;
 
-    void *protocol_family_network_layer;
+//    void *protocol_family_network_layer;
 };
 
 }

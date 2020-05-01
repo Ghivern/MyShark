@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "../dissector/dissres/dissectresutltframe.h"
-#include "../dissector/dissres/tcp_ip_protocol_family/dissectresultlinklayer.h"
+//#include "../dissector/dissres/tcp_ip_protocol_family/dissectresultlinklayer.h"
 
 MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     : QMainWindow(parent)
@@ -234,8 +234,8 @@ void MainWindow::Print(qint64 index){
         if(ipv4->GetType() == tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_TYPE_TCP){
             tcp_ip_protocol_family::DissectResultTcp *tcp = (tcp_ip_protocol_family::DissectResultTcp*)ipv4->GetNextLayer();
             qDebug() << "Tcp->"
-                 << "index:" << frame->GetIndex()
-                 << "o-stream:" << tcp->GetOriginalStreamIndex()
+                 << "index:" << frame->GetDissectResultBase()->GetIndex()
+                 << "o-stream:" << tcp->GetStreamIndexPlusOne()
                  << "srcPort:" << tcp->GetSourcePort()
                  << "dstPort:" << tcp->GetDestinationPort()
                  << (tcp->SYN()?"SYN":"")
@@ -277,10 +277,10 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     //No.
     item = new QTableWidgetItem();
-    item->setData(Qt::DisplayRole,frame->GetIndex());
+    item->setData(Qt::DisplayRole,frame->GetDissectResultBase()->GetIndex());
     this->ui->tableWidget->setItem(row,MainWindow::COL_NO,item);
 
-    if( frame->ContainProtocol("tcp") )
+    if( frame->GetDissectResultBase()->ContainProtocol("tcp") )
         item->setData(Qt::UserRole,qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1);
     else
         item->setData(Qt::UserRole,-1);
@@ -298,7 +298,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     //Source
     str.clear();
-    if(frame->ContainProtocol("ipv4")){
+    if(frame->GetDissectResultBase()->ContainProtocol("ipv4")){
         tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
         str.append(ipv4->GetSourceAddressStr());
     }else{
@@ -310,7 +310,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     //Destination
     str.clear();
-    if(frame->ContainProtocol("ipv4")){
+    if(frame->GetDissectResultBase()->ContainProtocol("ipv4")){
         tcp_ip_protocol_family::DissectResultIpv4 *ipv4 = (tcp_ip_protocol_family::DissectResultIpv4*)frame->GetTcpIpProtocolFamilyBaseLayer()->GetNextLayer();
         str.append(ipv4->GetDestinationAddressStr());
     }else{
@@ -322,7 +322,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     //Protocol
     str.clear();
-    str.append(frame->GetTopProtocolName());
+    str.append(frame->GetDissectResultBase()->GetTopProtocolName());
     item = new QTableWidgetItem(str);
     this->ui->tableWidget->setItem(row,MainWindow::COL_PROTOCOL,item);
 
@@ -333,7 +333,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     //Summery
     str.clear();
-    str.append(frame->GetSummery());
+    str.append(frame->GetDissectResultBase()->GetSummery());
     item = new QTableWidgetItem(str);
     this->ui->tableWidget->setItem(row,MainWindow::COL_INFO,item);
 
@@ -381,7 +381,7 @@ void MainWindow::addToTree(qint64 index){
 
 
 void MainWindow::addToRawDataPanel(qint64 index){
-    const quint8* ptr = this->capturer->GetDissectResultFrameByIndex(index)->GetData();
+    const quint8* ptr = this->capturer->GetDissectResultFrameByIndex(index)->GetDissectResultBase()->GetData();
     const quint8* line = nullptr;
     qint32 capLen = this->capturer->GetDissectResultFrameByIndex(index)->GetCapLen();
     QString text;

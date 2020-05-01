@@ -1,6 +1,7 @@
 #ifndef DISSECTRESULTIPV6_H
 #define DISSECTRESULTIPV6_H
 
+#include "../dissectresult.h"
 #include "../dissectresultbase.h"
 #include "dissectresulttcp.h"
 #include "dissectresulttcp.h"
@@ -29,7 +30,7 @@
 namespace tcp_ip_protocol_family {
 
 
-class DissectResultIpv6
+class DissectResultIpv6:public DissectResult
 {
 public:
     enum NETWORKLAYER_IPV6_FIELD_LENGTH{

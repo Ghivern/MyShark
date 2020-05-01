@@ -14,53 +14,39 @@ QFile DissectResultLinkLayer::file_ethernet_well_know_address(ethernet_well_know
 
 Stream DissectResultLinkLayer::stream;
 
-DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves){
+DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves):DissectResult(dissectResultBase)
+{
     Q_UNUSED(reserves)
     this->haveFCS = true;
-    this->protocol_family_network_layer = NULL;
-    this->dissectResultBase = dissectResultBase;
+    //this->protocol_family_network_layer = NULL;
+    //this->dissectResultBase = dissectResultBase;
+    //this->SetDissectResultBase(dissectResultBase);
     dissectResultBase->PushToProtocolList("ether",LINKLAYER_FIELD_LENGTH::LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ether");
     dissectResultBase->UpdateProtocolHeaderLengthCount(LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN);
 
     /*处理流记录器*/
-    this->streamIndexPlusOne = DissectResultLinkLayer::stream.Add(dissectResultBase,header->src,header->dst,LINKLAYER_FIELD_LENGTH_SRC_ADDR);
+    this->SetStremIndexPlusOne(
+            DissectResultLinkLayer::stream
+            .Add(dissectResultBase,header->src,header->dst,LINKLAYER_FIELD_LENGTH_SRC_ADDR)
+    );
 
     /*传递高层协议需要的数据,必须在AddNextLayer之前调用*/
     dissectResultBase->AddAdditional("linklayer_have_fcs",LINKLAYER_FIELD_LENGTH_TEMP_TOTAL_LEN,(void*)&this->haveFCS);
 
-    if(this->header != NULL)
-        this->AddNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type,reserves);
+    if(this->header != nullptr)
+        this->addNextLayer(dissectResultBase,(LINKLAYER_PROTOCOL_TYPE)*(quint16*)header->type,reserves);
 }
 
-void DissectResultLinkLayer::AddNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves){
-    switch(type){
-    case LINKLAYER_TYPE_IPV4:
-        this->protocol_family_network_layer = (void*)(new DissectResultIpv4(dissectResultBase,reserves));
-        break;
-    case LINKLAYER_TYPE_IPV6:
-        this->protocol_family_network_layer = (void*)(new DissectResultIpv6(dissectResultBase,reserves));
-        break;
-    case LINKLAYER_TYPE_ARP:
-        this->protocol_family_network_layer = (void*)(new DissectResultArp(dissectResultBase,reserves));
-        break;
-    default:
-    {
-        this->dissectResultBase->SetSummery(QString("未处理链路层类型: %1")
-                                            .arg(this->GetTypeStr())
-                                            );
-        this->protocol_family_network_layer = NULL;
-    }
-    }
-}
 
-void* DissectResultLinkLayer::GetNextLayer(){
-    return this->protocol_family_network_layer;
-}
 
-DissectResultBase* DissectResultLinkLayer::GetDissectResultBase(){
-    return this->dissectResultBase;
-}
+//void* DissectResultLinkLayer::GetNextLayer(){
+//    return this->protocol_family_network_layer;
+//}
+
+//DissectResultBase* DissectResultLinkLayer::GetDissectResultBase(){
+//    return this->dissectResultBase;
+//}
 
 /*获取协议首部字段位置或值的方法*/
 const quint8* DissectResultLinkLayer::GetSourceAddressPtr(){
@@ -72,36 +58,36 @@ const quint8* DissectResultLinkLayer::GetDestinationAddressPtr(){
 }
 
 QString DissectResultLinkLayer::GetSourceAddressOriginalStr(){
-    return this->GetAddressOriginalStr(this->header->src);
+    return this->getAddressOriginalStr(this->header->src);
 }
 
 QString DissectResultLinkLayer::GetDestinationAddressOriginalStr(){
-    return this->GetAddressOriginalStr(this->header->dst);
+    return this->getAddressOriginalStr(this->header->dst);
 }
 
 QString DissectResultLinkLayer::GetSourceAddressStr(){
-    return this->GetAddressStr(this->header->src);
+    return this->getAddressStr(this->header->src);
 }
 
 QString DissectResultLinkLayer::GetDestinationAddressStr(){
-    return this->GetAddressStr(this->header->dst);
+    return this->getAddressStr(this->header->dst);
 }
 
 /*----处理LG/IG bit------*/
 bool DissectResultLinkLayer::SourceAddressIsGroup(){
-    return this->IsGroupAddress(this->header->src);
+    return this->isGroupAddress(this->header->src);
 }
 
 bool DissectResultLinkLayer::DestinationAddressIsGroup(){
-    return this->IsGroupAddress(this->header->dst);
+    return this->isGroupAddress(this->header->dst);
 }
 
 bool DissectResultLinkLayer::SourceAddressIsLocalAdministered(){
-    return this->IsLocalAdministeredAddress(this->header->src);
+    return this->isLocalAdministeredAddress(this->header->src);
 }
 
 bool DissectResultLinkLayer::DestinationAddressIsLocalAdministered(){
-    return this->IsLocalAdministeredAddress(this->header->dst);
+    return this->isLocalAdministeredAddress(this->header->dst);
 }
 
 QString DissectResultLinkLayer::GetSourceAddressLGBitStr(){
@@ -181,7 +167,8 @@ bool DissectResultLinkLayer::HaveFCS(){
 }
 
 const quint8* DissectResultLinkLayer::GetFCSPtr(){
-    return dissectResultBase->GetData() + dissectResultBase->GetPkthdr()->caplen - LINKLAYER_FIELD_LENGTH_FCS;
+    return this->GetDissectResultBase()->GetData()
+            + this->GetDissectResultBase()->GetPkthdr()->caplen - LINKLAYER_FIELD_LENGTH_FCS;
 }
 
 QString DissectResultLinkLayer::GetFCSStr(){
@@ -246,8 +233,8 @@ quint32 DissectResultLinkLayer::GetCalculatedFCS(){
     };
     quint32 crc32val = 0;
     crc32val ^= 0xFFFFFFFF;
-    for (qint32 i = 0; i < (qint32)dissectResultBase->GetPkthdr()->caplen - LINKLAYER_FIELD_LENGTH_FCS; i++)
-        crc32val = crc32_tab[(crc32val ^ dissectResultBase->GetData()[i]) & 0xFF] ^ ((crc32val >> 8) & 0x00FFFFFF);
+    for (qint32 i = 0; i < (qint32)this->GetDissectResultBase()->GetPkthdr()->caplen - LINKLAYER_FIELD_LENGTH_FCS; i++)
+        crc32val = crc32_tab[(crc32val ^ this->GetDissectResultBase()->GetData()[i]) & 0xFF] ^ ((crc32val >> 8) & 0x00FFFFFF);
     return ntohl(crc32val ^ 0xFFFFFFFF);
 }
 
@@ -257,18 +244,18 @@ QString DissectResultLinkLayer::GetCalculatedFCSStr(){
 }
 
 
-QString DissectResultLinkLayer::GetAddressOriginalStr(quint8 *address){
+QString DissectResultLinkLayer::getAddressOriginalStr(quint8 *address){
     return Converter::ConvertQuint8ArrayToHexStr(address,LINKLAYER_FIELD_LENGTH_SRC_ADDR,":","");
 }
 
-QString DissectResultLinkLayer::GetAddressStr(quint8 *address){
+QString DissectResultLinkLayer::getAddressStr(quint8 *address){
     /*
      * XX:XX:XX:XX:XX:XX
      * XX:XX:XX
      * XX:XX:XX:X
      * XX:XX:XX:XX:X
      */
-    QString originalAddress = this->GetAddressOriginalStr(address);
+    QString originalAddress = this->getAddressOriginalStr(address);
     if(ethernet_address_modify_hash.contains(originalAddress)){   //all
         return ethernet_address_modify_hash.value(originalAddress);
     }else if(ethernet_address_modify_hash.contains(originalAddress.left(13))){  //left 36 bit
@@ -324,19 +311,40 @@ QString DissectResultLinkLayer::GetAddressStr(quint8 *address){
                 ethernet_address_modify_hash.insert(originalAddress,originalAddress);
             file_ethernet_well_know_address.close();
         }
-        return this->GetAddressStr(address);
+        return this->getAddressStr(address);
+    }
+}
+
+void DissectResultLinkLayer::addNextLayer(DissectResultBase *dissectResultBase, LINKLAYER_PROTOCOL_TYPE type,void *reserves){
+    switch(type){
+    case LINKLAYER_TYPE_IPV4:
+        this->SetNextLayer((void*)(new DissectResultIpv4(dissectResultBase,reserves)));
+        break;
+    case LINKLAYER_TYPE_IPV6:
+        this->SetNextLayer((void*)(new DissectResultIpv6(dissectResultBase,reserves)));
+        break;
+    case LINKLAYER_TYPE_ARP:
+        this->SetNextLayer((void*)(new DissectResultArp(dissectResultBase,reserves)));
+        break;
+    default:
+    {
+        this->GetDissectResultBase()->SetSummery(QString("未处理链路层类型: %1")
+                                            .arg(this->GetTypeStr())
+                                            );
+        this->SetNextLayer();
+    }
     }
 }
 
 /*Private*/
-bool DissectResultLinkLayer::IsGroupAddress(const quint8 *address){
+bool DissectResultLinkLayer::isGroupAddress(const quint8 *address){
     if((address[0] & 0x01) == 0x01)
         return true;
     else
         return false;
 }
 
-bool DissectResultLinkLayer::IsLocalAdministeredAddress(const quint8 *address){
+bool DissectResultLinkLayer::isLocalAdministeredAddress(const quint8 *address){
     if((address[0] & 0x02) == 0x02)
         return true;
     else
@@ -346,18 +354,18 @@ bool DissectResultLinkLayer::IsLocalAdministeredAddress(const quint8 *address){
 /*第一个字节的倒数第二位*/
 QString DissectResultLinkLayer::getAddressLGBbitStr(const quint8 *address){
     return QString(".... ..%1. .... .... .... ....")
-            .arg(this->IsLocalAdministeredAddress(address)?1:0);
+            .arg(this->isLocalAdministeredAddress(address)?1:0);
 }
 
 QString DissectResultLinkLayer::getAddressLGbit_short_meaning(const quint8 *address){
-    if( this->IsLocalAdministeredAddress(address) )
+    if( this->isLocalAdministeredAddress(address) )
         return QString("Locally administered address");
     else
         return QString("Globally unique address");
 }
 
 QString DissectResultLinkLayer::getAddressLGbit_meaning(const quint8 *address){
-    if( this->IsLocalAdministeredAddress(address) )
+    if( this->isLocalAdministeredAddress(address) )
         return QString("This is not the factory default");
     else
         return QString("Factory default");
@@ -366,18 +374,18 @@ QString DissectResultLinkLayer::getAddressLGbit_meaning(const quint8 *address){
 /*第一个字节的最后一位*/
 QString DissectResultLinkLayer::getAddressIGBitStr(const quint8 *address){
     return QString(".... ...%1 .... .... .... ....")
-            .arg(this->IsGroupAddress(address)?1:0);
+            .arg(this->isGroupAddress(address)?1:0);
 }
 
 QString DissectResultLinkLayer::getAddressIGbit_meaning(const quint8 *address){
-    if( this->IsGroupAddress(address) )
+    if( this->isGroupAddress(address) )
         return QString("Group address");
     else
         return QString("Individual address");
 }
 
 QString DissectResultLinkLayer::getAddressIGbit_short_meaning(const quint8 *address){
-    if( this->IsGroupAddress(address) )
+    if( this->isGroupAddress(address) )
         return QString("multicast/broadcast");
     else
         return QString("nuicast");

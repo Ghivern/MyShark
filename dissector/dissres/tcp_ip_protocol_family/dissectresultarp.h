@@ -1,6 +1,7 @@
 #ifndef DISSECTRESULTARP_H
 #define DISSECTRESULTARP_H
 
+#include "../dissectresult.h"
 #include "../dissectresultbase.h"
 
 /*0                   1          |        2                   3
@@ -10,7 +11,7 @@
 
 namespace tcp_ip_protocol_family {
 
-class DissectResultArp
+class DissectResultArp:public DissectResult
 {
 public:
     DissectResultArp(DissectResultBase *dissectResultBase,void *reserves = nullptr);

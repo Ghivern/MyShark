@@ -4,10 +4,11 @@
 #include "arpa/inet.h"
 #include "time.h"
 
-#include "../converter.h"
+#include "../../units/converter.h"
 #include "../../units/bit.h"
 #include "../../units/keys.h"
 
+#include "../dissectresult.h"
 #include "../dissectresultcommonstream.h"
 #include "../dissectresultbase.h"
 #include "dissectresulttcp.h"
@@ -138,7 +139,7 @@ const QHash<qint32,QString> dscp_vals =
 namespace tcp_ip_protocol_family {
 
 
-class DissectResultIpv4:public DissectResultCommonStream
+class DissectResultIpv4:public DissectResult
 {
 public:
     enum NETWORKLAYER_IPV4_FIELD_LENGTH{
@@ -162,10 +163,10 @@ public:
     };
 
     DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves = nullptr);
-    void AddNextLayer(DissectResultBase *dissectResultBase, NETWORKLAYER_IPV4_PROTOCOL_TYPE type,void *reserves = nullptr);
 
-    void* GetNextLayer();
-    DissectResultBase* GetDissectResultBase();
+
+//    void* GetNextLayer();
+//    DissectResultBase* GetDissectResultBase();
 
 
     /*0                   1          |        2                   3
@@ -238,9 +239,6 @@ public:
     QString GetDestinationAddressStr();
 
 private:
-    const qint32 pseudoHeaderLen = 12;
-    quint8* producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
-
     struct header_t{
         quint8 version_hdrLen[NETWORKLAYER_IPV4_FIELD_LENGTH_VERSION_HDRLEN];
         quint8 DS[NETWORKLAYER_IPV4_FIELD_LENGTH_DS];
@@ -254,11 +252,16 @@ private:
         quint8 dstaddr[NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR];
     };
 
+    void addNextLayer(DissectResultBase *dissectResultBase
+                      , NETWORKLAYER_IPV4_PROTOCOL_TYPE type,void *reserves = nullptr);
+    quint8* producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
+
+    const qint32 pseudoHeaderLen = 12;
     static Stream stream;
 
     struct header_t *header;
-    DissectResultBase *dissectResultBase;
-    void *protocol_family_transport_layer;
+//    DissectResultBase *dissectResultBase;
+//    void *protocol_family_transport_layer;
 
 };
 

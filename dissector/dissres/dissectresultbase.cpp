@@ -41,20 +41,16 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
 
 }
 
+void DissectResultBase::SetSummery(QString summery){
+    this->summery.clear();
+    this->summery.append(summery);
+}
+
 bool DissectResultBase::ContainProtocol(QString proName){
     if(this->protocolList.contains(proName))
         return true;
     else
         return false;
-}
-
-QString DissectResultBase::GetTopProtocolName(){
-    return this->protocolList.last();
-}
-
-void DissectResultBase::SetSummery(QString summery){
-    this->summery.clear();
-    this->summery.append(summery);
 }
 
 const quint8* DissectResultBase::GetData(){
@@ -75,6 +71,10 @@ qint32 DissectResultBase::GetProtocolHeaderLengthCount(){
 
 qint32 DissectResultBase::GetProtocolListLength(){
     return this->protocolList.length();
+}
+
+QString DissectResultBase::GetTopProtocolName(){
+    return this->protocolList.last();
 }
 
 QString DissectResultBase::GetProtocolNameByIndex(qint32 index){
