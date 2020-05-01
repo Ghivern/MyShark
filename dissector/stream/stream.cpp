@@ -6,6 +6,9 @@ Stream::Stream()
 }
 
 qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 *dstAddr, qint32 addr_size, quint8 *srcPort, quint8 *dstPort, qint32 port_size){
+    if( dissectResultBase->GetIndex() == 0 && this->streamHash.count() > 0){
+        this->ClearStream();
+    }
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData((char*)srcAddr,addr_size);
     hash.addData((char*)dstAddr,addr_size);
@@ -45,4 +48,10 @@ QList<quint64> Stream::GetPacketsIndexListByStream(qint64 streamIndexPlusOne){
     }else{
         return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).indexes;
     }
+}
+
+void Stream::ClearStream(){
+    this->md5Hash.clear();
+    this->streamHash.clear();
+    this->maxStreamIndexPlusOne = 1;
 }

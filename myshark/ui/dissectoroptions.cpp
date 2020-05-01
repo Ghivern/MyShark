@@ -8,10 +8,25 @@
 /*默认选项,所有处理的协议均要添加*/
 QHash<QString,quint64>* DissectorOptions::dissectorOptions = new QHash<QString,quint64>
       {
-            {"ether",0}
-            ,{"arp",6}
-            ,{"ipv4",7}
-            ,{"tcp",100}
+            {"frame",
+                 FRAME_SHOW_NUMBER_OF_BITS | FRAME_GENERATE_EPOCH_TIME
+            },
+
+            {"ether",
+
+            0},
+
+            {"arp",
+
+            6},
+
+            {"ipv4",
+
+            7},
+
+            {"tcp",
+
+            100}
       };
 
 DissectorOptions::DissectorOptions(QWidget *parent) :
@@ -30,6 +45,7 @@ DissectorOptions::~DissectorOptions()
 }
 
 void DissectorOptions::setupListWidget(){
+    this->ui->listWidget->addItem("frame");
     this->ui->listWidget->addItem("ether");
     this->ui->listWidget->addItem("arp");
     this->ui->listWidget->addItem("ipv4");
@@ -40,9 +56,11 @@ void DissectorOptions::setupWidget(){
     this->Vlayout = new QVBoxLayout;
     this->ui->widget->setLayout(Vlayout);
 
+    this->frame = new Frame(this->dissectorOptions->value("frame"));
     this->ether = new Ether(this->dissectorOptions->value("ether"));
     this->arp = new Arp;
 
+    this->Vlayout->addWidget(frame);
     this->Vlayout->addWidget(ether);
     this->Vlayout->addWidget(arp);
 
@@ -58,9 +76,11 @@ void DissectorOptions::clearWidget(){
 void DissectorOptions::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     this->clearWidget();
-    if( item->text() == "ether" ){
+    if( item->text() == "frame" ){
+        this->frame->show();
+    }else if( item->text() == "ether" ){
         this->ether->show();
-        *(this->dissectorOptions->find("tcp")) = 600;
+//        *(this->dissectorOptions->find("tcp")) = 600;
     }else if( item->text() == "arp" ){
         this->arp->show();
     }
@@ -68,6 +88,7 @@ void DissectorOptions::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void DissectorOptions::on_pushButton_ok_clicked()
 {
+    (*this->dissectorOptions->find("frame")) = this->frame->Result();
     (*this->dissectorOptions->find("ether")) = this->ether->Result();
 
     this->accept();

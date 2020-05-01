@@ -6,34 +6,34 @@ Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
     this->capHandle = new CapHandle(devName);
     this->capHandle->ActivateHandleWithParas();
     this->dissectorOptions = dissectorOptions;
-    this->dissResList = new DissResList_t;
-    this->mutex = new QMutex();
+//    this->dissResList = new DissResList_t;
+//    this->mutex = new QMutex();
     this->stop = false;
 }
 
 Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions){
     this->capHandle = capHandle;
     this->dissectorOptions = dissectorOptions;
-    this->dissResList = new DissResList_t;
-    this->mutex = new QMutex();
+//    this->dissResList = new DissResList_t;
+//    this->mutex = new QMutex();
     this->stop = false;
 }
 
 Capturer::~Capturer(){
-    delete capHandle;
-    delete mutex;
-    for(int index = 0; index < this->dissResList->length(); index++)
-        delete dissResList->at(index);
-    delete dissResList;
+//    delete capHandle;
+    //delete mutex;
+//    for(int index = 0; index < this->dissResList->length(); index++)
+//        delete dissResList->at(index);
+//    delete dissResList;
 }
 
-qint32 Capturer::GetIntLinkType(){
-    return this->capHandle->GetLinkType();
-}
+//qint32 Capturer::GetIntLinkType(){
+//    return this->capHandle->GetLinkType();
+//}
 
-QList<DissRes*>* Capturer::GetDissResList(){
-    return this->dissResList;
-}
+//QList<DissRes*>* Capturer::GetDissResList(){
+//    return this->dissResList;
+//}
 
 qint64 Capturer::GetCount(){
     return this->dissectResultFrameList.length();
@@ -52,15 +52,16 @@ void Capturer::run(){
     struct pcap_pkthdr *pkthdr;
     qint64 index = 0;
     qint32 res;
-    this->stop = false;
+    //this->stop = false;
     QList<void*> *reserves = new QList<void*> {dissectorOptions};
+    this->dissectResultFrameList.clear();
     while(true){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-            DissRes *dissRes;
+            //DissRes *dissRes;
             switch (this->capHandle->GetLinkType()) {
             case 1:
             {
-                dissRes = new DissResEth(index);
+                //dissRes = new DissResEth(index);
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
                     ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
                 break;
@@ -68,16 +69,16 @@ void Capturer::run(){
             default:
             {
                 qDebug() << "未知链路层类型";
-                dissRes = new DissRes(index);
+//                dissRes = new DissRes(index);
                 break;
             }
             }
-            dissRes->SetPacket(raw,pkthdr);
-            this->mutex->lock();
-            this->dissResList->append(dissRes);
-            this->mutex->unlock();
+            //dissRes->SetPacket(raw,pkthdr);
+            //this->mutex->lock();
+            //this->dissResList->append(dissRes);
+            //this->mutex->unlock();
             emit onePacketCaptured(this->dissectResultFrameList.at(index));
-            emit onePacketCaptured(index);
+            //emit onePacketCaptured(index);
             //qDebug() << "Capturer : capture one packet successfully";
             index++;
         }else if(res == 0){
@@ -89,21 +90,22 @@ void Capturer::run(){
         }else{
             qDebug() << "Other error";
         }
-        if(this->stop)
-            return;
+        if(this->stop){
+            this->exit();
+        }
     }
 }
 
 
 //Public Slots
 void Capturer::Start(){
+    this->stop = false;
     this->start();
 }
 
 void Capturer::Stop(){
     this->stop = true;
+    this->quit();
 }
 
-void Capturer::Clear(){
-    this->dissectResultFrameList.clear();
-}
+

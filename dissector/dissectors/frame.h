@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include <QtCore>
+#include <QCryptographicHash>
 
 #include "../protree/protree.h"
 

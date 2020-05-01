@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QVBoxLayout>
 
+#include "./widgets/frame.h"
 #include "./widgets/ether.h"
 #include "./widgets/arp.h"
 
@@ -31,6 +32,8 @@ private:
     Ui::DissectorOptions *ui;
 
     QVBoxLayout *Vlayout;
+
+    Frame *frame;
     Arp *arp;
     Ether *ether;
 

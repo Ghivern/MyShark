@@ -32,6 +32,11 @@ void StreamTcp2::ClearWindow(qint64 streamIndexPlusOne){
 }
 
 qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *srcAddr,quint8 *dstAddr,qint32 addr_size,quint8 *srcPort,quint8 *dstPort,qint32 port_size){
+    if(dissectResultBase->GetIndex() == 0 && this->allWindow.count() > 0){
+        this->allWindow.clear();
+        this->ClearStream();
+    }
+
     qint64 streamIndexPlusOne =  this->Add(dissectResultBase,srcAddr,dstAddr,addr_size,srcPort,dstPort,port_size);
 
 //    bool SYN = dissectResultBase->GetAdditionalVal(TCP_ISSYN) == 1 ? true:false;

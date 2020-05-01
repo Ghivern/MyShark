@@ -19,7 +19,7 @@ public:
 
 
     static QString ConvertQuint8ArrayToHexStr(const quint8 *ptr,qint32 size,QString sep = "",QString preFix = "0x");
-    static QString ConvertQuint8ArrayToDecStr(const quint8 *ptr,qint32 size,QString sep = "",QString preFix = "");
+    static QString ConvertQuint8ArrayToDecStr(const quint8 *ptr,qint32 size,QString sep = "",QString preFix = "");    
 
 private:
 

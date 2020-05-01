@@ -34,6 +34,7 @@ public:
     qint32 GetProtocolListLength();
     QString GetTopProtocolName();
     QString GetProtocolNameByIndex(qint32 index);
+    QString GetProtocolsInFrame();
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
     qint64 GetProtocolHeaderStartPositionByName(QString protocolName);
     const quint8* GetProtocolHeaderEndPtrByName(QString protocolName);

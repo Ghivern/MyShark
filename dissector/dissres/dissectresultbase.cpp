@@ -84,6 +84,16 @@ QString DissectResultBase::GetProtocolNameByIndex(qint32 index){
         return "";
 }
 
+QString DissectResultBase::GetProtocolsInFrame(){
+    QString protocolsInFrame = "";
+    for(qint32 index = 0; index < this->protocolList.length(); index++){
+        protocolsInFrame.append(this->protocolList.at(index));
+        if( index != this->protocolList.length() - 1 )
+            protocolsInFrame.append(":");
+    }
+    return protocolsInFrame;
+}
+
 const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protocolName){
     if(this->protocolPositionHash.contains(protocolName))
         return this->data + this->protocolPositionHash.value(protocolName).start;

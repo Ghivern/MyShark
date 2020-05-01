@@ -3,7 +3,7 @@
 Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkLayer *dissectResultLinklayer,void *reserves)
 {
     QList<void*> *r = (QList<void*>*)reserves;
-    QString linklayerTypeName(*(QString*)r->at(3));
+    QString linklayerTypeName(*(QString*)r->at(4));
     quint64 dissectorOption = ((QHash<QString,quint64>*)r->at(0))->value("ether");
 
     Q_UNUSED(reserves)
@@ -24,7 +24,7 @@ Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkL
                      .arg(dissectResultLinklayer->GetDestinationAddressStr())
                      .arg(dissectResultLinklayer->GetDestinationAddressOriginalStr())
                      ,start
-                     ,dissectResultLinklayer->GetDissectResultBase()->GetProtocolHeaderEndPositionByName("ether") - 1
+                     ,dissectResultLinklayer->GetDissectResultBase()->GetProtocolHeaderEndPositionByName("ether") - start - 1
                      );
 
     // Summery - Destination

@@ -14,7 +14,7 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     this->setupSignal();
 
 
-    this->setWindowTitle(DeviceList::SelectedDevice);
+    this->setWindowTitle("capturing from " + DeviceList::SelectedDevice);
     this->ui->actionStart->setEnabled(false);
 
     this->streamIndex = -1;
@@ -28,12 +28,17 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::setupUi(){
+    /*MainWindow*/
+    this->resize(1050,650);
+
     /*Font*/
     QFont font = this->ui->tableWidget->font();
+    font.setPointSize(this->defaultTextSize);
     QFontMetrics fontMetrics(font);
 
     /*TableWidget*/
     this->scrollToBottom = false;
+    this->ui->tableWidget->setFont(font);
     this->ui->tableWidget->verticalHeader()->setVisible(false);
     this->ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     this->ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -45,6 +50,8 @@ void MainWindow::setupUi(){
     /*TreeWidget*/
 
     /*RawDataPanel*/
+    this->ui->rawDataPanel->setFont(font);
+    this->ui->treeWidget->setFont(font);
     this->ui->rawDataPanel->setEditTriggers(QAbstractItemView::NoEditTriggers);
     this->ui->rawDataPanel->verticalHeader()->setVisible(true);
     this->ui->rawDataPanel->horizontalHeader()->hide();
@@ -69,11 +76,11 @@ void MainWindow::setupUi(){
 void MainWindow::setupSignal(){
     //connect(ui->interfaceListWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(StartCapture(QListWidgetItem *)));
     capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
-    dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
+    //dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
 
     /*原来用于测试的，是暂时性的*/
-    connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
-    connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
+    //connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
+    //connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
 
     /*安装事件过滤器*/
     this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
@@ -84,7 +91,7 @@ void MainWindow::setupSignal(){
 /*初始化解析选项*/
 void MainWindow::setupDissectorOptions(){
     this->dissectorOptions = new QHash<QString,quint64>;
-    this->dissectorOptions->insert("tcp",5); //测试
+//    this->dissectorOptions->insert("tcp",5); //测试
 }
 
 void MainWindow::setTableWidgetColor(qint32 row,quint32 background, quint32 textColor){
@@ -370,8 +377,9 @@ void MainWindow::ergoditTree(QTreeWidgetItem *parent,ProTreeNode *node){
 void MainWindow::addToTree(qint64 index){
      qint32 *interfaceId = new qint32(this->capturer->GetCapHandle()->GetDeviceIndex());
      QString *interfaceName = new QString(this->capturer->GetCapHandle()->GetDeviceName());
+     qint32 *linklayerType = new qint32(this->capturer->GetCapHandle()->GetLinkType());
      QString *linklayerTypeName = new QString(this->capturer->GetCapHandle()->GetLinkTypeName());
-     QList<void*> *reserve = new QList<void*> {this->dissectorOptions,interfaceId,interfaceName,linklayerTypeName};
+     QList<void*> *reserve = new QList<void*> {this->dissectorOptions,interfaceId,interfaceName,linklayerType,linklayerTypeName};
 
      ProTreeMaker *maker = new ProTreeMaker(this->capturer->GetCapHandle()->GetLinkType(),this->capturer->GetDissectResultFrameByIndex(index),reserve);
      ProTreeNode *node = maker->GetProTree()->GetHeader();
@@ -510,12 +518,13 @@ void MainWindow::on_actionStart_triggered()
     this->ui->actionStart->setEnabled(false);
     this->ui->actionStop->setEnabled(true);
     this->ui->actionRestart->setEnabled(true);
-    this->capturer->start();
+    this->capturer->Start();
 }
 
 void MainWindow::on_actionRestart_triggered()
 {
-
+    this->on_actionStop_triggered();
+    this->on_actionStart_triggered();
 }
 
 

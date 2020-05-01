@@ -79,7 +79,8 @@ qint32 CapHandle::ActivateHandle(){
 qint32 CapHandle::ActivateHandleWithParas(qint32 promisc, qint32 immediateMode,qint32 snapLen){
     this->SetPromisc(promisc);
     this->SetSnaplen(snapLen);
-    this->SetImmediateMode(immediateMode);
+    //this->SetImmediateMode(immediateMode);
+    pcap_set_timeout(this->pcapHandle,1);
     return this->ActivateHandle();
 }
 

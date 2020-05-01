@@ -30,6 +30,9 @@ public:
     ProTreeNode* GetHeader();
 private:
 
+    //指定start和字段长；  addStart用于控制start指向的的值是否增加qint32(len)/len-1，默认不加;   position用于指定协议树是否分杈，默认不分杈
+    void addItem(QString protocol,QString msg,qint32 *start,float len,bool addStart=false,qint32 position = level::CURRENT);
+
     QStack<ProTreeNode*> nodeStack;
     ProTreeNode *header;
 };

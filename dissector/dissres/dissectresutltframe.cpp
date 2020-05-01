@@ -10,6 +10,11 @@ DissectResultFrame::DissectResultFrame(const quint8 *data
                                        ,PROTOCOL_FAMILY_TYPE protocol_family_type
                                        ,void *reserves)
 {
+    if( index == 0 && this->dissectResultBaseList->length() > 0){
+        this->dissectResultBaseList->clear();
+        this->isFirstPacket = true;
+    }
+
     Q_UNUSED(reserves)
     quint8 *dst_data = (quint8*)malloc(pkthdr->caplen);
     memcpy(dst_data,data,pkthdr->caplen);

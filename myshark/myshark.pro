@@ -25,6 +25,7 @@ SOURCES += \
     ui/dissectoroptions.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
+    ui/widgets/frame.cpp \
     units/caphandle.cpp
 
 HEADERS += \
@@ -35,6 +36,7 @@ HEADERS += \
     ui/dissectoroptions.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
+    ui/widgets/frame.h \
     units/caphandle.h \
 
 
@@ -43,7 +45,8 @@ FORMS += \
     mainwindow.ui \
     ui/dissectoroptions.ui \
     ui/widgets/arp.ui \
-    ui/widgets/ether.ui
+    ui/widgets/ether.ui \
+    ui/widgets/frame.ui
 
 LIBS += -lpcap
 LIBS += -L../lib -ldissector

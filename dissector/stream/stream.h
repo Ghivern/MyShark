@@ -22,6 +22,9 @@ public:
     /*统计Conversion时使用*/
     QList<quint64> GetPacketsIndexListByStream(qint64 streamIndexPlusOne);
 
+protected:
+    void ClearStream();
+
 
 private:
     struct indexes_streamIndex{
