@@ -13,7 +13,7 @@ Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
 
 Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions){
     this->capHandle = capHandle;
-    this->capHandle->ActivateHandleWithParas();
+    //this->capHandle->ActivateHandleWithParas();
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
 //    this->mutex = new QMutex();
@@ -85,7 +85,7 @@ void Capturer::run(){
         }else if(res == -2){
             qDebug() << "Capturer : come to file end";
         }else{
-            qDebug() << "Other error";
+            qDebug() << pcap_geterr(this->capHandle->GetPcapHandle());
         }
     }
     this->exit();

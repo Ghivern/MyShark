@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QWheelEvent>
+#include <QMessageBox>
 
 #include "capturer/capturer.h"
 #include "dissector/dissector.h"
@@ -49,6 +50,8 @@ private:
 
     void addBackgroundToTableRow(DissectResultFrame *frame,qint32 row);
 
+    void saveFile(QString path);
+
     bool eventFilter(QObject *target, QEvent *event);
 
     Ui::MainWindow *ui;
@@ -85,6 +88,9 @@ private:
     /*暂时用于存储过滤器需要的StreamIndex*/
     qint64 streamIndex;
 
+    /*Dialog*/
+   SaveOrCloseFileDialog *saveOrCloseFileDialog;
+
 
 public slots:
     void Print(qint64 index);
@@ -96,12 +102,13 @@ private slots:
     void addToTree(qint64 index);
     void addToRawDataPanel(qint64 index);
 
-
     void on_tableWidget_cellClicked(int row, int column);
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
     void on_actionStop_triggered();
     void on_actionStart_triggered();
+    void slot_startCapture();
+    void slot_saveFileBeforeCapture(QString path);
     void on_actionRestart_triggered();
     void on_actionEnlargeTextSize_triggered();
     void on_actionShrinkTextSize_triggered();
@@ -110,5 +117,6 @@ private slots:
     void on_actionResizeTableWidgetTOFitContents_triggered();
     void on_pushButton_filter_clicked();
     void on_actionDissector_options_triggered();
+
 };
 #endif // MAINWINDOW_H

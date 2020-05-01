@@ -43,16 +43,27 @@ void DeviceList::setupSignal(){
 void DeviceList::updateSelectedDevice(QListWidgetItem *item){
     DeviceList::SelectedDevice.clear();
     DeviceList::SelectedDevice.append(item->text());
-    DeviceList::capHandle = new CapHandle(item->text());
-    if(DeviceList::capHandle->ActivateHandleWithParas(this->ui->checkBox->isChecked()?1:0) == -1){
-        QMessageBox::critical(this,"Error",DeviceList::capHandle->GetError());
-        return;
-    }else{
-        if(DeviceList::capHandle->GetLinkType() != 1){
+
+    try {
+        DeviceList::capHandle = new CapHandle(item->text());
+        DeviceList::capHandle->ActivateHandleWithParas();
+        if( DeviceList::capHandle->GetLinkType() != 1){
             QMessageBox::critical(this,"Error","Corresponding parser has not been added yet");
             return;
         }
+    } catch (QString e) {
+            QMessageBox::critical(this,"Error",e);
+            return;
     }
+//    if(DeviceList::capHandle->ActivateHandleWithParas(this->ui->checkBox->isChecked()?1:0) == -1){
+//        QMessageBox::critical(this,"Error",DeviceList::capHandle->GetError());
+//        return;
+//    }else{
+//        if(DeviceList::capHandle->GetLinkType() != 1){
+//            QMessageBox::critical(this,"Error","Corresponding parser has not been added yet");
+//            return;
+//        }
+//    }
     this->accept();
 }
 

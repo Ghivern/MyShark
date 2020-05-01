@@ -9,14 +9,12 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->setupUi();
-    this->dissectorOptions = dissectorOptions; //必须在setupSignal前面
-    this->setupSignal();
-
-
     this->streamIndex = -1;
 
-    capturer->Start();
+    this->setupUi();
+
+    this->dissectorOptions = dissectorOptions; //必须在setupSignal前面
+    this->setupSignal();
 }
 
 MainWindow::~MainWindow()
@@ -73,24 +71,53 @@ void MainWindow::setupUi(){
     this->displayProportion = new QLabel();
     this->displayProportion->setLineWidth(5);
     this->ui->statusbar->addWidget(this->displayProportion);
+
+    /*Dialog*/
+    this->saveOrCloseFileDialog = new SaveOrCloseFileDialog;
 }
 
 void MainWindow::setupSignal(){
     //connect(ui->interfaceListWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(StartCapture(QListWidgetItem *)));
 //    capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
-    capturer = new Capturer(DeviceList::SelectedDevice,this->dissectorOptions);
+
+    /*安装事件过滤器*/
+    this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
+
+    connect(this->saveOrCloseFileDialog,SIGNAL(continueWithoutSave()),this,SLOT(slot_startCapture()));
+    connect(this->saveOrCloseFileDialog,SIGNAL(saveFileBeforeCapture(QString)),this,SLOT(slot_saveFileBeforeCapture(QString)));
+
+//    connect(this,SIGNAL(signal_startCapture()),this,SLOT(slot_startCapture()));
+//    emit signal_startCapture();
+    try {
+        //DeviceList::capHandle->ActivateHandleWithParas();
+        this->capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+        connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+        capturer->Start();
+    } catch (QString e) {
+        this->capturer = nullptr;
+        if( this->capturer != nullptr ){
+            this->capturer->deleteLater();
+            this->capturer = nullptr;
+        }
+        this->ui->actionStop->setEnabled(false);
+        this->ui->actionStart->setEnabled(true);
+        this->ui->actionRestart->setEnabled(false);
+        this->ui->actionDissector_options->setEnabled(true);
+        QMessageBox::critical(this,"Error",e);
+        return;
+    }
+
     //dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
 
     /*原来用于测试的，是暂时性的*/
     //connect(this->capturer,SIGNAL(onePacketCaptured(qint64)),this->dissector,SLOT(Dissect(qint64)));
     //connect(this->dissector,SIGNAL(onePacketDissected(qint64)),this,SLOT(Print(qint64)));
 
-    /*安装事件过滤器*/
-    this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
+
 
     //connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
 
-    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+
 }
 
 /*初始化解析选项*/
@@ -151,6 +178,10 @@ void MainWindow::addBackgroundToTableRow(DissectResultFrame *frame,qint32 row){
     }else{
         this->setTableWidgetColor(row,0xD5D5D5);
     }
+}
+
+void MainWindow::saveFile(QString path){
+    qDebug() << "path" << path;
 }
 
 /*事件过滤器*/
@@ -511,13 +542,75 @@ void MainWindow::on_actionStop_triggered()
     this->ui->actionStop->setEnabled(false);
     this->ui->actionRestart->setEnabled(false);
     this->ui->actionDissector_options->setEnabled(true);
+    try {
+        this->capturer->GetCapHandle()->SetNonBlock(1);
+    } catch (QString e) {
+        QMessageBox::critical(this,"Error",e);
+    }
     this->capturer->Stop();
 }
 
 void MainWindow::on_actionStart_triggered()
 {
-    SaveOrCloseFileDialog saveOrCloseFileDialog;
-    saveOrCloseFileDialog.exec();
+//    SaveOrCloseFileDialog saveOrCloseFileDialog;
+//    saveOrCloseFileDialog.exec();
+
+    this->saveOrCloseFileDialog->exec();
+
+    if( this->saveOrCloseFileDialog->result() == QDialog::Accepted )
+        this->slot_startCapture();
+//    this->slot_startCapture();
+//    this->capturer->quit();
+//    if(this->capturer != nullptr)
+//        connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
+
+//    try {
+//        DeviceList::capHandle->ChangeDevice();
+//        DeviceList::capHandle->ActivateHandleWithParas();
+//        capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+//        connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+//        capturer->Start();
+//    } catch (QString e) {
+//        QMessageBox::critical(this,"Error",e);
+//        return;
+//    }
+
+//    this->ui->tableWidget->clearContents();
+//    this->ui->tableWidget->setRowCount(0);
+//    this->ui->treeWidget->clear();
+//    this->ui->rawDataPanel->clearContents();
+//    this->ui->rawDataPanel->setRowCount(0);
+//    this->ui->actionStart->setEnabled(false);
+//    this->ui->actionStop->setEnabled(true);
+//    this->ui->actionRestart->setEnabled(true);
+//    this->ui->actionDissector_options->setEnabled(false);
+
+//    DeviceList::capHandle->ChangeDevice();
+
+//    this->capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+
+//    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+
+//    this->capturer->Start();
+}
+
+void MainWindow::slot_startCapture(){
+    if(this->capturer != nullptr){
+        if( this->capturer->isRunning() )
+            this->capturer->terminate();
+        connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
+    }
+
+    try {
+        DeviceList::capHandle->ChangeDevice();
+        DeviceList::capHandle->ActivateHandleWithParas();
+        capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+        connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+        capturer->Start();
+    } catch (QString e) {
+        QMessageBox::critical(this,"Error",e);
+        return;
+    }
 
     this->ui->tableWidget->clearContents();
     this->ui->tableWidget->setRowCount(0);
@@ -528,15 +621,11 @@ void MainWindow::on_actionStart_triggered()
     this->ui->actionStop->setEnabled(true);
     this->ui->actionRestart->setEnabled(true);
     this->ui->actionDissector_options->setEnabled(false);
+}
 
-    this->capturer->terminate();
-    connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
-
-    this->capturer = new Capturer(DeviceList::SelectedDevice,this->dissectorOptions);
-
-    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
-
-    this->capturer->Start();
+void MainWindow::slot_saveFileBeforeCapture(QString path){
+    this->saveFile(path);
+    this->slot_startCapture();
 }
 
 void MainWindow::on_actionRestart_triggered()
@@ -633,8 +722,6 @@ void MainWindow::on_pushButton_filter_clicked()
         }
     }
 }
-
-
 
 
 

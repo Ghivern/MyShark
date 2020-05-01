@@ -5,19 +5,27 @@
 class CapHandle
 {
 public:
-    CapHandle();
+//    CapHandle();
     CapHandle(QString devName);
-    CapHandle(qint32 devIndex);
+    void ChangeDevice(QString devName = "");
 
-    void createPcapHandle(QString devName);
-    void createPcapHandle(qint32 devIndex);
+//    CapHandle(qint32 devIndex);
 
-    qint32 SetSnaplen(qint32 snap);
-    qint32 SetPromisc(qint32 promisc);
-    qint32 SetImmediateMode(qint32 immediateMode);
+//    void createPcapHandle(QString devName);
+//    void createPcapHandle(qint32 devIndex);
 
-    qint32 ActivateHandle();
-    qint32 ActivateHandleWithParas(qint32 promisc = 1,qint32 immediateMode = 1,qint32 snapLen = 65535);
+    void SetSnaplen(qint32 snap);
+    void SetPromisc(qint32 promisc);
+    void SetImmediateMode(qint32 immediateMode);
+    void SetNonBlock(qint32 nonblock);
+
+    void ActivateHandle();
+    void ActivateHandleWithParas(qint32 promisc = 1
+            ,qint32 immediateMode = 1
+            //,qint32 nonblock = 1
+            ,qint32 snapLen = 65535);
+
+    //qint32 GetFd();
 
     pcap_t *GetPcapHandle();
 
@@ -28,11 +36,10 @@ public:
     QString GetDeviceName();
     qint32 GetDeviceIndex();
 
-    QString GetError();
-
-    void Close();
-
 private:
+    void closeOldHandle();
+    void createHandle(QString devName);
+
     QString error;
 
     pcap_t *pcapHandle;

@@ -12,3 +12,23 @@ SaveOrCloseFileDialog::~SaveOrCloseFileDialog()
 {
     delete ui;
 }
+
+
+void SaveOrCloseFileDialog::on_pushButton_continue_without_save_clicked()
+{
+    emit continueWithoutSave();
+    this->accept();
+}
+
+void SaveOrCloseFileDialog::on_pushButton_save_clicked()
+{
+    emit saveFileBeforeCapture("~/");
+    this->reject();
+}
+
+void SaveOrCloseFileDialog::on_pushButton_cancle_clicked()
+{
+    this->reject();
+}
+
+
