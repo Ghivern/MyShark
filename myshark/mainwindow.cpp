@@ -75,7 +75,8 @@ void MainWindow::setupUi(){
 
 void MainWindow::setupSignal(){
     //connect(ui->interfaceListWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(StartCapture(QListWidgetItem *)));
-    capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+//    capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
+    capturer = new Capturer(DeviceList::SelectedDevice,this->dissectorOptions);
     //dissector = new Dissector(capturer->GetDissResList(),capturer->GetIntLinkType());
 
     /*原来用于测试的，是暂时性的*/
@@ -84,6 +85,8 @@ void MainWindow::setupSignal(){
 
     /*安装事件过滤器*/
     this->ui->tableWidget->verticalScrollBar()->installEventFilter(this);
+
+    //connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
 
     connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
 }
@@ -518,6 +521,13 @@ void MainWindow::on_actionStart_triggered()
     this->ui->actionStart->setEnabled(false);
     this->ui->actionStop->setEnabled(true);
     this->ui->actionRestart->setEnabled(true);
+
+    connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
+
+    this->capturer = new Capturer(DeviceList::SelectedDevice,this->dissectorOptions);
+
+    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
+
     this->capturer->Start();
 }
 

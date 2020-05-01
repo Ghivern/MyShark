@@ -30,6 +30,8 @@ public:
 
     QString GetError();
 
+    void Close();
+
 private:
     QString error;
 

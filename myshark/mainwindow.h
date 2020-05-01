@@ -77,6 +77,7 @@ private:
     const qint32 rawDataPanelColCount = 34;
     const qint32 defaultTextSize = 10;
 
+
     /*解析选项，用协议名作为Key*/
     QHash<QString,quint64> *dissectorOptions;
 

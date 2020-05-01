@@ -7,12 +7,13 @@ Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
     this->capHandle->ActivateHandleWithParas();
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
-//    this->mutex = new QMutex();
+    this->mutex = new QMutex();
     this->stop = false;
 }
 
 Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions){
     this->capHandle = capHandle;
+    this->capHandle->ActivateHandleWithParas();
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
 //    this->mutex = new QMutex();
@@ -52,12 +53,11 @@ void Capturer::run(){
     struct pcap_pkthdr *pkthdr;
     qint64 index = 0;
     qint32 res;
-    //this->stop = false;
     QList<void*> *reserves = new QList<void*> {dissectorOptions};
     this->dissectResultFrameList.clear();
-    while(true){
+    while(!this->stop){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-            //DissRes *dissRes;
+            qDebug() << "抓取成功";
             switch (this->capHandle->GetLinkType()) {
             case 1:
             {
@@ -73,13 +73,7 @@ void Capturer::run(){
                 break;
             }
             }
-            //dissRes->SetPacket(raw,pkthdr);
-            //this->mutex->lock();
-            //this->dissResList->append(dissRes);
-            //this->mutex->unlock();
             emit onePacketCaptured(this->dissectResultFrameList.at(index));
-            //emit onePacketCaptured(index);
-            //qDebug() << "Capturer : capture one packet successfully";
             index++;
         }else if(res == 0){
             qDebug() << "Capturer : timeout";
@@ -90,10 +84,10 @@ void Capturer::run(){
         }else{
             qDebug() << "Other error";
         }
-        if(this->stop){
-            this->exit();
-        }
     }
+    this->capHandle->Close();
+    delete this->capHandle;
+    this->exit();
 }
 
 
@@ -105,7 +99,6 @@ void Capturer::Start(){
 
 void Capturer::Stop(){
     this->stop = true;
-    this->quit();
 }
 
 

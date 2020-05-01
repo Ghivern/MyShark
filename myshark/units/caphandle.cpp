@@ -79,8 +79,7 @@ qint32 CapHandle::ActivateHandle(){
 qint32 CapHandle::ActivateHandleWithParas(qint32 promisc, qint32 immediateMode,qint32 snapLen){
     this->SetPromisc(promisc);
     this->SetSnaplen(snapLen);
-    //this->SetImmediateMode(immediateMode);
-    pcap_set_timeout(this->pcapHandle,1);
+    this->SetImmediateMode(immediateMode);
     return this->ActivateHandle();
 }
 
@@ -110,4 +109,8 @@ qint32 CapHandle::GetDeviceIndex(){
 
 QString CapHandle::GetError(){
     return this->error;
+}
+
+void CapHandle::Close(){
+    pcap_close(this->pcapHandle);
 }
