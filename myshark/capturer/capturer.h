@@ -34,7 +34,7 @@ protected:
 private:
     CapHandle *capHandle;
     //DissResList_t *dissResList;
-    QMutex *mutex;
+//    QMutex *mutex;
     bool stop;
 
     QList<DissectResultFrame*> dissectResultFrameList;

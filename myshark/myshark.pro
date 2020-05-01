@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     ui/devicelist.cpp \
+    ui/dialogs/saveorclosefiledialog.cpp \
     ui/dissectoroptions.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     dissector/dissector.h \
     mainwindow.h \
     ui/devicelist.h \
+    ui/dialogs/saveorclosefiledialog.h \
     ui/dissectoroptions.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
@@ -43,6 +45,7 @@ HEADERS += \
 FORMS += \
     ui/devicelist.ui \
     mainwindow.ui \
+    ui/dialogs/saveorclosefiledialog.ui \
     ui/dissectoroptions.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \

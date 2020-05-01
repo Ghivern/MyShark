@@ -14,9 +14,6 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     this->setupSignal();
 
 
-    this->setWindowTitle("capturing from " + DeviceList::SelectedDevice);
-    this->ui->actionStart->setEnabled(false);
-
     this->streamIndex = -1;
 
     capturer->Start();
@@ -30,6 +27,11 @@ MainWindow::~MainWindow()
 void MainWindow::setupUi(){
     /*MainWindow*/
     this->resize(1050,650);
+    this->setWindowTitle("capturing from " + DeviceList::SelectedDevice);
+
+    /*Actions*/
+    this->ui->actionStart->setEnabled(false);
+    this->ui->actionDissector_options->setEnabled(false);
 
     /*Font*/
     QFont font = this->ui->tableWidget->font();
@@ -508,11 +510,15 @@ void MainWindow::on_actionStop_triggered()
     this->ui->actionStart->setEnabled(true);
     this->ui->actionStop->setEnabled(false);
     this->ui->actionRestart->setEnabled(false);
+    this->ui->actionDissector_options->setEnabled(true);
     this->capturer->Stop();
 }
 
 void MainWindow::on_actionStart_triggered()
 {
+    SaveOrCloseFileDialog saveOrCloseFileDialog;
+    saveOrCloseFileDialog.exec();
+
     this->ui->tableWidget->clearContents();
     this->ui->tableWidget->setRowCount(0);
     this->ui->treeWidget->clear();
@@ -521,7 +527,9 @@ void MainWindow::on_actionStart_triggered()
     this->ui->actionStart->setEnabled(false);
     this->ui->actionStop->setEnabled(true);
     this->ui->actionRestart->setEnabled(true);
+    this->ui->actionDissector_options->setEnabled(false);
 
+    this->capturer->terminate();
     connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
 
     this->capturer = new Capturer(DeviceList::SelectedDevice,this->dissectorOptions);

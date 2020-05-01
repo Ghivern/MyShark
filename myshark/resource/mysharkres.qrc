@@ -8,5 +8,6 @@
         <file>shrinkTextSize.ico</file>
         <file>scroll_to_bottom.ico</file>
         <file>fit_content.ico</file>
+        <file>question_mark.ico</file>
     </qresource>
 </RCC>

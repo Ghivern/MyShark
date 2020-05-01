@@ -7,7 +7,7 @@ Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
     this->capHandle->ActivateHandleWithParas();
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
-    this->mutex = new QMutex();
+//    this->mutex = new QMutex();
     this->stop = false;
 }
 
@@ -21,6 +21,7 @@ Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions
 }
 
 Capturer::~Capturer(){
+//    this->capHandle->Close();
 //    delete capHandle;
     //delete mutex;
 //    for(int index = 0; index < this->dissResList->length(); index++)
@@ -54,7 +55,7 @@ void Capturer::run(){
     qint64 index = 0;
     qint32 res;
     QList<void*> *reserves = new QList<void*> {dissectorOptions};
-    this->dissectResultFrameList.clear();
+    //this->dissectResultFrameList.clear();
     while(!this->stop){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
             qDebug() << "抓取成功";
@@ -64,6 +65,9 @@ void Capturer::run(){
                 //dissRes = new DissResEth(index);
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
                     ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
+//                if( this->stop ) break;
+                emit onePacketCaptured(this->dissectResultFrameList.at(index));
+                index++;
                 break;
             }
             default:
@@ -73,8 +77,7 @@ void Capturer::run(){
                 break;
             }
             }
-            emit onePacketCaptured(this->dissectResultFrameList.at(index));
-            index++;
+
         }else if(res == 0){
             qDebug() << "Capturer : timeout";
         }else if(res == -1){
@@ -85,8 +88,6 @@ void Capturer::run(){
             qDebug() << "Other error";
         }
     }
-    this->capHandle->Close();
-    delete this->capHandle;
     this->exit();
 }
 

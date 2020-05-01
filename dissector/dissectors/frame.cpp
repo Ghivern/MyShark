@@ -3,7 +3,7 @@
 
 Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reserves)
 {
-        quint64 option = 0;
+    quint64 option = 0;
     qint32 interfaceId = 0;
     QString interfaceName("");
     qint32 linklayer = 0;

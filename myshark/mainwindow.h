@@ -21,6 +21,7 @@
 //ui
 #include "./ui/devicelist.h"
 #include "./ui/dissectoroptions.h"
+#include "./ui/dialogs/saveorclosefiledialog.h"
 
 
 

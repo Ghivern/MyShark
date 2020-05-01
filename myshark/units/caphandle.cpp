@@ -73,6 +73,7 @@ qint32 CapHandle::ActivateHandle(){
         this->error.append(QLatin1String(pcap_geterr(this->pcapHandle)));
         return -1;
     }
+    pcap_setnonblock(this->pcapHandle,1,nullptr);
     return 0;
 }
 
@@ -80,6 +81,7 @@ qint32 CapHandle::ActivateHandleWithParas(qint32 promisc, qint32 immediateMode,q
     this->SetPromisc(promisc);
     this->SetSnaplen(snapLen);
     this->SetImmediateMode(immediateMode);
+    //pcap_set_timeout(this->pcapHandle,1);
     return this->ActivateHandle();
 }
 
