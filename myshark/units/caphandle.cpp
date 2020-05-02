@@ -7,19 +7,34 @@
 //    this->devName = "";
 //}
 
-CapHandle::CapHandle(QString devName){
-    this->devName = devName;
-    this->devIndex = Device::GetDeviceIndexByName(devName);
-    this->createHandle(this->devName);
+CapHandle::CapHandle(QString devNameOrPath,bool fromFile){
+    this->fromFile = fromFile;
+    this->devNameOrPath = devNameOrPath;
+    if( !fromFile )
+        this->devIndex = Device::GetDeviceIndexByName(devNameOrPath);
+    else
+        this->devIndex = -1;
+    this->createHandle();
 }
 
 void CapHandle::ChangeDevice(QString devName){
     if( !devName.isEmpty() ){
-        this->devName = devName;
+        this->devNameOrPath = devName;
         this->devIndex = Device::GetDeviceIndexByName(devName);
     }
+    this->fromFile = false;
     this->closeOldHandle();
-    this->createHandle(this->devName);
+    this->createHandle();
+}
+
+void CapHandle::ChangePath(QString path){
+    if( !path.isEmpty() ){
+        this->devNameOrPath = path;
+        this->devIndex = -1;
+    }
+    this->fromFile = true;
+    this->closeOldHandle();
+    this->createHandle();
 }
 
 //CapHandle::CapHandle(qint32 devIndex){
@@ -110,6 +125,14 @@ void CapHandle::ActivateHandleWithParas(qint32 promisc
     //this->SetNonBlock(nonblock);
 }
 
+void CapHandle::Close(){
+    pcap_close(this->pcapHandle);
+}
+
+bool CapHandle::FromFile(){
+    return this->fromFile;
+}
+
 pcap_t* CapHandle::GetPcapHandle(){
     return this->pcapHandle;
 }
@@ -127,7 +150,9 @@ QString CapHandle::GetLinkTypeDes(){
 }
 
 QString CapHandle::GetDeviceName(){
-    return this->devName;
+    if( fromFile )
+        return "";
+    return this->devNameOrPath;
 }
 
 qint32 CapHandle::GetDeviceIndex(){
@@ -138,9 +163,12 @@ void CapHandle::closeOldHandle(){
     pcap_close(this->pcapHandle);
 }
 
-void CapHandle::createHandle(QString devName){
+void CapHandle::createHandle(){
     char errbuf[PCAP_ERRBUF_SIZE];
-    this->pcapHandle = pcap_create(devName.toLatin1(),errbuf);
+    if( !fromFile )
+        this->pcapHandle = pcap_create(this->devNameOrPath.toLatin1(),errbuf);
+    else
+        this->pcapHandle = pcap_open_offline(this->devNameOrPath.toLatin1(),errbuf);
     if( this->pcapHandle == nullptr )
         throw QString(errbuf);
 }

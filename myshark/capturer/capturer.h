@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
+#include <QTemporaryFile>
 
 #include "../units/caphandle.h"
+#include "../units/dumper.h"
 
 #include "../../dissector/dissres/dissreseth.h"
 
@@ -26,6 +28,7 @@ public:
     CapHandle* GetCapHandle();
     DissectResultFrame* GetDissectResultFrameByIndex(qint64 index);
 
+    QTemporaryFile* GetTempFile();
 
 
 protected:
@@ -33,6 +36,8 @@ protected:
 
 private:
     CapHandle *capHandle;
+    QTemporaryFile *tempfile;
+    Dumper *dumper;
     //DissResList_t *dissResList;
 //    QMutex *mutex;
     bool stop;

@@ -8,6 +8,15 @@ Capturer::Capturer(QString devName,QHash<QString,quint64>* dissectorOptions)
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
 //    this->mutex = new QMutex();
+
+    this->tempfile = new QTemporaryFile;
+    this->tempfile->setAutoRemove(true);
+    //this->tempfile.setFileTemplate("myshark_" + devName + "_XXXXXX");
+    this->tempfile->open();
+    this->tempfile->close();
+    this->dumper = new Dumper(this->capHandle,this->tempfile->fileName());
+    //qDebug() << this->tempfile.fileName();
+    //qDebug() << QDir::tempPath();
     this->stop = false;
 }
 
@@ -17,10 +26,19 @@ Capturer::Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions
     this->dissectorOptions = dissectorOptions;
 //    this->dissResList = new DissResList_t;
 //    this->mutex = new QMutex();
+    this->tempfile = new QTemporaryFile;
+    this->tempfile->setAutoRemove(true);
+    //this->tempfile.setFileTemplate("/myshark_" + capHandle->GetDeviceName() + "_XXXXXX");
+    this->tempfile->open();
+    this->tempfile->close();
+    this->dumper = new Dumper(this->capHandle,this->tempfile->fileName());
+    //qDebug() << this->tempfile.fileName();
+    //qDebug() << QDir::tempPath();
     this->stop = false;
 }
 
 Capturer::~Capturer(){
+    //this->tempfile.deleteLater();
 //    this->capHandle->Close();
 //    delete capHandle;
     //delete mutex;
@@ -45,6 +63,10 @@ DissectResultFrame* Capturer::GetDissectResultFrameByIndex(qint64 index){
     return this->dissectResultFrameList.at(index);
 }
 
+QTemporaryFile* Capturer::GetTempFile(){
+    return this->tempfile;
+}
+
 CapHandle* Capturer::GetCapHandle(){
     return this->capHandle;
 }
@@ -58,7 +80,7 @@ void Capturer::run(){
     //this->dissectResultFrameList.clear();
     while(!this->stop){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-            if( this->stop ) break;
+            if( this->stop ) { break; }
 //            qDebug() << "抓取成功";
             switch (this->capHandle->GetLinkType()) {
             case 1:
@@ -66,6 +88,7 @@ void Capturer::run(){
                 //dissRes = new DissResEth(index);
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
                     ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
+                this->dumper->Dump(pkthdr,raw);
                 emit onePacketCaptured(this->dissectResultFrameList.at(index));
                 index++;
                 break;
@@ -84,10 +107,13 @@ void Capturer::run(){
             qDebug() << "Capturer : error, 没有权限";
         }else if(res == -2){
             qDebug() << "Capturer : come to file end";
+            break;
         }else{
             qDebug() << pcap_geterr(this->capHandle->GetPcapHandle());
         }
     }
+    this->dumper->Flush();
+    this->dumper->Close();
     this->exit();
 }
 

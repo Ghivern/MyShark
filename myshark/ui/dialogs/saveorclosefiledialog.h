@@ -3,6 +3,10 @@
 
 #include <QDialog>
 
+#define CONTINUE_WITHOUT_SAVING 0x01
+#define CONTINUE_WITH_SAVING 0x02
+#define CANCEL 0x04
+
 namespace Ui {
 class SaveOrCloseFileDialog;
 }
@@ -15,11 +19,19 @@ public:
     explicit SaveOrCloseFileDialog(QWidget *parent = nullptr);
     ~SaveOrCloseFileDialog();
 
+    void SetContentForOpenFile();
+    void SetContentForNewCapture();
+
+    bool IsContinueWithoutSaving();
+    bool IsContinueWithSaving();
+    bool IsCancel();
+
 private:
     Ui::SaveOrCloseFileDialog *ui;
+    qint32 status;
 
 signals:
-    void saveFileBeforeCapture(QString path);
+    void saveFileBeforeCapture();
     void continueWithoutSave();
 
 private slots:

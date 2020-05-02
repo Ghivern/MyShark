@@ -6,8 +6,9 @@ class CapHandle
 {
 public:
 //    CapHandle();
-    CapHandle(QString devName);
-    void ChangeDevice(QString devName = "");
+    CapHandle(QString devNameOrPath,bool fromFile = false);
+    void ChangeDevice(QString devNameOrPath = "");
+    void ChangePath(QString path = "");
 
 //    CapHandle(qint32 devIndex);
 
@@ -25,7 +26,10 @@ public:
             //,qint32 nonblock = 1
             ,qint32 snapLen = 65535);
 
+    void Close();
     //qint32 GetFd();
+
+    bool FromFile();
 
     pcap_t *GetPcapHandle();
 
@@ -38,12 +42,13 @@ public:
 
 private:
     void closeOldHandle();
-    void createHandle(QString devName);
+    void createHandle();
 
     QString error;
+    bool fromFile;
 
     pcap_t *pcapHandle;
-    QString devName;
+    QString devNameOrPath;
     qint32 devIndex;
 };
 

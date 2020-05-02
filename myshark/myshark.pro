@@ -28,7 +28,8 @@ SOURCES += \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
     ui/widgets/frame.cpp \
-    units/caphandle.cpp
+    units/caphandle.cpp \
+    units/dumper.cpp
 
 HEADERS += \
     capturer/capturer.h \
@@ -41,7 +42,9 @@ HEADERS += \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
     ui/widgets/frame.h \
-    units/caphandle.h \
+    units/caphandle.h \ \
+    units/dumper.h
+
 
 
 FORMS += \

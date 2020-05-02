@@ -10,6 +10,9 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 #include <QMessageBox>
+#include <QFileDialog>
+
+#include <sys/stat.h>
 
 #include "capturer/capturer.h"
 #include "dissector/dissector.h"
@@ -51,20 +54,29 @@ private:
 
     void addBackgroundToTableRow(DissectResultFrame *frame,qint32 row);
 
-    void saveFile(QString path);
+    bool saveFile(QTemporaryFile *tempFile);
 
     bool eventFilter(QObject *target, QEvent *event);
 
     Ui::MainWindow *ui;
 
-    bool haveDate; /*用于判断结束时是否抓到了数据*/
+    bool readyToQuit;
+
+    //bool haveDate; /*用于判断结束时是否抓到了数据*/
+    bool packetsNeedToBeSavedBeforeStart;
 
     /*Device List*/
     QString selectedDevName;
 
+    /*读取文件的路径和标志*/
+    bool fromFile;
+    QString filePath;
+
     Capturer *capturer;
     //Dissector *dissector;
     //Loader *loader;
+
+    QTemporaryFile *tempFile;
 
     /*StatuBar*/
     QLabel *displayProportion;
@@ -116,7 +128,7 @@ private slots:
     void on_actionStop_triggered();
     void on_actionStart_triggered();
     void slot_startCapture();
-    void slot_saveFileBeforeCapture(QString path);
+    void slot_saveFileBeforeCapture();
     void on_actionRestart_triggered();
     void on_actionEnlargeTextSize_triggered();
     void on_actionShrinkTextSize_triggered();
@@ -127,5 +139,12 @@ private slots:
     void on_actionDissector_options_triggered();
 
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+    void on_actionOpen_triggered();
+    void on_actionSave_triggered();
+    void on_actionSave_As_triggered();
+    void on_actionClose_triggered();
+    void on_actionQuit_triggered();
+
+    void close();
 };
 #endif // MAINWINDOW_H
