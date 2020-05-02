@@ -20,7 +20,7 @@
 
 
 //ui
-#include "./ui/devicelist.h"
+//#include "./ui/devicelist.h"
 #include "./ui/dissectoroptions.h"
 #include "./ui/dialogs/saveorclosefiledialog.h"
 
@@ -55,6 +55,9 @@ private:
     bool eventFilter(QObject *target, QEvent *event);
 
     Ui::MainWindow *ui;
+
+    /*Device List*/
+    QString selectedDevName;
 
     Capturer *capturer;
     //Dissector *dissector;
@@ -102,6 +105,8 @@ private slots:
     void addToTree(qint64 index);
     void addToRawDataPanel(qint64 index);
 
+    void slot_updateSelectedDevice(QListWidgetItem *item);
+
     void on_tableWidget_cellClicked(int row, int column);
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
@@ -118,5 +123,6 @@ private slots:
     void on_pushButton_filter_clicked();
     void on_actionDissector_options_triggered();
 
+    void on_listWidget_itemClicked(QListWidgetItem *item);
 };
 #endif // MAINWINDOW_H

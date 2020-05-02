@@ -7,12 +7,12 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    DeviceList deviceList;
-    if(deviceList.exec() == QDialog::Accepted){
+//    DeviceList deviceList;
+//    if(deviceList.exec() == QDialog::Accepted){
         MainWindow w(DissectorOptions::dissectorOptions);
         w.show();
         return a.exec();
-    }
+//    }
 //    MainWindow w;
 //    w.show();
 //    return a.exec();

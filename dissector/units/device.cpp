@@ -11,6 +11,8 @@ Device::Device()
     if(pcap_findalldevs(&devLinkList,errbuf) == -1){
         qDebug() << QLatin1String(errbuf);
     }else{
+        this->devices.clear();
+        this->devNames.clear();
         while(devLinkList != NULL){
             this->devices.append(devLinkList);
             this->devNames.append(QLatin1String(devLinkList->name));
@@ -20,8 +22,8 @@ Device::Device()
 }
 
 Device::~Device(){
-    if(!this->devices.isEmpty())
-        pcap_freealldevs(this->devices.first());
+//    if(!this->devices.isEmpty())
+//        pcap_freealldevs(this->devices.first());
 }
 
 qint32 Device::GetDeviceCount(){
