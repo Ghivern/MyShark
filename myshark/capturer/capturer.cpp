@@ -58,14 +58,14 @@ void Capturer::run(){
     //this->dissectResultFrameList.clear();
     while(!this->stop){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-            qDebug() << "抓取成功";
+            if( this->stop ) break;
+//            qDebug() << "抓取成功";
             switch (this->capHandle->GetLinkType()) {
             case 1:
             {
                 //dissRes = new DissResEth(index);
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
                     ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
-//                if( this->stop ) break;
                 emit onePacketCaptured(this->dissectResultFrameList.at(index));
                 index++;
                 break;

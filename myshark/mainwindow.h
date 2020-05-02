@@ -56,6 +56,8 @@ private:
 
     Ui::MainWindow *ui;
 
+    bool haveDate; /*用于判断结束时是否抓到了数据*/
+
     /*Device List*/
     QString selectedDevName;
 
@@ -123,6 +125,6 @@ private slots:
     void on_pushButton_filter_clicked();
     void on_actionDissector_options_triggered();
 
-    void on_listWidget_itemClicked(QListWidgetItem *item);
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 };
 #endif // MAINWINDOW_H

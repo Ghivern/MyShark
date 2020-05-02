@@ -11,6 +11,7 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
 
     this->streamIndex = -1;
     this->capturer = nullptr;
+    this->haveDate = false;
 
     this->setupUi();
 
@@ -41,8 +42,10 @@ void MainWindow::setupUi(){
 //        item->setText("hello");
         this->ui->listWidget->addItem(item);
     }
+    this->ui->listWidget->setCurrentRow(0);
     this->selectedDevName.clear();
     this->selectedDevName.append(this->ui->listWidget->item(0)->text());
+
 
     /*MainWindow*/
     this->resize(1050,650);
@@ -416,6 +419,10 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     /*显示百分比*/
     this->displayProportion->clear();
     this->displayProportion->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
+
+    if( !this->haveDate )
+        this->haveDate = true;
+
 }
 
 
@@ -569,16 +576,23 @@ void MainWindow::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
 /*工具栏相应方法*/
 void MainWindow::on_actionStop_triggered()
 {
-    this->ui->actionStart->setEnabled(true);
-    this->ui->actionStop->setEnabled(false);
-    this->ui->actionRestart->setEnabled(false);
-    this->ui->actionDissector_options->setEnabled(true);
+    this->capturer->Stop();
     try {
         this->capturer->GetCapHandle()->SetNonBlock(1);
     } catch (QString e) {
         QMessageBox::critical(this,"Error",e);
     }
-    this->capturer->Stop();
+    this->ui->actionStart->setEnabled(true);
+    this->ui->actionStop->setEnabled(false);
+    this->ui->actionRestart->setEnabled(false);
+    this->ui->actionDissector_options->setEnabled(true);
+
+    if( this->capturer != nullptr && this->capturer->GetCount() == 0){
+        this->ui->widget_deviceList->show();
+        this->ui->tableWidget->hide();
+        this->ui->treeWidget->hide();
+        this->ui->rawDataPanel->hide();
+    }
 }
 
 void MainWindow::on_actionStart_triggered()
@@ -586,7 +600,7 @@ void MainWindow::on_actionStart_triggered()
 //    SaveOrCloseFileDialog saveOrCloseFileDialog;
 //    saveOrCloseFileDialog.exec();
 
-    if( this->capturer != nullptr ){
+    if( this->capturer != nullptr && this->ui->widget_deviceList->isHidden()){
         this->saveOrCloseFileDialog->exec();
         if( this->saveOrCloseFileDialog->result() == QDialog::Accepted )
             this->slot_startCapture();
@@ -652,10 +666,12 @@ void MainWindow::slot_startCapture(){
         QMessageBox::critical(this,"Error",e);
         return;
     }
-    this->ui->widget_deviceList->hide();
-    this->ui->tableWidget->show();
-    this->ui->treeWidget->show();
-    this->ui->rawDataPanel->show();
+    if( !this->ui->widget_deviceList->isHidden()){
+        this->ui->widget_deviceList->hide();
+        this->ui->tableWidget->show();
+        this->ui->treeWidget->show();
+        this->ui->rawDataPanel->show();
+    }
 
     this->ui->tableWidget->clearContents();
     this->ui->tableWidget->setRowCount(0);
@@ -777,7 +793,9 @@ void MainWindow::on_actionDissector_options_triggered()
     dp.exec();
 }
 
-void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
+
+/*Device List*/
+void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
     this->slot_updateSelectedDevice(item);
     this->slot_startCapture();
