@@ -23,6 +23,7 @@ SOURCES += \
     mainwindow.cpp \
     ui/devicelist.cpp \
     ui/dialogs/saveorclosefiledialog.cpp \
+    ui/dialogs/stopwithoutanypacket.cpp \
     ui/dissectoroptions.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     mainwindow.h \
     ui/devicelist.h \
     ui/dialogs/saveorclosefiledialog.h \
+    ui/dialogs/stopwithoutanypacket.h \
     ui/dissectoroptions.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
@@ -46,6 +48,7 @@ FORMS += \
     ui/devicelist.ui \
     mainwindow.ui \
     ui/dialogs/saveorclosefiledialog.ui \
+    ui/dialogs/stopwithoutanypacket.ui \
     ui/dissectoroptions.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \

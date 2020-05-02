@@ -587,7 +587,9 @@ void MainWindow::on_actionStop_triggered()
     this->ui->actionRestart->setEnabled(false);
     this->ui->actionDissector_options->setEnabled(true);
 
-    if( this->capturer != nullptr && this->capturer->GetCount() == 0){
+    if( this->capturer != nullptr && this->ui->tableWidget->rowCount() == 0){
+        StopWithoutAnyPacket stopWithoutAnyPacketDialog;
+        stopWithoutAnyPacketDialog.exec();
         this->ui->widget_deviceList->show();
         this->ui->tableWidget->hide();
         this->ui->treeWidget->hide();

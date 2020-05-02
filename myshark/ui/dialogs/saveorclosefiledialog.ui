@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
+    <width>470</width>
     <height>156</height>
    </rect>
   </property>
@@ -21,15 +21,20 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>424</width>
+    <width>470</width>
     <height>156</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>424</width>
+    <width>470</width>
     <height>156</height>
    </size>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>11</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>

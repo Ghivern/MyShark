@@ -6,6 +6,7 @@ SaveOrCloseFileDialog::SaveOrCloseFileDialog(QWidget *parent) :
     ui(new Ui::SaveOrCloseFileDialog)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Unsaved packets...");
 }
 
 SaveOrCloseFileDialog::~SaveOrCloseFileDialog()
