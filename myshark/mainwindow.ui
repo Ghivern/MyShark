@@ -306,12 +306,17 @@
    <addaction name="actionStop"/>
    <addaction name="actionRestart"/>
    <addaction name="separator"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionClose"/>
+   <addaction name="separator"/>
    <addaction name="actionScrollToLastLine"/>
    <addaction name="separator"/>
    <addaction name="actionEnlargeTextSize"/>
    <addaction name="actionShrinkTextSize"/>
    <addaction name="actionDefaultTextSize"/>
    <addaction name="actionResizeTableWidgetTOFitContents"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionStart">
    <property name="icon">
