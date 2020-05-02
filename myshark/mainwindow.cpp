@@ -224,10 +224,12 @@ void MainWindow::addBackgroundToTableRow(DissectResultFrame *frame,qint32 row){
 bool MainWindow::saveFile(QTemporaryFile *tempFile){
     QString curPath = QDir::currentPath();
     QString dlgTitle = "Save file";
-    QString filter = "all file(*.*)";
+    QString filter = "pcap(*.pcap)";
     QString path = QFileDialog::getSaveFileName(this,dlgTitle,curPath,filter);
-    if( !path.isEmpty() && tempFile != nullptr && QFile::copy(tempFile->fileName(),path)){
+
+    if( !path.isEmpty() && tempFile != nullptr ){
         this->tempFile = tempFile;
+        QFile::copy(tempFile->fileName(),path);
         //tempFile->deleteLater();
         return true;
     }
@@ -714,6 +716,7 @@ void MainWindow::slot_startCapture(){
             this->tempFile->deleteLater();
 
         this->capturer = tempCapturer;
+        this->tempFile = tempCapturer->GetTempFile();
         this->packetsNeedToBeSavedBeforeStart = false;
         this->capturer->Start();
     } catch (QString e) {
