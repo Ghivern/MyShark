@@ -43,6 +43,9 @@ public:
     MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private:
     void setupUi();
     void setupSignal();
@@ -54,7 +57,9 @@ private:
 
     void addBackgroundToTableRow(DissectResultFrame *frame,qint32 row);
 
+    QString getSaveFilePath();
     bool saveFile(QTemporaryFile *tempFile);
+    bool saveFile(QTemporaryFile *tempFile,QString path);
 
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -109,6 +114,8 @@ private:
     /*Dialog*/
    SaveOrCloseFileDialog *saveOrCloseFileDialog;
 
+signals:
+   void closeWindow();
 
 public slots:
     void Print(qint64 index);
@@ -145,6 +152,5 @@ private slots:
     void on_actionClose_triggered();
     void on_actionQuit_triggered();
 
-    void close();
 };
 #endif // MAINWINDOW_H

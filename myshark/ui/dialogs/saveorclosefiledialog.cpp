@@ -19,12 +19,21 @@ SaveOrCloseFileDialog::~SaveOrCloseFileDialog()
     delete ui;
 }
 
+int SaveOrCloseFileDialog::exec(){
+    this->status = 0;
+    return QDialog::exec();
+}
+
 void SaveOrCloseFileDialog::SetContentForOpenFile(){
     this->ui->label_question->setText("Do you want to save the captured packets before opening another file?");
 }
 
 void SaveOrCloseFileDialog::SetContentForNewCapture(){
     this->ui->label_question->setText("Do you want to save the captured packets before starting a new capture?");
+}
+
+void SaveOrCloseFileDialog::SetContentForQuit(){
+    this->ui->label_question->setText("Do you want to save the captured packets before quiting?");
 }
 
 void SaveOrCloseFileDialog::on_pushButton_continue_without_save_clicked()

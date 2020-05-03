@@ -34,6 +34,37 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event){
+    this->readyToQuit = true;
+    if( this->packetsNeedToBeSavedBeforeStart ){
+        this->saveOrCloseFileDialog->SetContentForQuit();
+        this->saveOrCloseFileDialog->exec();
+
+        if( this->saveOrCloseFileDialog->result() == QDialog::Accepted){
+            this->capturer->Stop();
+            event->accept();
+        }else{
+            if( this->saveOrCloseFileDialog->IsCancel() ){
+                this->readyToQuit = false;
+                event->ignore();
+            }else if( this->saveOrCloseFileDialog->IsContinueWithSaving() ){
+                QString path = this->getSaveFilePath();
+                if( !path.isEmpty() ){
+                    this->capturer->Stop();
+                    this->saveFile(this->tempFile,path);
+                    event->accept();
+                }else{
+                    this->readyToQuit = false;
+                    event->ignore();
+                }
+            }else{
+                this->readyToQuit = false;
+                event->ignore();
+            }
+        }
+    }
+}
+
 void MainWindow::setupUi(){
     this->ui->tableWidget->hide();
     this->ui->treeWidget->hide();
@@ -221,12 +252,27 @@ void MainWindow::addBackgroundToTableRow(DissectResultFrame *frame,qint32 row){
     }
 }
 
-bool MainWindow::saveFile(QTemporaryFile *tempFile){
+QString MainWindow::getSaveFilePath(){
     QString curPath = QDir::currentPath();
     QString dlgTitle = "Save file";
     QString filter = "pcap(*.pcap)";
     QString path = QFileDialog::getSaveFileName(this,dlgTitle,curPath,filter);
+    return path;
+}
 
+bool MainWindow::saveFile(QTemporaryFile *tempFile){
+    QString path = this->getSaveFilePath();
+
+    if( !path.isEmpty() && tempFile != nullptr ){
+        this->tempFile = tempFile;
+        QFile::copy(tempFile->fileName(),path);
+        //tempFile->deleteLater();
+        return true;
+    }
+    return  false;
+}
+
+bool MainWindow::saveFile(QTemporaryFile *tempFile, QString path){
     if( !path.isEmpty() && tempFile != nullptr ){
         this->tempFile = tempFile;
         QFile::copy(tempFile->fileName(),path);
@@ -634,53 +680,13 @@ void MainWindow::on_actionStop_triggered()
 void MainWindow::on_actionStart_triggered()
 {
     /*从网卡抓包的槽函数*/
-//    SaveOrCloseFileDialog saveOrCloseFileDialog;
-//    saveOrCloseFileDialog.exec();
-
     this->fromFile = false;
     if( this->capturer != nullptr && this->packetsNeedToBeSavedBeforeStart){
         this->saveOrCloseFileDialog->SetContentForNewCapture();
         this->saveOrCloseFileDialog->exec();
-//        if( this->saveOrCloseFileDialog->result() == QDialog ){
-//            return;
-//        }
     }else{
         this->slot_startCapture();
     }
-    //this->slot_startCapture();
-//    this->slot_startCapture();
-//    this->capturer->quit();
-//    if(this->capturer != nullptr)
-//        connect(this->capturer,&QThread::finished,this->capturer,&QThread::deleteLater);
-
-//    try {
-//        DeviceList::capHandle->ChangeDevice();
-//        DeviceList::capHandle->ActivateHandleWithParas();
-//        capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
-//        connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
-//        capturer->Start();
-//    } catch (QString e) {
-//        QMessageBox::critical(this,"Error",e);
-//        return;
-//    }
-
-//    this->ui->tableWidget->clearContents();
-//    this->ui->tableWidget->setRowCount(0);
-//    this->ui->treeWidget->clear();
-//    this->ui->rawDataPanel->clearContents();
-//    this->ui->rawDataPanel->setRowCount(0);
-//    this->ui->actionStart->setEnabled(false);
-//    this->ui->actionStop->setEnabled(true);
-//    this->ui->actionRestart->setEnabled(true);
-//    this->ui->actionDissector_options->setEnabled(false);
-
-//    DeviceList::capHandle->ChangeDevice();
-
-//    this->capturer = new Capturer(DeviceList::capHandle,this->dissectorOptions);
-
-//    connect(this->capturer,SIGNAL(onePacketCaptured(DissectResultFrame*)),this,SLOT(addToTable(DissectResultFrame*)));
-
-//    this->capturer->Start();
 }
 
 void MainWindow::slot_startCapture(){
@@ -751,9 +757,9 @@ void MainWindow::slot_saveFileBeforeCapture(){
 //    QString dlgTitle = "Save file";
 //    QString filter = "all file(*.*)";
 //    QString aFile = QFileDialog::getSaveFileName(this,dlgTitle,curPath,filter);
-
-    if( this->saveFile(this->capturer->GetTempFile()) )
-        this->slot_startCapture();
+    if( !this->readyToQuit )
+        if( this->saveFile(this->capturer->GetTempFile()) )
+            this->slot_startCapture();
 
 }
 
@@ -938,9 +944,6 @@ void MainWindow::on_actionClose_triggered()
 
 void MainWindow::on_actionQuit_triggered()
 {
-    this->close();
+    emit close();
 }
 
-void MainWindow::close(){
-
-}

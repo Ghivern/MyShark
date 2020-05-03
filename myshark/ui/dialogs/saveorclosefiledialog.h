@@ -21,10 +21,13 @@ public:
 
     void SetContentForOpenFile();
     void SetContentForNewCapture();
+    void SetContentForQuit();
 
     bool IsContinueWithoutSaving();
     bool IsContinueWithSaving();
     bool IsCancel();
+
+    int exec();
 
 private:
     Ui::SaveOrCloseFileDialog *ui;
