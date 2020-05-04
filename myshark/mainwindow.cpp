@@ -15,6 +15,10 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     this->capturer = nullptr;
     this->packetsNeedToBeSavedBeforeStart = false;
 
+    this->displayedRowCount = 0;
+
+    //this->captureFileProperties = nullptr;
+
     this->fromFile = false;
     this->filePath = "";
 
@@ -25,7 +29,6 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
     this->dissectorOptions = dissectorOptions; //必须在setupSignal前面
     this->setupSignal();
 
-//    this->ui->widget_2->hide();
 
 }
 
@@ -144,6 +147,8 @@ void MainWindow::setupUi(){
     this->ui->actionClose->setEnabled(false);
     this->ui->actionSave->setEnabled(false);
     this->ui->actionSave_As->setEnabled(false);
+
+    this->ui->actionCapture_file_properitys->setEnabled(false);
     //this->ui->actionQuit->setEnabled(false);
 }
 
@@ -433,6 +438,12 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     if( this->streamIndex != -1 && item->data(Qt::UserRole).toInt() != this->streamIndex){
         this->ui->tableWidget->hideRow(row);
+    }else{
+        this->displayedRowCount++;
+    }
+
+    if( this->streamIndex == - 1 ){
+        this->displayedRowCount = this->ui->tableWidget->rowCount();
     }
 
     //Time
@@ -492,7 +503,7 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     /*显示百分比*/
     this->displayProportion->clear();
-    this->displayProportion->setText(QString("%1%").arg(this->ui->tableWidget->rowCount()*1.0/this->capturer->GetCount()*100));
+    this->displayProportion->setText(QString("%1%").arg(this->displayedRowCount*1.0/this->capturer->GetCount()*100));
 
     if( !this->packetsNeedToBeSavedBeforeStart && !this->fromFile)
         this->packetsNeedToBeSavedBeforeStart = true;
@@ -750,6 +761,8 @@ void MainWindow::slot_startCapture(){
     this->ui->actionSave->setEnabled(false);
     this->ui->actionSave_As->setEnabled( this->fromFile ? true : false);
     this->ui->actionClose->setEnabled( this->fromFile ? true : false);
+
+    this->ui->actionCapture_file_properitys->setEnabled(true);
 }
 
 void MainWindow::slot_saveFileBeforeCapture(){
@@ -841,6 +854,7 @@ void MainWindow::on_actionResizeTableWidgetTOFitContents_triggered()
 
 void MainWindow::on_pushButton_filter_clicked()
 {
+
     if( this->ui->lineEdit->text().isEmpty() ){
         this->streamIndex = -1;
         for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
@@ -848,8 +862,10 @@ void MainWindow::on_pushButton_filter_clicked()
         }
     }else{
         this->streamIndex = this->ui->lineEdit->text().toInt();
+        this->displayedRowCount = 0;
         for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
             if( this->ui->tableWidget->item(index,COL_NO)->data(Qt::UserRole).toInt() == this->streamIndex ){
+                this->displayedRowCount++;
                 this->ui->tableWidget->showRow(index);
             }else{
                 this->ui->tableWidget->hideRow(index);
@@ -872,10 +888,26 @@ void MainWindow::on_actionOpen_triggered()
     //this->fromFile = false;
 
 
-    QString curPath = QDir::currentPath();
-    QString dlgTitle = "Open file";
-    QString filter = "all file(*.*)";
-    QString aFile = QFileDialog::getOpenFileName(this,dlgTitle,curPath,filter);
+//    QString curPath = QDir::currentPath();
+//    QString dlgTitle = "Open file";
+//    QString filter = "all file(*.*)";
+//    QString aFile = QFileDialog::getOpenFileName(this,dlgTitle,curPath,filter);
+    QString aFile = "";
+
+    QFileDialog filedialog;
+    filedialog.setAcceptMode(QFileDialog::AcceptOpen);
+    filedialog.setViewMode(QFileDialog::List);
+    filedialog.setFileMode(QFileDialog::AnyFile);
+    filedialog.setWindowTitle(tr("Open file"));
+    filedialog.setDefaultSuffix("pcap");
+    filedialog.setOption(QFileDialog::DontUseNativeDialog);
+    if(filedialog.exec()==  QDialog::Accepted )
+    {
+        QStringList filePaths = filedialog.selectedFiles();
+        aFile =filePaths[0];
+    }
+
+
     if( !aFile.isEmpty() ){
         this->fromFile = true;
         this->filePath.clear();
@@ -940,6 +972,8 @@ void MainWindow::on_actionClose_triggered()
     this->ui->actionSave->setEnabled(false);
     this->ui->actionSave_As->setEnabled(false);
     this->ui->actionClose->setEnabled(false);
+
+    this->ui->actionCapture_file_properitys->setEnabled(false);
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -947,3 +981,33 @@ void MainWindow::on_actionQuit_triggered()
     emit close();
 }
 
+
+void MainWindow::on_actionCapture_file_properitys_triggered()
+{
+    CaptureFileProperties *cfp = new CaptureFileProperties;
+    QString path = "";
+    if( this->fromFile )
+        path.append(this->filePath);
+    else
+        path.append(this->tempFile->fileName());
+
+    cfp->SetFile(path,this->capturer->GetCapHandle()->GetLinkTypeName());
+
+
+    qint64 firstPacketTime = 0;
+    qint64 lastPacketTime = 0;
+    if( this->capturer->GetCount() > 0 ){
+        firstPacketTime = this->capturer->GetDissectResultFrameByIndex(0)->GetCaptureTimeSec();
+        lastPacketTime = this->capturer->GetDissectResultFrameByIndex(this->capturer->GetCount() - 1)->GetCaptureTimeSec();
+    }
+    cfp->SetTime(firstPacketTime,lastPacketTime);
+
+    cfp->SetCapture();
+
+    cfp->SetInterface(this->capturer->GetCapHandle()->GetDeviceName()
+                       ,0,"none",this->capturer->GetCapHandle()->GetLinkTypeName(),0
+                      );
+
+    cfp->SetText();
+    cfp->show();
+}

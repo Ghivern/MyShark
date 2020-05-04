@@ -151,7 +151,7 @@ QString CapHandle::GetLinkTypeDes(){
 
 QString CapHandle::GetDeviceName(){
     if( fromFile )
-        return "";
+        return "unknow";
     return this->devNameOrPath;
 }
 

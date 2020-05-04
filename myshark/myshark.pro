@@ -25,6 +25,7 @@ SOURCES += \
     ui/dialogs/saveorclosefiledialog.cpp \
     ui/dialogs/stopwithoutanypacket.cpp \
     ui/dissectoroptions.cpp \
+    ui/statistics/capturefileproperties.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
     ui/widgets/frame.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     ui/dialogs/saveorclosefiledialog.h \
     ui/dialogs/stopwithoutanypacket.h \
     ui/dissectoroptions.h \
+    ui/statistics/capturefileproperties.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
     ui/widgets/frame.h \
@@ -53,6 +55,7 @@ FORMS += \
     ui/dialogs/saveorclosefiledialog.ui \
     ui/dialogs/stopwithoutanypacket.ui \
     ui/dissectoroptions.ui \
+    ui/statistics/capturefileproperties.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \
     ui/widgets/frame.ui

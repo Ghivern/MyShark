@@ -89,6 +89,9 @@ void Capturer::run(){
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
                     ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
                 this->dumper->Dump(pkthdr,raw);
+                if( index %10 == 0 )
+                    this->dumper->Flush();
+                //this->tempfile->flush();
                 emit onePacketCaptured(this->dissectResultFrameList.at(index));
                 index++;
                 break;

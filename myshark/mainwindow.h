@@ -28,6 +28,9 @@
 #include "./ui/dialogs/saveorclosefiledialog.h"
 #include "./ui/dialogs/stopwithoutanypacket.h"
 
+//Statistics
+#include "./ui/statistics/capturefileproperties.h"
+
 
 
 
@@ -65,6 +68,9 @@ private:
 
     Ui::MainWindow *ui;
 
+    //Statistics
+    //CaptureFileProperties *captureFileProperties;
+
     bool readyToQuit;
 
     //bool haveDate; /*用于判断结束时是否抓到了数据*/
@@ -85,6 +91,8 @@ private:
 
     /*StatuBar*/
     QLabel *displayProportion;
+
+    qint32 displayedRowCount;
 
     /*tableWidget*/
     bool scrollToBottom;
@@ -152,5 +160,6 @@ private slots:
     void on_actionClose_triggered();
     void on_actionQuit_triggered();
 
+    void on_actionCapture_file_properitys_triggered();
 };
 #endif // MAINWINDOW_H
