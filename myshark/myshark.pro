@@ -26,10 +26,12 @@ SOURCES += \
     ui/dialogs/stopwithoutanypacket.cpp \
     ui/dissectoroptions.cpp \
     ui/statistics/capturefileproperties.cpp \
+    ui/statusbar/displayproportion.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
     ui/widgets/frame.cpp \
     units/caphandle.cpp \
+    units/displayfilter.cpp \
     units/dumper.cpp
 
 HEADERS += \
@@ -41,10 +43,12 @@ HEADERS += \
     ui/dialogs/stopwithoutanypacket.h \
     ui/dissectoroptions.h \
     ui/statistics/capturefileproperties.h \
+    ui/statusbar/displayproportion.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
     ui/widgets/frame.h \
     units/caphandle.h \ \
+    units/displayfilter.h \
     units/dumper.h
 
 
@@ -56,6 +60,7 @@ FORMS += \
     ui/dialogs/stopwithoutanypacket.ui \
     ui/dissectoroptions.ui \
     ui/statistics/capturefileproperties.ui \
+    ui/statusbar/displayproportion.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \
     ui/widgets/frame.ui

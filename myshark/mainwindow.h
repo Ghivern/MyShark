@@ -27,9 +27,13 @@
 #include "./ui/dissectoroptions.h"
 #include "./ui/dialogs/saveorclosefiledialog.h"
 #include "./ui/dialogs/stopwithoutanypacket.h"
+#include "./ui/statusbar/displayproportion.h"
 
 //Statistics
 #include "./ui/statistics/capturefileproperties.h"
+
+//display filter
+#include "./units/displayfilter.h"
 
 
 
@@ -91,6 +95,7 @@ private:
 
     /*StatuBar*/
     QLabel *displayProportion;
+    DisplayProportion *showDisplayProportion;
 
     qint32 displayedRowCount;
 
@@ -116,14 +121,18 @@ private:
     /*解析选项，用协议名作为Key*/
     QHash<QString,quint64> *dissectorOptions;
 
-    /*暂时用于存储过滤器需要的StreamIndex*/
-    qint64 streamIndex;
+//    /*暂时用于存储过滤器需要的StreamIndex*/
+//    qint64 streamIndex;
 
     /*Dialog*/
    SaveOrCloseFileDialog *saveOrCloseFileDialog;
 
+   /*Display Filter*/
+   DisplayFilter displayFilter;
+
+
 signals:
-   void closeWindow();
+    void addOneRowToTablewidget(qint64 no);
 
 public slots:
     void Print(qint64 index);

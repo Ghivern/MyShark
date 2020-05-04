@@ -11,7 +11,7 @@ MainWindow::MainWindow(QHash<QString,quint64> *dissectorOptions,QWidget *parent)
 
     this->readyToQuit = false;
 
-    this->streamIndex = -1;
+//    this->streamIndex = -1;
     this->capturer = nullptr;
     this->packetsNeedToBeSavedBeforeStart = false;
 
@@ -136,6 +136,9 @@ void MainWindow::setupUi(){
     this->displayProportion = new QLabel();
     this->displayProportion->setLineWidth(5);
     this->ui->statusbar->addWidget(this->displayProportion);
+
+    this->showDisplayProportion = new DisplayProportion;
+    this->ui->statusbar->addWidget(this->showDisplayProportion);
 
     /*Dialog*/
     this->saveOrCloseFileDialog = new SaveOrCloseFileDialog;
@@ -426,25 +429,28 @@ void MainWindow::addToTable(DissectResultFrame *frame){
 
     this->ui->tableWidget->insertRow(row);
 
+    if( !this->displayFilter.Filte(frame) ){
+        this->ui->tableWidget->hideRow(row);
+    }
+
     //No.
     item = new QTableWidgetItem();
     item->setData(Qt::DisplayRole,frame->GetDissectResultBase()->GetIndex());
     this->ui->tableWidget->setItem(row,MainWindow::COL_NO,item);
 
-    if( frame->GetDissectResultBase()->ContainProtocol("tcp") )
-        item->setData(Qt::UserRole,qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1);
-    else
-        item->setData(Qt::UserRole,-1);
+//    if( frame->GetDissectResultBase()->ContainProtocol("tcp") )
+//        item->setData(Qt::UserRole,qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1);
+//    else
+//        item->setData(Qt::UserRole,-1);
 
-    if( this->streamIndex != -1 && item->data(Qt::UserRole).toInt() != this->streamIndex){
-        this->ui->tableWidget->hideRow(row);
-    }else{
-        this->displayedRowCount++;
-    }
-
-    if( this->streamIndex == - 1 ){
-        this->displayedRowCount = this->ui->tableWidget->rowCount();
-    }
+//    if( this->streamIndex != -1 && item->data(Qt::UserRole).toInt() != this->streamIndex){
+//        this->ui->tableWidget->hideRow(row);
+//    }else{
+//        if( this->streamIndex != -1 )
+//            this->displayedRowCount++;
+//        else
+//            this->displayedRowCount = this->ui->tableWidget->rowCount();
+//    }
 
     //Time
     str.clear();
@@ -501,9 +507,21 @@ void MainWindow::addToTable(DissectResultFrame *frame){
     if(this->scrollToBottom)
         this->ui->tableWidget->scrollToBottom();
 
+    emit addOneRowToTablewidget(frame->GetDissectResultBase()->GetIndex());
+
     /*显示百分比*/
     this->displayProportion->clear();
-    this->displayProportion->setText(QString("%1%").arg(this->displayedRowCount*1.0/this->capturer->GetCount()*100));
+    if( this->capturer->GetCount() > 0){
+        this->displayProportion->setText(
+                    QString("Packets: %1; Displayed: %2 (%3)%")
+                    .arg(this->capturer->GetCount())
+                    .arg(this->displayFilter.GetDisplayedCount())
+                    .arg(QString::asprintf("%.1f",this->displayFilter.GetDisplayedCount()*1.0/this->capturer->GetCount()*100))
+                    );
+        this->showDisplayProportion->SetData(this->capturer->GetCount(),this->displayFilter.GetDisplayedCount());
+    }else{
+        this->displayProportion->setText("No packet");
+    }
 
     if( !this->packetsNeedToBeSavedBeforeStart && !this->fromFile)
         this->packetsNeedToBeSavedBeforeStart = true;
@@ -855,20 +873,43 @@ void MainWindow::on_actionResizeTableWidgetTOFitContents_triggered()
 void MainWindow::on_pushButton_filter_clicked()
 {
 
-    if( this->ui->lineEdit->text().isEmpty() ){
-        this->streamIndex = -1;
-        for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
-            this->ui->tableWidget->showRow(index);
-        }
-    }else{
-        this->streamIndex = this->ui->lineEdit->text().toInt();
-        this->displayedRowCount = 0;
-        for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
-            if( this->ui->tableWidget->item(index,COL_NO)->data(Qt::UserRole).toInt() == this->streamIndex ){
-                this->displayedRowCount++;
+//    if( this->ui->lineEdit->text().isEmpty() ){
+//        this->streamIndex = -1;
+//        for( qint64 index = 0; index < this->ui->tableWidget->rowCount() - 1; index++ ){
+//            this->ui->tableWidget->showRow(index);
+//        }
+//    }else{
+//        this->streamIndex = this->ui->lineEdit->text().toInt();
+//        this->displayedRowCount = 0;
+//        qint32 rowCount = this->ui->tableWidget->rowCount();
+//        for( qint64 index = 0; index < rowCount - 1; index++ ){
+//            if( this->ui->tableWidget->item(index,COL_NO)->data(Qt::UserRole).toInt() == this->streamIndex ){
+//                this->displayedRowCount++;
+//                this->ui->tableWidget->showRow(index);
+//            }else{
+//                this->ui->tableWidget->hideRow(index);
+//            }
+//        }
+//    }
+    if( this->displayFilter.SetFilter(this->ui->lineEdit->text()) ){
+        qint64 rowCount = this->ui->tableWidget->rowCount();
+        for(qint64 index = 0; index < rowCount; index++ ){
+            if(this->displayFilter.Filte(this->capturer->GetDissectResultFrameByIndex(index))){
                 this->ui->tableWidget->showRow(index);
             }else{
                 this->ui->tableWidget->hideRow(index);
+            }
+            this->displayProportion->clear();
+            if( this->capturer->GetCount() > 0){
+                this->displayProportion->setText(
+                            QString("Packets: %1; Displayed: %2 (%3)%")
+                            .arg(this->capturer->GetCount())
+                            .arg(this->displayFilter.GetDisplayedCount())
+                            .arg(QString::asprintf("%.1f",this->displayFilter.GetDisplayedCount()*1.0/this->capturer->GetCount()*100))
+                            );
+            this->showDisplayProportion->SetData(this->capturer->GetCount(),this->displayFilter.GetDisplayedCount());
+            }else{
+                this->displayProportion->setText("No packet");
             }
         }
     }
