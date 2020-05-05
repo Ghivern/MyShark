@@ -13,8 +13,11 @@ public:
     ProTreeMaker(qint32 datalink,DissectResultFrame *dissectRestltFrame,void *reserves);
     ProTree* GetProTree();
 
+
 private:
     ProTree *proTree;
+
+
 };
 
 #endif // PROTREEMAKER_H

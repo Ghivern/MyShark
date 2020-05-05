@@ -7,17 +7,41 @@ DisplayFilter::DisplayFilter()
 }
 
 bool DisplayFilter::SetFilter(QString filterStr){
+    this->mutex.tryLock();
+    this->filterStr = filterStr;
+    this->displayedCount = 0;
+    this->mutex.unlock();
+    return true;
+}
+
+bool DisplayFilter::FilterIsValied(QString filterStr){
+    bool allNumber = true;
+    if( filterStr.isEmpty() )
+        return true;
+    for( qint32 index = 0; index < filterStr.length(); index++){
+        if( filterStr.at(index).isNumber() ){
+            continue;
+        }else{
+            allNumber = false;
+            break;
+        }
+    }
+    if( allNumber ){
         this->mutex.tryLock();
         this->filterStr = filterStr;
         this->displayedCount = 0;
         this->mutex.unlock();
         return true;
+    }else{
+        return false;
+    }
 }
 
 bool DisplayFilter::Filte(DissectResultFrame *frame){
     this->mutex.tryLock();
     if( !this->filterStr.isEmpty() ){
-        if( qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1 == this->filterStr.toInt()){
+        if( frame->GetDissectResultBase()->ContainProtocol("tcp")
+                && qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1 == this->filterStr.toInt()){
             this->displayedCount++;
             this->mutex.unlock();
             return true;

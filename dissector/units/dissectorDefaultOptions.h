@@ -1,0 +1,15 @@
+#ifndef DISSECTORDEFAULTOPTIONS_H
+#define DISSECTORDEFAULTOPTIONS_H
+#include <QHash>
+#include <QString>
+
+#define FRAME_GENERATE_EPOCH_TIME 0x0001
+#define FRAME_SHOW_NUMBER_OF_BITS 0x0002
+#define FRAME_GENERATE_MD5_HASH   0x0004
+namespace config{
+
+
+
+
+}
+#endif // DISSECTORDEFAULTOPTIONS_H

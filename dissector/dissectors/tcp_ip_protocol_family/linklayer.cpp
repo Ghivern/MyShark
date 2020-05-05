@@ -2,9 +2,9 @@
 
 Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkLayer *dissectResultLinklayer,void *reserves)
 {
-    QList<void*> *r = (QList<void*>*)reserves;
-    QString linklayerTypeName(*(QString*)r->at(4));
-    quint64 dissectorOption = ((QHash<QString,quint64>*)r->at(0))->value("ether");
+    Q_UNUSED(reserves)
+    QString linklayerTypeName(DissectResultBase::linklayerType);
+    quint64 dissectorOption = DissectResultBase::DissectorOptions->value("ether");
 
     Q_UNUSED(reserves)
         /*LinkLayer处理代码*/

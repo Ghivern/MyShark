@@ -22,12 +22,11 @@ public:
     void SetContentForOpenFile();
     void SetContentForNewCapture();
     void SetContentForQuit();
+    void SetContentForClose();
 
     bool IsContinueWithoutSaving();
     bool IsContinueWithSaving();
     bool IsCancel();
-
-    int exec();
 
 private:
     Ui::SaveOrCloseFileDialog *ui;

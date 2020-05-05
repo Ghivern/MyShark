@@ -1,5 +1,8 @@
 #include "dissectresutltframe.h"
 
+
+
+
 bool DissectResultFrame::isFirstPacket = true;
 timeval DissectResultFrame::firstPacketCaptureTime;
 QList<DissectResultBase*>* DissectResultFrame::dissectResultBaseList = new QList<DissectResultBase*>;
@@ -108,6 +111,7 @@ void* DissectResultFrame::GetProtocolFamilyBaseLayer(){
 tcp_ip_protocol_family::DissectResultLinkLayer* DissectResultFrame::GetTcpIpProtocolFamilyBaseLayer(){
     return (tcp_ip_protocol_family::DissectResultLinkLayer*)this->protocol_family_base_layer;
 }
+
 
 //QString DissectResultFrame::GetSummery(){
 //    return this->dissectResultBase->GetSummery();

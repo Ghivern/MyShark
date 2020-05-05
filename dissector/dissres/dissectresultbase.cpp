@@ -1,5 +1,34 @@
 #include "dissectresultbase.h"
 
+
+QHash<QString,quint64>* DissectResultBase::DissectorOptions = new QHash<QString,quint64>
+      {
+            {"frame",
+                 FRAME_SHOW_NUMBER_OF_BITS | FRAME_GENERATE_EPOCH_TIME
+            },
+
+            {"ether",
+
+            0},
+
+            {"arp",
+
+            6},
+
+            {"ipv4",
+
+            7},
+
+            {"tcp",
+
+            100}
+      };
+
+qint32 DissectResultBase::InterfaceId = -1;
+QString DissectResultBase::InterfaceName = "";
+qint32 DissectResultBase::linklayerType = -1;
+QString DissectResultBase::linklayerTypeName = "";
+
 DissectResultBase::DissectResultBase(const quint8 *data,const pcap_pkthdr *pkther, qint64 index){
     this->data = data;
     this->index = index;
@@ -204,4 +233,14 @@ void DissectResultBase::AddAdditional(QString name, TcpInfo &tcpInfo){
 
 TcpInfo& DissectResultBase::GetAdditional(QString name){
     return *this->reserve_tcp.find(name);
+}
+
+
+void DissectResultBase::SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName){
+    DissectResultBase::InterfaceId = interfaceId;
+    DissectResultBase::InterfaceName.clear();
+    DissectResultBase::InterfaceName.append(interfaceName);
+    DissectResultBase::linklayerType = linklayer;
+    DissectResultBase::linklayerTypeName.clear();
+    DissectResultBase::linklayerTypeName.append(linklayerName);
 }

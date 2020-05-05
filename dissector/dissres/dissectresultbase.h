@@ -7,6 +7,8 @@
 #include "pcap.h"
 #include "../units/tcpinfo.h"
 
+#include "../units/dissectorDefaultOptions.h"
+
 
 
 /*
@@ -18,6 +20,13 @@
 class DissectResultBase
 {
 public:
+    static QHash<QString,quint64>* DissectorOptions;
+
+    static qint32 InterfaceId;
+    static QString InterfaceName;
+    static qint32 linklayerType;
+    static QString linklayerTypeName;
+
     DissectResultBase(const quint8 *data,const pcap_pkthdr *pkther, qint64 index);
     ~DissectResultBase();
 
@@ -60,6 +69,7 @@ public:
     void AddAdditional(QString name,TcpInfo &tcpInfo);
     TcpInfo& GetAdditional(QString name);
 
+    void SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName);
 
 
 private:

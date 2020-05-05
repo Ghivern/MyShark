@@ -12,6 +12,7 @@ public:
 
     bool Filte(DissectResultFrame *frame);
     bool SetFilter(QString filterStr);
+    bool FilterIsValied(QString filterStr);
 
     qint64 GetDisplayedCount();
 

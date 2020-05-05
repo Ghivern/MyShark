@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QTemporaryFile>
 
+
 #include "../units/caphandle.h"
 #include "../units/dumper.h"
 
@@ -17,42 +18,44 @@ class Capturer:public QThread
 {
     Q_OBJECT
 public:
-    Capturer(QString devName,QHash<QString,quint64>* dissectorOptions = nullptr);
-    Capturer(CapHandle *capHandle,QHash<QString,quint64>* dissectorOptions = nullptr);
+    Capturer();
     ~Capturer();
-//    qint32 GetIntLinkType();
-//    QList<DissRes*>* GetDissResList();
 
     qint64 GetCount();
-
     CapHandle* GetCapHandle();
     DissectResultFrame* GetDissectResultFrameByIndex(qint64 index);
 
-    QTemporaryFile* GetTempFile();
+    QString GetFilePath();
+
+public slots:
+    bool slot_startThread(QString interfaceOrFile,bool fromFile);
+    bool slot_stopThread();
+    bool slot_clearThread(qint32 newCapOrFileOrCloseOrQuit = 2);
+    bool slot_saveTempFile();
 
 
 protected:
     void run() Q_DECL_OVERRIDE;
 
 private:
+    bool updateCaptureThread(QString interfaceOrFile,bool fromFile = false);
+    bool clearCaptureThread(qint32 newCapOrFileOrQuit = 0);
+    bool saveTempFile();
+
+    QMutex mutexForStartAndStop;
+
     CapHandle *capHandle;
     QTemporaryFile *tempfile;
     Dumper *dumper;
-    //DissResList_t *dissResList;
-//    QMutex *mutex;
-    bool stop;
-
-    QList<DissectResultFrame*> dissectResultFrameList;
 
     QHash<QString,quint64>* dissectorOptions;
 
-signals:
-    //void onePacketCaptured(qint64 index);
-    void onePacketCaptured(DissectResultFrame *frame);
+    bool tempFileHaveBeenSaved;
 
-public slots:
-    void Start();
-    void Stop();
+    QList<DissectResultFrame*> dissectResultFrameList;
+
+signals:
+    void onePacketCaptured(DissectResultFrame *frame);
 };
 
 #endif // CAPTURER_H

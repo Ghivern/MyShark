@@ -1,21 +1,16 @@
 #include "frame.h"
 #include <QDebug>
 
+
 Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reserves)
 {
-    quint64 option = 0;
-    qint32 interfaceId = 0;
-    QString interfaceName("");
-    qint32 linklayer = 0;
-    QString linklayerName("");
-    if(reserves != nullptr){
-        QList<void*> *r = (QList<void*>*)reserves;
-        option = (*(QHash<QString,quint64>*)r->at(0)).value("frame");
-        interfaceId = *(qint32*)r->at(1);
-        interfaceName.append(*(QString*)r->at(2));
-        linklayer = *(qint32*)r->at(3);
-        linklayerName.append(*(QString*)r->at(4));
-    }
+    Q_UNUSED(reserves)
+    quint64 option = DissectResultBase::DissectorOptions->value("frame");
+    qint32 interfaceId = DissectResultBase::InterfaceId;
+    QString interfaceName(DissectResultBase::InterfaceName);
+    qint32 linklayer = DissectResultBase::linklayerType;
+    QString linklayerName(DissectResultBase::linklayerTypeName);
+
 
     /*Summery*/
     proTree->AddItem("frame",

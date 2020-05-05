@@ -21,10 +21,13 @@ SOURCES += \
     dissector/dissector.cpp \
     main.cpp \
     mainwindow.cpp \
-    ui/devicelist.cpp \
     ui/dialogs/saveorclosefiledialog.cpp \
     ui/dialogs/stopwithoutanypacket.cpp \
     ui/dissectoroptions.cpp \
+    ui/maindisplaywidget/displayinterfaces.cpp \
+    ui/maindisplaywidget/displayrawdata.cpp \
+    ui/maindisplaywidget/displaytable.cpp \
+    ui/maindisplaywidget/displaytree.cpp \
     ui/statistics/capturefileproperties.cpp \
     ui/statusbar/displayproportion.cpp \
     ui/widgets/arp.cpp \
@@ -38,10 +41,13 @@ HEADERS += \
     capturer/capturer.h \
     dissector/dissector.h \
     mainwindow.h \
-    ui/devicelist.h \
     ui/dialogs/saveorclosefiledialog.h \
     ui/dialogs/stopwithoutanypacket.h \
     ui/dissectoroptions.h \
+    ui/maindisplaywidget/displayinterfaces.h \
+    ui/maindisplaywidget/displayrawdata.h \
+    ui/maindisplaywidget/displaytable.h \
+    ui/maindisplaywidget/displaytree.h \
     ui/statistics/capturefileproperties.h \
     ui/statusbar/displayproportion.h \
     ui/widgets/arp.h \
@@ -54,7 +60,6 @@ HEADERS += \
 
 
 FORMS += \
-    ui/devicelist.ui \
     mainwindow.ui \
     ui/dialogs/saveorclosefiledialog.ui \
     ui/dialogs/stopwithoutanypacket.ui \

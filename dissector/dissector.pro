@@ -117,6 +117,7 @@ HEADERS += \
     units/checksum.h \
     units/converter.h \
     units/device.h \
+    units/dissectorDefaultOptions.h \
     units/keys.h \
     units/tcpinfo.h
 

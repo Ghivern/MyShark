@@ -1,33 +1,33 @@
 #include "dissectoroptions.h"
 #include "ui_dissectoroptions.h"
 
+#include "../../dissector/dissres/dissectresultbase.h"
 
 
 
+///*默认选项,所有处理的协议均要添加*/
+//QHash<QString,quint64>* DissectorOptions::dissectorOptions = new QHash<QString,quint64>
+//      {
+//            {"frame",
+//                 FRAME_SHOW_NUMBER_OF_BITS | FRAME_GENERATE_EPOCH_TIME
+//            },
 
-/*默认选项,所有处理的协议均要添加*/
-QHash<QString,quint64>* DissectorOptions::dissectorOptions = new QHash<QString,quint64>
-      {
-            {"frame",
-                 FRAME_SHOW_NUMBER_OF_BITS | FRAME_GENERATE_EPOCH_TIME
-            },
+//            {"ether",
 
-            {"ether",
+//            0},
 
-            0},
+//            {"arp",
 
-            {"arp",
+//            6},
 
-            6},
+//            {"ipv4",
 
-            {"ipv4",
+//            7},
 
-            7},
+//            {"tcp",
 
-            {"tcp",
-
-            100}
-      };
+//            100}
+//      };
 
 DissectorOptions::DissectorOptions(QWidget *parent) :
     QDialog(parent),
@@ -36,6 +36,7 @@ DissectorOptions::DissectorOptions(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Options");
     this->setupListWidget();
+    this->dissectorOptions = DissectResultBase::DissectorOptions;
     this->setupWidget();
 }
 
@@ -88,8 +89,8 @@ void DissectorOptions::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void DissectorOptions::on_pushButton_ok_clicked()
 {
-    (*this->dissectorOptions->find("frame")) = this->frame->Result();
-    (*this->dissectorOptions->find("ether")) = this->ether->Result();
+    (*dissectorOptions->find("frame")) = this->frame->Result();
+    (*dissectorOptions->find("ether")) = this->ether->Result();
 
     this->accept();
 }

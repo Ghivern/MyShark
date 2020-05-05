@@ -19,11 +19,6 @@ SaveOrCloseFileDialog::~SaveOrCloseFileDialog()
     delete ui;
 }
 
-int SaveOrCloseFileDialog::exec(){
-    this->status = 0;
-    return QDialog::exec();
-}
-
 void SaveOrCloseFileDialog::SetContentForOpenFile(){
     this->ui->label_question->setText("Do you want to save the captured packets before opening another file?");
 }
@@ -36,40 +31,41 @@ void SaveOrCloseFileDialog::SetContentForQuit(){
     this->ui->label_question->setText("Do you want to save the captured packets before quiting?");
 }
 
+void SaveOrCloseFileDialog::SetContentForClose(){
+    this->ui->label_question->setText("Do you want to save the captured packets before closing the file?");
+}
+
 void SaveOrCloseFileDialog::on_pushButton_continue_without_save_clicked()
 {
     this->status = CONTINUE_WITHOUT_SAVING;
-    emit continueWithoutSave();
     this->accept();
 }
 
 void SaveOrCloseFileDialog::on_pushButton_save_clicked()
 {
     this->status = CONTINUE_WITH_SAVING;
-    emit saveFileBeforeCapture();
     this->reject();
 }
 
 void SaveOrCloseFileDialog::on_pushButton_cancle_clicked()
 {
-    this->status = CANCEL;
     this->reject();
 }
 
 bool SaveOrCloseFileDialog::IsContinueWithoutSaving(){
-    if( this->status == CONTINUE_WITHOUT_SAVING )
+    if( this->status & CONTINUE_WITHOUT_SAVING )
         return true;
     return false;
 }
 
 bool SaveOrCloseFileDialog::IsContinueWithSaving(){
-    if( this->status == CONTINUE_WITH_SAVING )
+    if( this->status & CONTINUE_WITH_SAVING )
         return true;
     return false;
 }
 
 bool SaveOrCloseFileDialog::IsCancel(){
-    if( this->status == CANCEL )
+    if( this->status & CANCEL )
         return true;
     return false;
 }

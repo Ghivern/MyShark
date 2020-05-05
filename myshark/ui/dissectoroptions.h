@@ -9,6 +9,8 @@
 #include "./widgets/ether.h"
 #include "./widgets/arp.h"
 
+#include "../../dissector/units/dissectorDefaultOptions.h"
+
 namespace Ui {
 class DissectorOptions;
 }
@@ -18,7 +20,7 @@ class DissectorOptions : public QDialog
     Q_OBJECT
 
 public:
-    static QHash<QString,quint64> *dissectorOptions;
+    //static QHash<QString,quint64> *dissectorOptions;
 
 
     explicit DissectorOptions(QWidget *parent = nullptr);
@@ -32,6 +34,8 @@ private:
     Ui::DissectorOptions *ui;
 
     QVBoxLayout *Vlayout;
+
+    QHash<QString,quint64>* dissectorOptions;
 
     Frame *frame;
     Arp *arp;

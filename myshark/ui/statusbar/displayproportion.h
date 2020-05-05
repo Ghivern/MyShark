@@ -15,9 +15,15 @@ public:
     explicit DisplayProportion(QWidget *parent = nullptr);
     ~DisplayProportion();
 
-    void SetData(qint64 allPacketCount,qint64 displayedPacketClunt);
+    void SetDefaultInfo();
+
+
+public slots:
+    void slot_setData(qint32 displayedPacketCount,qint32 allPacketCount);
 
 private:
+    void setData(qint32 displayedPacketCount,qint32 allPacketCount);
+
     Ui::DisplayProportion *ui;
 };
 
