@@ -187,18 +187,22 @@ public:
     /*获得协议首部位置或值的方法*/
     const quint8* GetVersionHeaderLengthPtr();
     quint8 GetVersion();
+    QString GetVersionDotStr();
     /*以四字节为单位*/
     quint8 GetHeaderLength();
+    QString GetHeaderLengthDotStr();
 
     const quint8* GetDifferentiatedServicePrt();
     QString GetDifferentiatedServiceStr();
 
     /*bit0~1*/
     quint8 GetDSField_ECN();
+    QString GetDSField_ECN_DotStr();
     QString GetDSFField_ECN_short_meaning();
     QString GetDSField_ECN_meanning();
     /*bit2~7*/
     quint8 GetDSField_DSCP();
+    QString GetDSField_DSCP_DotStr();
     QString GetDSField_DSCP_short_meaning();
     QString GetDSField_DSCP_meanning();
 
@@ -213,14 +217,18 @@ public:
     const quint8* GetFlagOffsetPtr();
     QString GetFlagOffsetStr();
     bool Reserve();
+    QString GetReserveDotStr();
     QString Reserve_meaning();
     /*Don't fragment*/
     bool DF();
+    QString GetDFDotStr();
     QString DF_meaning();
     /*More fragment*/
     bool MF();
+    QString GetMFDotStr();
     QString MF_meaning();
     quint16 GetFragmentOffset();
+    QString GetFragmentOffsetDotStr();
 
     const quint8* GetTimeToLivePtr();
     quint8 GetTimeToLive();
@@ -260,9 +268,6 @@ private:
     static Stream stream;
 
     struct header_t *header;
-//    DissectResultBase *dissectResultBase;
-//    void *protocol_family_transport_layer;
-
 };
 
 }

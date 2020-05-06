@@ -7,8 +7,10 @@
 #include "pcap.h"
 #include "../units/tcpinfo.h"
 
-#include "../units/dissectorDefaultOptions.h"
 
+#define FRAME_GENERATE_EPOCH_TIME 0x0001
+#define FRAME_SHOW_NUMBER_OF_BITS 0x0002
+#define FRAME_GENERATE_MD5_HASH   0x0004
 
 
 /*
@@ -20,12 +22,7 @@
 class DissectResultBase
 {
 public:
-    static QHash<QString,quint64>* DissectorOptions;
 
-    static qint32 InterfaceId;
-    static QString InterfaceName;
-    static qint32 linklayerType;
-    static QString linklayerTypeName;
 
     DissectResultBase(const quint8 *data,const pcap_pkthdr *pkther, qint64 index);
     ~DissectResultBase();
@@ -44,6 +41,7 @@ public:
     QString GetTopProtocolName();
     QString GetProtocolNameByIndex(qint32 index);
     QString GetProtocolsInFrame();
+    QString GetNextProtocolName(QString currentProtocolName);
     const quint8* GetProtocolHeaderStartPtrByName(QString protocolName);
     qint64 GetProtocolHeaderStartPositionByName(QString protocolName);
     const quint8* GetProtocolHeaderEndPtrByName(QString protocolName);
@@ -69,10 +67,23 @@ public:
     void AddAdditional(QString name,TcpInfo &tcpInfo);
     TcpInfo& GetAdditional(QString name);
 
-    void SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName);
+    static void SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName);
+    static qint32 GetInterfaceId();
+    static QString GetInterfaceName();
+    static qint32 GetLinklayerType();
+    static QString GetLinklayerTypeName();
+    static QHash<QString,quint64>* GetDissectorOptionPtr();
+
 
 
 private:
+    static QHash<QString,quint64>* dissectorOptions;
+
+    static qint32 interfaceId;
+    static QString interfaceName;
+    static qint32 linklayerType;
+    static QString linklayerTypeName;
+
     typedef struct position_t{
         qint32 start;
         qint32 end;

@@ -13,6 +13,8 @@ public:
 
     static quint8 GetBitFromOctetPtr(quint8 *data,qint32 position);
 
+    static QString GetDotStrFormOctetPtr(quint8 *data,qint32 star = -1,qint32 end = -1);
+
 private:
     quint64 data;
 };

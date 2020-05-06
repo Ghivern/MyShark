@@ -219,7 +219,10 @@ void MainWindow::on_actionRestart_triggered(){
 }
 
 void MainWindow::on_actionOpen_triggered(){
-    QString path = QFileDialog::getOpenFileName(nullptr,"Save file",QDir::currentPath(),"pcap(*.pcap)");
+    QString path = QFileDialog::getOpenFileName(nullptr
+                                                ,"Save file"
+                                                ,QDir::currentPath()
+                                                ,"all(*.*);;pcap(*.pcap);;pcapng(*.pcapng)");
     if( !path.isEmpty() ){
         if( this->capturer->slot_startThread(path,true) ){
             this->ui->tableWidget->Clear();

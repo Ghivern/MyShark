@@ -20,9 +20,9 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
 
     this->dealTcpOptions();
 
-    QList<void*> *list = (QList<void*>*)reserves;
-    QHash<QString,quint64> *hash = (QHash<QString,quint64>*)list->at(0);
-    qDebug() << "Tcp的测试选项" << hash->value("tcp");
+//    QList<void*> *list = (QList<void*>*)reserves;
+//    QHash<QString,quint64> *hash = (QHash<QString,quint64>*)list->at(0);
+    qDebug() << "Tcp的测试选项" << DissectResultBase::GetDissectorOptionPtr()->value("tcp");
 
     dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
     dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);

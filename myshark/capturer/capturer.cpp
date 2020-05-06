@@ -9,7 +9,7 @@
 Capturer::Capturer(){
     this->capHandle = nullptr;
     this->tempfile = nullptr;
-    this->dissectorOptions = DissectResultBase::DissectorOptions;
+    this->dissectorOptions = DissectResultBase::GetDissectorOptionPtr();
     this->dumper = nullptr;
     this->tempFileHaveBeenSaved = false;
 }
@@ -80,22 +80,22 @@ void Capturer::run(){
     struct pcap_pkthdr *pkthdr;
     qint64 index = 0;
     qint32 res;
-    QList<void*> *reserves = new QList<void*> {dissectorOptions};
+//    QList<void*> *reserves = new QList<void*> {dissectorOptions};
     this->dissectResultFrameList.clear();
     this->tempFileHaveBeenSaved = false;
+    DissectResultBase::SetInterfaceInfo(this->capHandle->GetDeviceIndex()
+                                        ,this->capHandle->GetDeviceName()
+                                        ,this->capHandle->GetLinkType()
+                                        ,this->capHandle->GetLinkTypeName());
     while(true){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
-//            qDebug() << "抓取成功";
             switch (this->capHandle->GetLinkType()) {
             case 1:
             {
-                //dissRes = new DissResEth(index);
                 this->dissectResultFrameList.append(new DissectResultFrame(raw,pkthdr,index
-                    ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,reserves));
+                    ,DissectResultFrame::PROTOCOL_FAMILY_TYPE::TCP_IP_PROTOCOL_FAMILY,nullptr));
                 this->dumper->Dump(pkthdr,raw);
-//                if( index %10 == 0 )
                 this->dumper->Flush();
-                //this->tempfile->flush();
                 emit onePacketCaptured(this->dissectResultFrameList.at(index));
                 index++;
                 break;

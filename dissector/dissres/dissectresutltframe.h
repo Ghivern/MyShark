@@ -9,17 +9,6 @@
 #include "./dissectresult.h"
 #include "./dissectresultbase.h"
 #include "./tcp_ip_protocol_family/dissectresultlinklayer.h"
-//#include "./tcp_ip_protocol_family/dissectresultarp.h"
-//#include "./tcp_ip_protocol_family/dissectresultipv4.h"
-//#include "./tcp_ip_protocol_family/dissectresultipv6.h"
-//#include "./tcp_ip_protocol_family/dissectresultudp.h"
-//#include "./tcp_ip_protocol_family/dissectresulttcp.h"
-//#include "./tcp_ip_protocol_family/dissectresulthttp.h"
-
-
-//#define FRAME_GENERATE_EPOCH_TIME 0x0001
-//#define FRAME_SHOW_NUMBER_OF_BITS 0x0002
-//#define FRAME_GENERATE_MD5_HASH   0x0004
 
 class DissectResultFrame
 {

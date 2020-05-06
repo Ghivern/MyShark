@@ -5,11 +5,12 @@
 Frame::Frame(ProTree *proTree,DissectResultFrame *dissectResultFrame,void *reserves)
 {
     Q_UNUSED(reserves)
-    quint64 option = DissectResultBase::DissectorOptions->value("frame");
-    qint32 interfaceId = DissectResultBase::InterfaceId;
-    QString interfaceName(DissectResultBase::InterfaceName);
-    qint32 linklayer = DissectResultBase::linklayerType;
-    QString linklayerName(DissectResultBase::linklayerTypeName);
+
+    quint64 option = DissectResultBase::GetDissectorOptionPtr()->value("frame");
+    qint32 interfaceId = DissectResultBase::GetInterfaceId();
+    QString interfaceName(DissectResultBase::GetInterfaceName());
+    qint32 linklayer = DissectResultBase::GetLinklayerType();
+    QString linklayerName(DissectResultBase::GetLinklayerTypeName());
 
 
     /*Summery*/

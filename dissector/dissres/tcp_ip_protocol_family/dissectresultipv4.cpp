@@ -69,8 +69,24 @@ quint8 DissectResultIpv4::GetVersion(){
     return (*this->header->version_hdrLen & 0xf0) >> 4;
 }
 
+QString DissectResultIpv4::GetVersionDotStr(){
+    return QString("%1%2%3%4 ....")
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,7))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,6))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,5))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,4));
+}
+
 quint8 DissectResultIpv4::GetHeaderLength(){
     return *this->header->version_hdrLen & 0x0f;
+}
+
+QString DissectResultIpv4::GetHeaderLengthDotStr(){
+    return QString(".... %1%2%3%4")
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,3))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,2))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,1))
+            .arg(Bit::GetBitFromOctetPtr(this->header->version_hdrLen,0));
 }
 
 /*Differentiated Service*/
@@ -80,6 +96,10 @@ const quint8* DissectResultIpv4::GetDifferentiatedServicePrt(){
 
 quint8 DissectResultIpv4::GetDSField_ECN(){
     return *this->header->DS & 0x03;
+}
+
+QString DissectResultIpv4::GetDSField_ECN_DotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->DS,0,1);
 }
 
 QString DissectResultIpv4::GetDSFField_ECN_short_meaning(){
@@ -92,6 +112,10 @@ QString DissectResultIpv4::GetDSField_ECN_meanning(){
 
 quint8 DissectResultIpv4::GetDSField_DSCP(){
     return (*this->header->DS & 0xfc) >> 2;
+}
+
+QString DissectResultIpv4::GetDSField_DSCP_DotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->DS,2,7);
 }
 
 QString DissectResultIpv4::GetDSField_DSCP_short_meaning(){
@@ -147,6 +171,10 @@ bool DissectResultIpv4::Reserve(){
     return false;
 }
 
+QString DissectResultIpv4::GetReserveDotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->flag_offset,7,7).append(" .... ....");
+}
+
 QString DissectResultIpv4::Reserve_meaning(){
     if(this->Reserve())
         return "Set";
@@ -159,6 +187,10 @@ bool DissectResultIpv4::DF(){
     return false;
 }
 
+QString DissectResultIpv4::GetDFDotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->flag_offset,6,6).append(" .... ....");
+}
+
 QString DissectResultIpv4::DF_meaning(){
     if(this->DF())
         return "Set";
@@ -169,6 +201,10 @@ bool DissectResultIpv4::MF(){
     if(Bit::GetBitFromOctetPtr(this->header->flag_offset,5))
         return true;
     return false;
+}
+
+QString DissectResultIpv4::GetMFDotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->flag_offset,5,5).append(" .... ....");
 }
 
 QString DissectResultIpv4::MF_meaning(){
@@ -185,6 +221,11 @@ quint16 DissectResultIpv4::GetFragmentOffset(){
     return ntohs(res) >> 3;
 }
 
+QString DissectResultIpv4::GetFragmentOffsetDotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->flag_offset,0,4)
+            + " "
+            + Bit::GetDotStrFormOctetPtr(this->header->flag_offset + 1,0,7);
+}
 
 /*Time To Live*/
 const quint8* DissectResultIpv4::GetTimeToLivePtr(){

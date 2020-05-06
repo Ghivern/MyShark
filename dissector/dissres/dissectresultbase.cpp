@@ -1,7 +1,7 @@
 #include "dissectresultbase.h"
 
 
-QHash<QString,quint64>* DissectResultBase::DissectorOptions = new QHash<QString,quint64>
+QHash<QString,quint64>* DissectResultBase::dissectorOptions = new QHash<QString,quint64>
       {
             {"frame",
                  FRAME_SHOW_NUMBER_OF_BITS | FRAME_GENERATE_EPOCH_TIME
@@ -24,8 +24,8 @@ QHash<QString,quint64>* DissectResultBase::DissectorOptions = new QHash<QString,
             100}
       };
 
-qint32 DissectResultBase::InterfaceId = -1;
-QString DissectResultBase::InterfaceName = "";
+qint32 DissectResultBase::interfaceId = -1;
+QString DissectResultBase::interfaceName = "";
 qint32 DissectResultBase::linklayerType = -1;
 QString DissectResultBase::linklayerTypeName = "";
 
@@ -121,6 +121,19 @@ QString DissectResultBase::GetProtocolsInFrame(){
             protocolsInFrame.append(":");
     }
     return protocolsInFrame;
+}
+
+QString DissectResultBase::GetNextProtocolName(QString currentProtocolName){
+    if( this->protocolList.contains(currentProtocolName) ){
+        qint32 index = this->protocolList.indexOf(currentProtocolName);
+        if( index+ 1 < this->protocolList.length() )
+            return this->protocolList.at(index + 1);
+        else
+            return "Non-Nextlayer or Non-Nextlayer-Dissector";
+    }else{
+        return "Non-Current-Protocol";
+    }
+
 }
 
 const quint8* DissectResultBase::GetProtocolHeaderStartPtrByName(QString protocolName){
@@ -237,10 +250,30 @@ TcpInfo& DissectResultBase::GetAdditional(QString name){
 
 
 void DissectResultBase::SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName){
-    DissectResultBase::InterfaceId = interfaceId;
-    DissectResultBase::InterfaceName.clear();
-    DissectResultBase::InterfaceName.append(interfaceName);
+    DissectResultBase::interfaceId = interfaceId;
+    DissectResultBase::interfaceName.clear();
+    DissectResultBase::interfaceName.append(interfaceName);
     DissectResultBase::linklayerType = linklayer;
     DissectResultBase::linklayerTypeName.clear();
     DissectResultBase::linklayerTypeName.append(linklayerName);
+}
+
+qint32 DissectResultBase::GetInterfaceId(){
+    return DissectResultBase::interfaceId;
+}
+
+QString DissectResultBase::GetInterfaceName(){
+    return DissectResultBase::interfaceName;
+}
+
+qint32 DissectResultBase::GetLinklayerType(){
+    return DissectResultBase::linklayerType;
+}
+
+QString DissectResultBase::GetLinklayerTypeName(){
+    return DissectResultBase::linklayerTypeName;
+}
+
+QHash<QString,quint64>* DissectResultBase::GetDissectorOptionPtr(){
+    return DissectResultBase::dissectorOptions;
 }
