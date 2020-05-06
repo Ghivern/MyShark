@@ -4,6 +4,8 @@
 #include "../../protree/protree.h"
 #include "../../dissres/dissectresutltframe.h"
 
+#include "../../units/checksum2.h"
+
 class Ipv4
 {
 public:

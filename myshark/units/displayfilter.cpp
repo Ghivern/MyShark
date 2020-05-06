@@ -38,10 +38,11 @@ bool DisplayFilter::FilterIsValied(QString filterStr){
 }
 
 bool DisplayFilter::Filte(DissectResultFrame *frame){
+    TcpInfo &tcpInfo = *(TcpInfo*)frame->GetDissectResultBase()->GetAdditionalVal(TCP_INFO_PTR);
     this->mutex.tryLock();
     if( !this->filterStr.isEmpty() ){
         if( frame->GetDissectResultBase()->ContainProtocol("tcp")
-                && qAbs(frame->GetDissectResultBase()->GetAdditionalVal(TCP_STREAM)) - 1 == this->filterStr.toInt()){
+                && qAbs(tcpInfo.streamPlusOne) - 1 == this->filterStr.toInt()){
             this->displayedCount++;
             this->mutex.unlock();
             return true;

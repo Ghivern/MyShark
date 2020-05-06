@@ -3,6 +3,7 @@
 Ipv4::Ipv4(ProTree *proTree,tcp_ip_protocol_family::DissectResultIpv4 *dissectResultIpv4,void *reserves)
 {
     Q_UNUSED(reserves)
+    quint64 options = DissectResultBase::GetDissectorOptionPtr()->value("ipv4");
 
     // Summery
     qint32 start = dissectResultIpv4->GetDissectResultBase()->GetProtocolHeaderStartPositionByName("ipv4");
@@ -149,4 +150,45 @@ Ipv4::Ipv4(ProTree *proTree,tcp_ip_protocol_family::DissectResultIpv4 *dissectRe
                                  ,tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_FIELD_LENGTH_TYPE
                                  ,true);
 
+
+    // Summery - Checksum
+    proTree->AddCurrentLayerItem("ipv4"
+                                 ,QString("Header checksum: %1")
+                                 .arg(dissectResultIpv4->GetChecksumStr())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_FIELD_LENGTH_HEADERCHECKSUM
+                                 ,true);
+
+    if( (options & IPV4_VALIDATE_CHECKSUM) && reserves != nullptr){
+
+        bool equal =  dissectResultIpv4->GetChecksumStr() == dissectResultIpv4->GetCalculatedChecksumStr();
+        // Summery - Checksum Status
+        proTree->AddItem("ipv4"
+                         ,QString("[Calculated checksum status: %1]")
+                         .arg(equal ? "Good" : "Bad")
+                         ,ProTree::level::CURRENT);
+
+        // Summery - Calculated Checksum
+        proTree->AddItem("ipv4"
+                         ,QString("[Calculated checksum: %1]")
+                         .arg(dissectResultIpv4->GetCalculatedChecksumStr())
+                         ,ProTree::level::CURRENT);
+
+    }
+
+    // Summery - Source
+    proTree->AddCurrentLayerItem("ipv4"
+                                 ,QString("Source: %1")
+                                 .arg(dissectResultIpv4->GetSourceAddressStr())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR
+                                 ,true);
+
+    // Summery - Destination
+    proTree->AddCurrentLayerItem("ipv4"
+                                 ,QString("Destination: %1")
+                                 .arg(dissectResultIpv4->GetDestinationAddressStr())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR
+                                 ,true);
 }

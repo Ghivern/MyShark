@@ -24,32 +24,32 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
 //    QHash<QString,quint64> *hash = (QHash<QString,quint64>*)list->at(0);
     qDebug() << "Tcp的测试选项" << DissectResultBase::GetDissectorOptionPtr()->value("tcp");
 
-    dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
-    dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);
-    dissectResultBase->AddAdditional(TCP_ISFIN,this->FIN()?1:0);
-    dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
-    dissectResultBase->AddAdditional(TCP_SEQ_VAL,this->GetSeq());
-    dissectResultBase->AddAdditional(TCP_ACK_VAL,this->GetAck());
-    dissectResultBase->AddAdditional(TCP_PAYLOAD_LEN,this->GetPayloadLen());
-    dissectResultBase->AddAdditional(TCP_WINDOW,this->GetWindow());
-    dissectResultBase->AddAdditional(TCP_WINDOW_SCALE,this->GetOptionWindowScale());
-    dissectResultBase->AddAdditional(TCP_WINDOW_MULTIPLIER,this->GetOptionWindowMultiplier());
+//    dissectResultBase->AddAdditional(TCP_ISSYN,this->SYN()?1:0);
+//    dissectResultBase->AddAdditional(TCP_ISRST,this->RST()?1:0);
+//    dissectResultBase->AddAdditional(TCP_ISFIN,this->FIN()?1:0);
+//    dissectResultBase->AddAdditional(TCP_ISACK,this->ACK()?1:0);
+//    dissectResultBase->AddAdditional(TCP_SEQ_VAL,this->GetSeq());
+//    dissectResultBase->AddAdditional(TCP_ACK_VAL,this->GetAck());
+//    dissectResultBase->AddAdditional(TCP_PAYLOAD_LEN,this->GetPayloadLen());
+//    dissectResultBase->AddAdditional(TCP_WINDOW,this->GetWindow());
+//    dissectResultBase->AddAdditional(TCP_WINDOW_SCALE,this->GetOptionWindowScale());
+//    dissectResultBase->AddAdditional(TCP_WINDOW_MULTIPLIER,this->GetOptionWindowMultiplier());
 
-    TcpInfo tcpInfo;
-    tcpInfo.SYN = this->SYN();
-    tcpInfo.FIN = this->FIN();
-    tcpInfo.RST = this->RST();
-    tcpInfo.ACK = this->ACK();
-    tcpInfo.ack = this->GetAck();
-    tcpInfo.seq = this->GetSeq();
-    tcpInfo.segLen = this->GetPayloadLen();
-    tcpInfo.windowVal = this->GetWindow();
-    tcpInfo.windowSclae = this->GetOptionWindowScale();
-    tcpInfo.time.tv_sec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_sec;
-    tcpInfo.time.tv_usec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_usec;
-    tcpInfo.echoReplayTime.tv_sec = (__time_t)this->GetOptionTimestampEchoReply();
-    tcpInfo.echoReplayTime.tv_usec = 0;
-    dissectResultBase->AddAdditional(TCP_INFO,tcpInfo);
+//    TcpInfo tcpInfo;
+//    tcpInfo.SYN = this->SYN();
+//    tcpInfo.FIN = this->FIN();
+//    tcpInfo.RST = this->RST();
+//    tcpInfo.ACK = this->ACK();
+//    tcpInfo.ack = this->GetAck();
+//    tcpInfo.seq = this->GetSeq();
+//    tcpInfo.segLen = this->GetPayloadLen();
+//    tcpInfo.windowVal = this->GetWindow();
+//    tcpInfo.windowSclae = this->GetOptionWindowScale();
+//    tcpInfo.time.tv_sec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_sec;
+//    tcpInfo.time.tv_usec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_usec;
+//    tcpInfo.echoReplayTime.tv_sec = (__time_t)this->GetOptionTimestampEchoReply();
+//    tcpInfo.echoReplayTime.tv_usec = 0;
+//    dissectResultBase->AddAdditional(TCP_INFO,tcpInfo);
 
     TcpInfo *tcpInfo_ptr = new TcpInfo;
     tcpInfo_ptr->SYN = this->SYN();
@@ -78,16 +78,19 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
 //                         ,this->GetDestinationPortPtr()
 //                         ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
 //                         );
+    Ipv4Info *ipv4Info = (Ipv4Info*)this->GetDissectResultBase()->GetAdditionalPtr(IPV4_INFO_PTR);
     this->SetStremIndexPlusOne( stream2.AddWithWindow(dissectResultBase
-                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_SOURCE_ADDRESS_PTR)
-                         ,(quint8*)dissectResultBase->GetAdditionalPtr(IP_DESTINATION_ADDRESS_PTR)
-                         ,dissectResultBase->GetAdditionalVal(IP_ADDRESS_LENGTH)
+                         ,ipv4Info->src
+                         ,ipv4Info->dst
+                         ,ipv4Info->addrLen
                          ,this->GetSourcePortPtr()
                          ,this->GetDestinationPortPtr()
                          ,TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT
                          ));
 
-    dissectResultBase->AddAdditional(TCP_STREAM,this->GetStreamIndexPlusOne());
+
+    tcpInfo_ptr->streamPlusOne = this->GetStreamIndexPlusOne();
+    //dissectResultBase->AddAdditional(TCP_STREAM,this->GetStreamIndexPlusOne());
 
     dissectResultBase->SetSummery(QString("%1 -> %2").arg(this->GetSourcePort()).arg(this->GetDestinationPort()));
     dissectResultBase->SetSummery(QString("%1 Window scale:%2 maxSeg:%3 tval:%4 ter:%5 %6 win:%7 c-win:%8")
@@ -175,7 +178,9 @@ quint8 DissectResultTcp::GetOffset(){
 }
 
 quint32 DissectResultTcp::GetPayloadLen(){
-    return this->GetDissectResultBase()->GetAdditionalVal(TCP_TOTAL_LEN) - this->GetOffset() * 4;
+//    TcpInfo *tcpInfo = (TcpInfo*)this->GetDissectResultBase()->GetAdditionalPtr()
+    Ipv4Info *ipv4Info = (Ipv4Info*)this->GetDissectResultBase()->GetAdditionalPtr(IPV4_INFO_PTR);
+    return ipv4Info->payloadLen - this->GetOffset() * 4;
 }
 
 /*Flags*/
@@ -364,10 +369,11 @@ QString DissectResultTcp::GetSegmentStatusStr(){
     if( status & TCP_A_KEEP_ALIVE_ACK )
         str.append(tcp_segment_status_vals.value(TCP_A_KEEP_ALIVE_ACK)).append("-");
 
+    TcpInfo *tcpInfo = (TcpInfo*)this->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR);
     if ( (status & TCP_A_DUPLICATE_ACK) && !(status & TCP_A_KEEP_ALIVE_ACK) && !(status & TCP_A_KEEP_ALIVE) ){
         str.append(tcp_segment_status_vals.value(TCP_A_DUPLICATE_ACK)
-                   .arg(this->GetDissectResultBase()->GetAdditional(TCP_INFO).dupack_frame)
-                   .arg(this->GetDissectResultBase()->GetAdditional(TCP_INFO).dupack_num));
+                   .arg(tcpInfo->dupack_frame)
+                   .arg(tcpInfo->dupack_num));
     }
 
     if( status & TCP_A_ACK_LOST_PACKET ){
@@ -401,7 +407,8 @@ QString DissectResultTcp::GetSegmentStatusStr(){
 *取得分片的前一分片的包Index，若无前一个分片，或此分片长度为0，返回-1
 */
 qint64 DissectResultTcp::GetPrevious(){
-    return this->GetDissectResultBase()->GetAdditionalVal(TCP_PRE_SEGMENT);
+    //return this->GetDissectResultBase()->GetAdditionalVal(TCP_PRE_SEGMENT);
+    return 0;
 }
 
 

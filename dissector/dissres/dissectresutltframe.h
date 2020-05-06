@@ -6,8 +6,10 @@
 #include <arpa/inet.h>
 #include "pcap.h"
 
-#include "./dissectresult.h"
 #include "./dissectresultbase.h"
+
+#include "./dissectresult.h"
+
 #include "./tcp_ip_protocol_family/dissectresultlinklayer.h"
 
 class DissectResultFrame

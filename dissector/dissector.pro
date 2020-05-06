@@ -59,12 +59,13 @@ SOURCES += \
     stream/streamindex.cpp \
     stream/streamitem.cpp \
     stream/streamrecorder.cpp \
-    stream/streamtcp.cpp \
     stream/streamtcp2.cpp \
     units/bit.cpp \
     units/checksum.cpp \
+    units/checksum2.cpp \
     units/converter.cpp \
     units/device.cpp \
+    units/ipv4info.cpp \
     units/tcpinfo.cpp
 
 HEADERS += \
@@ -111,12 +112,13 @@ HEADERS += \
     stream/streamindex.h \
     stream/streamitem.h \
     stream/streamrecorder.h \
-    stream/streamtcp.h \
     stream/streamtcp2.h \
     units/bit.h \
     units/checksum.h \
+    units/checksum2.h \
     units/converter.h \
     units/device.h \
+    units/ipv4info.h \
     units/keys.h \
     units/tcpinfo.h
 

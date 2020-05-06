@@ -1,7 +1,6 @@
 #include "displaytable.h"
 
-#include <QHeaderView>
-#include <QTableWidgetItem>
+
 
 DisplayTable::DisplayTable(QWidget *parent) : QTableWidget(parent)
 {

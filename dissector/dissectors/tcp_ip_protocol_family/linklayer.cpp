@@ -2,10 +2,9 @@
 
 Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkLayer *dissectResultLinklayer,void *reserves)
 {
-    Q_UNUSED(reserves)
     QString linklayerTypeName(DissectResultBase::GetLinklayerTypeName());
     quint64 dissectorOption = DissectResultBase::GetDissectorOptionPtr()->value("ether");
-
+    Q_UNUSED(dissectorOption)
     Q_UNUSED(reserves)
         /*LinkLayer处理代码*/
         Q_UNUSED(dissectResultLinklayer)
@@ -118,14 +117,14 @@ Linklayer::Linklayer(ProTree *proTree,tcp_ip_protocol_family::DissectResultLinkL
                      ,true
                      );
 
-    //测试解析选项
-    proTree->AddCurrentLayerItem("ether",
-                                 QString("Validate ethernet fcs ? %1")
-                                 .arg(((dissectorOption & ETHERNET_VALIDATE_FCS) ? "YES":"NO"))
-                                 ,&start
-                                 ,tcp_ip_protocol_family::DissectResultLinkLayer::LINKLAYER_FIELD_LENGTH_TYPE
-                                 ,false
-                                 );
+//    //测试解析选项
+//    proTree->AddCurrentLayerItem("ether",
+//                                 QString("Validate ethernet fcs ? %1")
+//                                 .arg(((dissectorOption & ETHERNET_VALIDATE_FCS) ? "YES":"NO"))
+//                                 ,&start
+//                                 ,tcp_ip_protocol_family::DissectResultLinkLayer::LINKLAYER_FIELD_LENGTH_TYPE
+//                                 ,false
+//                                 );
 
     // Summery
     proTree->Pop();

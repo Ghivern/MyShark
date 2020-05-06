@@ -2,20 +2,13 @@
 #define DISSECTRESULTTCP_H
 
 #include <QtMath>
-
 #include "arpa/inet.h"
-
-//#include "../../units/keys.h"
-#include "../../units/converter.h"
-
-#include "../../stream/stream.h"
-//#include "../../stream/streamtcp.h"
 
 #include "../../stream/streamtcp2.h"
 
 #include "../dissectresultbase.h"
+
 #include "../dissectresult.h"
-#include "../dissectresultcommonstream.h"
 
 #include "./dissectresulthttp.h"
 

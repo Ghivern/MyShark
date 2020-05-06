@@ -5,12 +5,16 @@
 #include <QThread>
 #include <QMutex>
 #include <QTemporaryFile>
+#include <QFileDialog>
+#include <QMessageBox>
 
+#include "../ui/dialogs/saveorclosefiledialog.h"
+#include "../ui/dialogs/stopwithoutanypacket.h"
 
 #include "../units/caphandle.h"
 #include "../units/dumper.h"
 
-#include "../../dissector/dissres/dissreseth.h"
+//#include "../../dissector/dissres/dissreseth.h"
 
 #include "../dissector/dissres/dissectresutltframe.h"
 

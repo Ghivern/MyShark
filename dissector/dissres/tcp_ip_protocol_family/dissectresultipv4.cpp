@@ -8,58 +8,46 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *
         :DissectResult(dissectResultBase)
 {
     Q_UNUSED(reserves)
-//    this->protocol_family_transport_layer = NULL;
-//    this->SetDissectResultBase(dissectResultBase);
-//    this->dissectResultBase = dissectResultBase;
+    quint64 options = DissectResultBase::GetDissectorOptionPtr()->value("ipv4");
     dissectResultBase->PushToProtocolList("ipv4",NETWORKLAYER_IPV4_FIELD_LENGTH_TEMP_TOTAL_LEN);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("ipv4");
+
     if(this->header != NULL){
         dissectResultBase->UpdateProtocolList("ipv4",this->GetHeaderLength() * 4);
         dissectResultBase->UpdateProtocolHeaderLengthCount(this->GetHeaderLength() * 4);
+
+        /*填充Ipv4Info*/
+        Ipv4Info *ipv4Info = new Ipv4Info;
+        ipv4Info->header = (quint8*)this->header;
+        ipv4Info->headerLen = this->GetHeaderLength() * 4;
+        ipv4Info->payloadLen = this->GetTotalLength() - this->GetHeaderLength() * 4;
+        ipv4Info->src = header->srcaddr;
+        ipv4Info->dst = header->dstaddr;
+        ipv4Info->addrLen = NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR;
+        dissectResultBase->AddAdditional(IPV4_INFO_PTR,ipv4Info);
+
+        if( options & IPV4_VALIDATE_CHECKSUM ){
+            Checksum2 checksum2(dissectResultBase,"ipv4");
+            this->calculatedChecksum = checksum2.GetCalculateChecksumStr();
+            if( this->calculatedChecksum != this->GetChecksumStr() )
+                ipv4Info->status |= IPV4_A_BAD_CHECKSUM;
+        }else{
+            this->calculatedChecksum = "";
+        }
+
         this->SetStremIndexPlusOne( DissectResultIpv4::stream
                                     .Add(dissectResultBase,header->srcaddr,header->dstaddr
-                                         ,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR));
+                                    ,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR));
 
         this->addNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type,reserves);
     }
 
-    if(dissectResultBase->GetPkthdr()->caplen - dissectResultBase->GetAdditionalVal("linklayer_have_fcs") - this->GetTotalLength() < 4)
-        *((bool*)dissectResultBase->GetAdditionalPtr("linklayer_have_fcs")) = false;
-    dissectResultBase->RemoveAdditional("linklayer_have_fcs");
+//    if(dissectResultBase->GetPkthdr()->caplen - dissectResultBase->GetAdditionalVal("linklayer_have_fcs") - this->GetTotalLength() < 4)
+//        *((bool*)dissectResultBase->GetAdditionalPtr("linklayer_have_fcs")) = false;
+//    dissectResultBase->RemoveAdditional("linklayer_have_fcs");
 }
 
 
-
-//void* DissectResultIpv4::GetNextLayer(){
-//    return this->protocol_family_transport_layer;
-//}
-
-//DissectResultBase* DissectResultIpv4::GetDissectResultBase(){
-//    return this->dissectResultBase;
-//}
-
-/*
- *  以下均是解析Ipv4首部字段的方法,调用前提是，this->header已经被正确赋值
- *
- *0                   1          |        2                   3
- *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
- *Version|Hdr Len|   DS          |     total length              |
- *   identification              |flag | offset                  |
- *   ttl         | protocol      |    header checksum            |
- *                src address                                    |
- *                dst address                                    |
- * options            .  padding                                 |
- *                    data                                       |
- *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
- * 他
- * Hdr Len :单位是4字节
- * DS: Differntiated Service   RFC 2474 3168 3260
- * DS: bit0~1 ECT ;bit2~7 DSCP
- * offset:  片偏移
- * ttl : time to live
- * 考虑到Ipv4的首部拓展很少使用，所以暂时不做处理
- */
 /*Version-HeaderLength*/
 const quint8* DissectResultIpv4::GetVersionHeaderLengthPtr(){
     return this->header->version_hdrLen;
@@ -265,6 +253,10 @@ QString DissectResultIpv4::GetChecksumStr(){
     return Converter::ConvertQuint8ArrayToHexStr(this->header->headerchecksum,NETWORKLAYER_IPV4_FIELD_LENGTH_HEADERCHECKSUM);
 }
 
+QString DissectResultIpv4::GetCalculatedChecksumStr(){
+    return this->calculatedChecksum;
+}
+
 /*Source Address*/
 const quint8* DissectResultIpv4::GetSourceAddressPtr(){
     return this->header->srcaddr;
@@ -290,17 +282,11 @@ void DissectResultIpv4::addNextLayer(DissectResultBase *dissectResultBase
     switch (type) {
     case NETWORKLAYER_IPV4_TYPE_TCP:
     {
-        this->GetDissectResultBase()->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_TCP));
-        dissectResultBase->AddAdditional(TCP_TOTAL_LEN,this->GetTotalLength() - this->GetHeaderLength() * 4);
-        dissectResultBase->AddAdditional(IP_SOURCE_ADDRESS_PTR,header->srcaddr);
-        dissectResultBase->AddAdditional(IP_DESTINATION_ADDRESS_PTR,header->dstaddr);
-        dissectResultBase->AddAdditional(IP_ADDRESS_LENGTH,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
         this->SetNextLayer( (void*)(new DissectResultTcp(dissectResultBase,reserves)));
         break;
     }
     case NETWORKLAYER_IPV4_TYPE_UDP:
     {
-        this->GetDissectResultBase()->AddAdditional(IP_PERSUDO_HEADER_PTR,this->producePseudoHeader(NETWORKLAYER_IPV4_TYPE_UDP));
         this->SetNextLayer( (void*)(new DissectResultUdp(dissectResultBase,reserves)));
         break;
     }
@@ -314,12 +300,12 @@ void DissectResultIpv4::addNextLayer(DissectResultBase *dissectResultBase
     }
 }
 
-quint8* DissectResultIpv4::producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
-    quint8 *pseudoHeader = (quint8*)malloc(this->pseudoHeaderLen);
-    memcpy(pseudoHeader,this->header->srcaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2);
-    pseudoHeader[NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2] = 0;
-    pseudoHeader[NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2 + 1] = type;
-    quint16 total_len = this->GetTotalLength() - this->GetHeaderLength() * 4;
-    *(quint16*)(pseudoHeader + NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2 + 2) = htons(total_len);
-    return pseudoHeader;
-}
+//quint8* DissectResultIpv4::producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type){
+//    quint8 *pseudoHeader = (quint8*)malloc(this->pseudoHeaderLen);
+//    memcpy(pseudoHeader,this->header->srcaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2);
+//    pseudoHeader[NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2] = 0;
+//    pseudoHeader[NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2 + 1] = type;
+//    quint16 total_len = this->GetTotalLength() - this->GetHeaderLength() * 4;
+//    *(quint16*)(pseudoHeader + NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR*2 + 2) = htons(total_len);
+//    return pseudoHeader;
+//}

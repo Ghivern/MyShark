@@ -71,7 +71,7 @@ void DisplayRawData::addToRawDataPanel(DissectResultFrame *frame){
             this->setItem(row,col,item);
             if( col == 8 || col == 17 ){
                 if( col == 8 )
-                    item->setData(Qt::UserRole,row * 16 + col + 1);
+                    item->setData(Qt::UserRole,row * 16 + col - 0.5);
                 else
                     item->setData(Qt::UserRole, -1);
             }else if( col < 8 ){
@@ -148,10 +148,10 @@ void DisplayRawData::hightLight(qint32 start, qint32 end)
      */
     qint32 startRow = start / 16;
     qint32 endRow = end / 16;
-    qint32 no;
+    float no;
     for( qint32 row = startRow; row <= endRow; row++ ){
         for( qint32 col = 0; col < this->columnCount(); col++){
-            no = this->item(row,col)->data(Qt::UserRole).toInt();
+            no = this->item(row,col)->data(Qt::UserRole).toFloat();
             if( no >= start && no <= end )
                 this->item(row,col)->setBackground(QColor(0xff00cc));
         }

@@ -2,6 +2,9 @@
 #define DISPLAYTABLE_H
 
 #include <QTableWidget>
+#include <QHeaderView>
+#include <QTableWidgetItem>
+
 #include "../../../dissector/dissres/dissectresutltframe.h"
 
 #include "../../units/displayfilter.h"

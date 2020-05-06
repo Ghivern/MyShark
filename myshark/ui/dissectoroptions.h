@@ -8,6 +8,7 @@
 #include "./widgets/frame.h"
 #include "./widgets/ether.h"
 #include "./widgets/arp.h"
+#include "./widgets/ipv4.h"
 
 //#include "../../dissector/units/dissectorDefaultOptions.h"
 
@@ -36,8 +37,11 @@ private:
     QHash<QString,quint64>* dissectorOptions;
 
     Frame *frame;
-    Arp *arp;
     Ether *ether;
+    Arp *arp;
+    Ipv4 *ipv4;
+
+
 
 
 private slots:

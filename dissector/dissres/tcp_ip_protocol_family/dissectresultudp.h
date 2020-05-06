@@ -1,8 +1,10 @@
 #ifndef DISSECTRESULTUDP_H
 #define DISSECTRESULTUDP_H
 
-#include "../dissectresult.h"
 #include "../dissectresultbase.h"
+
+#include "../dissectresult.h"
+
 
 /*0              |    1          |        2      |             3
  *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1

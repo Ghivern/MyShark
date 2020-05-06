@@ -16,9 +16,9 @@ CheckSum::CheckSum(DissResEth *dissResEth,QString proName,quint16 length, bool w
         this->pseudoHeaderLength = 0;
     }
 
-    if(proName == "tcp")
+    if( proName == "tcp" )
         this->checksum_position = TCP_CHECKSUM_POSITION;
-    else if(proName == "udp")
+    else if( proName == "udp" )
         this->checksum_position = UDP_CHECKSUM_POSITION;
     else
         this->checksum_position = IPV4_CHECKSUM_POSITION;

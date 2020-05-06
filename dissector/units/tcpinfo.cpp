@@ -23,4 +23,6 @@ TcpInfo::TcpInfo()
 
     this->dupack_frame = 0;
     this->dupack_num = 0;
+
+    this->streamPlusOne = 0;
 }

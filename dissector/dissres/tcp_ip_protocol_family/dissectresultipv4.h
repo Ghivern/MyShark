@@ -4,13 +4,12 @@
 #include "arpa/inet.h"
 #include "time.h"
 
-#include "../../units/converter.h"
-#include "../../units/bit.h"
-#include "../../units/keys.h"
+#include "../../units/checksum2.h"
+
+#include "../dissectresultbase.h"
 
 #include "../dissectresult.h"
-#include "../dissectresultcommonstream.h"
-#include "../dissectresultbase.h"
+
 #include "dissectresulttcp.h"
 #include "dissectresultudp.h"
 
@@ -33,6 +32,8 @@
  * 考虑到Ipv4的首部拓展很少使用，所以暂时不做处理
  */
 
+/*Ipv4数据包状态*/
+#define IPV4_A_BAD_CHECKSUM 0X0001
 
 /* Differentiated Services Field. See RFCs 2474, 2597, 2598 and 3168. */
 /*bit0~1 ECN
@@ -165,25 +166,6 @@ public:
     DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves = nullptr);
 
 
-//    void* GetNextLayer();
-//    DissectResultBase* GetDissectResultBase();
-
-
-    /*0                   1          |        2                   3
-     *0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-     *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-     *Version|Hdr Len|   DS          |     total length              |
-     *   identification              |flag | offset                  |
-     *   ttl         | protocol      |    header checksum            |
-     *                src address                                    |
-     *                dst address                                    |
-     * options            .  padding                                 |
-     *                    data                                       |
-     *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-     * flags(3 bit)
-     *  * (Reserved) | * (DF) | * (MF)
-     */
-
     /*获得协议首部位置或值的方法*/
     const quint8* GetVersionHeaderLengthPtr();
     quint8 GetVersion();
@@ -239,6 +221,7 @@ public:
 
     const quint8* GetChecksumPtr();
     QString GetChecksumStr();
+    QString GetCalculatedChecksumStr();
 
     const quint8* GetSourceAddressPtr();
     QString GetSourceAddressStr();
@@ -262,9 +245,11 @@ private:
 
     void addNextLayer(DissectResultBase *dissectResultBase
                       , NETWORKLAYER_IPV4_PROTOCOL_TYPE type,void *reserves = nullptr);
-    quint8* producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
+    //quint8* producePseudoHeader(NETWORKLAYER_IPV4_PROTOCOL_TYPE type);
 
-    const qint32 pseudoHeaderLen = 12;
+    QString calculatedChecksum;
+
+    //const qint32 pseudoHeaderLen = 12;
     static Stream stream;
 
     struct header_t *header;

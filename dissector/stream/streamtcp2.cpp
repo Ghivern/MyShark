@@ -51,7 +51,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
 //    qint32 windowVal = dissectResultBase->GetAdditionalVal(TCP_WINDOW);
 //    qint32 windowScale = dissectResultBase->GetAdditionalVal(TCP_WINDOW_SCALE);
 
-    TcpInfo &tcpInfo = dissectResultBase->GetAdditional(TCP_INFO);
+    //TcpInfo &tcpInfo = dissectResultBase->GetAdditional(TCP_INFO);
     TcpInfo *tcpInfoPtr = (TcpInfo*)dissectResultBase->GetAdditionalPtr(TCP_INFO_PTR);
     bool SYN = tcpInfoPtr->SYN;
     bool FIN = tcpInfoPtr->FIN;
@@ -85,13 +85,13 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             (*this->allWindow.find(streamIndexPlusOne)).flags |= ACK ? TCP_S_SAW_SYNACK : TCP_S_SAW_SYN;
 
             if( SYN && !ACK ){
-                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_sec = tcpInfo.time.tv_sec;
-                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_usec = tcpInfo.time.tv_usec;
+                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_sec = tcpInfoPtr->time.tv_sec;
+                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_usec = tcpInfoPtr->time.tv_usec;
             }
 
             if( SYN && ACK && this->allWindow.value(-streamIndexPlusOne).first_rtt.tv_sec != 0){
-                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_sec = tcpInfo.time.tv_sec -  this->allWindow.value(-streamIndexPlusOne).first_rtt.tv_sec;
-                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_usec = tcpInfo.time.tv_usec -  this->allWindow.value(-streamIndexPlusOne).first_rtt.tv_usec;
+                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_sec = tcpInfoPtr->time.tv_sec -  this->allWindow.value(-streamIndexPlusOne).first_rtt.tv_sec;
+                (*this->allWindow.find(streamIndexPlusOne)).first_rtt.tv_usec = tcpInfoPtr->time.tv_usec -  this->allWindow.value(-streamIndexPlusOne).first_rtt.tv_usec;
 
                 (*this->allWindow.find(-streamIndexPlusOne)).first_rtt.tv_sec = this->allWindow.value(streamIndexPlusOne).first_rtt.tv_sec;
                 (*this->allWindow.find(-streamIndexPlusOne)).first_rtt.tv_usec = this->allWindow.value(streamIndexPlusOne).first_rtt.tv_usec;
@@ -114,14 +114,14 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
     /*TCP_A_ZERO_WINDOW_PROBE*/
     if( segLen == 1 && seq == this->allWindow.value(streamIndexPlusOne).nextSeq
             && this->allWindow.value(-streamIndexPlusOne).windowVal == 0){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW_PROBE);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW_PROBE);
         tcpInfoPtr->status |= TCP_A_ZERO_WINDOW_PROBE;
         goto finished;
     }
 
     /*TCP_A_ZERO_WINDOW*/
     if( windowVal == 0 && NOT_ACK_OR_FIN_OR_RST ){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW);
         tcpInfoPtr->status |= TCP_A_ZERO_WINDOW;
     }
 
@@ -129,7 +129,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
     if( this->allWindow.value(streamIndexPlusOne).nextSeq
             && seq > this->allWindow.value(streamIndexPlusOne).nextSeq
             && !RST ){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_LOST_PACKET);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_LOST_PACKET);
         tcpInfoPtr->status |= TCP_A_LOST_PACKET;
     }
 
@@ -137,7 +137,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
     if( ( segLen == 0 || segLen == 1)
             && seq == this->allWindow.value(streamIndexPlusOne).nextSeq - 1
             && NOT_ACK_OR_FIN_OR_RST){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_KEEP_ALIVE);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_KEEP_ALIVE);
         tcpInfoPtr->status |= TCP_A_KEEP_ALIVE;
     }
 
@@ -148,7 +148,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             && seq == this->allWindow.value(streamIndexPlusOne).nextSeq
             && ack == this->allWindow.value(streamIndexPlusOne).lastAck
             && NOT_ACK_OR_FIN_OR_RST){
-       dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_WINDOW_UPDATE);
+       //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_WINDOW_UPDATE);
        tcpInfoPtr->status |= TCP_A_WINDOW_UPDATE;
     }
 
@@ -158,7 +158,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             && (seq + segLen) == this->allWindow.value(streamIndexPlusOne).lastAck +(this->allWindow.value(streamIndexPlusOne).windowVal << (this->allWindow.value(streamIndexPlusOne).windowScale == -1 ? 0 : this->allWindow.value(streamIndexPlusOne).windowScale))
             && NOT_ACK_OR_FIN_OR_RST
             ){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_WINDOW_FULL);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_WINDOW_FULL);
         tcpInfoPtr->status |= TCP_A_WINDOW_FULL;
     }
 
@@ -167,7 +167,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             && this->allWindow.value(streamIndexPlusOne).windowVal
             && windowVal == this->allWindow.value(streamIndexPlusOne).windowVal
             && (this->allWindow.value(-streamIndexPlusOne).lastSegmentFlags & TCP_A_KEEP_ALIVE)){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_KEEP_ALIVE_ACK);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_KEEP_ALIVE_ACK);
         tcpInfoPtr->status |= TCP_A_KEEP_ALIVE_ACK;
         goto finished;
     }
@@ -178,7 +178,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
          && ack == this->allWindow.value(streamIndexPlusOne).lastAck
          && (this->allWindow.value(-streamIndexPlusOne).lastSegmentFlags & TCP_A_ZERO_WINDOW_PROBE)
          && NOT_ACK_OR_FIN_OR_RST){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW_PROBE_ACK);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ZERO_WINDOW_PROBE_ACK);
         tcpInfoPtr->status |= TCP_A_ZERO_WINDOW_PROBE_ACK;
         goto finished;
     }
@@ -190,10 +190,10 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             && ack == this->allWindow.value(streamIndexPlusOne).lastAck
             && NOT_ACK_OR_FIN_OR_RST){
         (*this->allWindow.find(streamIndexPlusOne)).dupAckNum++;
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_DUPLICATE_ACK);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_DUPLICATE_ACK);
         tcpInfoPtr->status |= TCP_A_DUPLICATE_ACK;
-        dissectResultBase->AddAdditional(TCP_DUPACK_NUM,this->allWindow.value(streamIndexPlusOne).dupAckNum);
-        dissectResultBase->AddAdditional(TCP_DUPACK_FRAME,this->allWindow.value(streamIndexPlusOne).lastNonDupAck);
+        //dissectResultBase->AddAdditional(TCP_DUPACK_NUM,this->allWindow.value(streamIndexPlusOne).dupAckNum);
+        //dissectResultBase->AddAdditional(TCP_DUPACK_FRAME,this->allWindow.value(streamIndexPlusOne).lastNonDupAck);
 
         tcpInfoPtr->dupack_num = this->allWindow.value(streamIndexPlusOne).dupAckNum;
         tcpInfoPtr->dupack_frame = this->allWindow.value(streamIndexPlusOne).lastNonDupAck;
@@ -210,12 +210,12 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
     if( this->allWindow.value(-streamIndexPlusOne).maxSeqToBeAcked
             && ack > this->allWindow.value(-streamIndexPlusOne).maxSeqToBeAcked
             && ACK){
-        dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ACK_LOST_PACKET);
+        //dissectResultBase->OrToAddition(TCP_STATUS2,TCP_A_ACK_LOST_PACKET);
         tcpInfoPtr->status |= TCP_A_ACK_LOST_PACKET;
         (*this->allWindow.find(-streamIndexPlusOne)).maxSeqToBeAcked = this->allWindow.value(-streamIndexPlusOne).nextSeq;
     }
 
-    if( tcpInfo.segLen > 0 || tcpInfo.SYN || tcpInfo.FIN ){
+    if( tcpInfoPtr->segLen > 0 || tcpInfoPtr->SYN || tcpInfoPtr->FIN ){
         bool seq_not_advanced = this->allWindow.value(streamIndexPlusOne).nextSeq
                 && tcpInfoPtr->seq < this->allWindow.value(streamIndexPlusOne).nextSeq;
 
@@ -253,7 +253,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
         qDebug() << "ooo_thres" << ooo_thres;
         if( seq_not_advanced
                 && t < ooo_thres
-                && this->allWindow.value(streamIndexPlusOne).nextSeq != tcpInfo.seq + tcpInfo.segLen){
+                && this->allWindow.value(streamIndexPlusOne).nextSeq != tcpInfoPtr->seq + tcpInfoPtr->segLen){
             tcpInfoPtr->status |= TCP_A_OUT_OF_ORDER;
             goto finished_checking_retransmission_type;
         }
@@ -261,7 +261,7 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
         /*TCP_A_SPURIOUS_RETRANSMISSION*/
         if( tcpInfoPtr->segLen > 0
                 && this->allWindow.value(-streamIndexPlusOne).lastAck
-                && tcpInfo.seq + tcpInfo.segLen < this->allWindow.value(-streamIndexPlusOne).lastAck){
+                && tcpInfoPtr->seq + tcpInfoPtr->segLen < this->allWindow.value(-streamIndexPlusOne).lastAck){
             tcpInfoPtr->status |= TCP_A_SPURIOUS_RETRANSMISSION;
             goto finished_checking_retransmission_type;
         }
@@ -285,8 +285,8 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
             || !this->allWindow.value(streamIndexPlusOne).nextSeq ){
         if( !( tcpInfoPtr->status & TCP_A_ZERO_WINDOW_PROBE) ){
             (*this->allWindow.find(streamIndexPlusOne)).nextSeq = nextseq;
-            (*this->allWindow.find(streamIndexPlusOne)).nextSeqTime.tv_sec = tcpInfo.time.tv_sec;
-            (*this->allWindow.find(streamIndexPlusOne)).nextSeqTime.tv_usec = tcpInfo.time.tv_usec;
+            (*this->allWindow.find(streamIndexPlusOne)).nextSeqTime.tv_sec = tcpInfoPtr->time.tv_sec;
+            (*this->allWindow.find(streamIndexPlusOne)).nextSeqTime.tv_usec = tcpInfoPtr->time.tv_usec;
         }
     }
 

@@ -5,12 +5,19 @@
 #include <QHash>
 
 #include "pcap.h"
+
+#include "../units/converter.h"
+#include "../units/bit.h"
+#include "../units/keys.h"
+#include "../units/ipv4info.h"
 #include "../units/tcpinfo.h"
 
 
 #define FRAME_GENERATE_EPOCH_TIME 0x0001
 #define FRAME_SHOW_NUMBER_OF_BITS 0x0002
 #define FRAME_GENERATE_MD5_HASH   0x0004
+
+#define IPV4_VALIDATE_CHECKSUM 0X0001
 
 
 /*
@@ -22,8 +29,6 @@
 class DissectResultBase
 {
 public:
-
-
     DissectResultBase(const quint8 *data,const pcap_pkthdr *pkther, qint64 index);
     ~DissectResultBase();
 
@@ -31,6 +36,7 @@ public:
     void PushToProtocolList(QString protocolName, qint32 protocolHeaderLength);
     void UpdateProtocolList(QString protocolName, qint32 newProtocolHeaderLength);
     void SetSummery(QString summery);
+    void AppendSummery(QString field);
 
     bool ContainProtocol(QString proName);
     const quint8* GetData();
@@ -48,24 +54,14 @@ public:
     qint64 GetProtocolHeaderEndPositionByName(QString protocolName);
     QString GetSummery();
 
-
     /*保留字段的操作*/
-    void ClearReserve();
-    void ClearReserveVal();
-    void ClearReservePtr();
     void AddAdditional(QString name,qint64 val);
     void AddAdditional(QString name,void *ptr,qint32 dataLen = 1);
     void AddAdditional(QString name,qint64 val,void *ptr,qint32 dataLen = 1);
-    void OrToAddition(QString name,qint64 val);
-    void RemoveAdditional(QString name);
-    void RemoveAdditionalVal(QString name);
-    void RemoveAdditionalPtr(QString name);
+
     qint64 GetAdditionalVal(QString name);
     void* GetAdditionalPtr(QString name,qint32 *len = nullptr);
 
-    bool ReserveTcpContain(QString name);
-    void AddAdditional(QString name,TcpInfo &tcpInfo);
-    TcpInfo& GetAdditional(QString name);
 
     static void SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName);
     static qint32 GetInterfaceId();
@@ -110,7 +106,6 @@ private:
      */
     QHash<QString,struct reserve> reserve_ptr;
     QHash<QString,qint64> reserve_val;
-    QHash<QString,TcpInfo> reserve_tcp;
 };
 
 #endif // DISSECTRESULTBASE_H

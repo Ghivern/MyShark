@@ -15,10 +15,6 @@ void DissectResult::SetNextLayer(void *nextlayer){
     this->nextLayer = nextlayer;
 }
 
-//void DissectResult::SetDissectResultBase(DissectResultBase *dissectResultBase){
-//    this->dissectResultBase = dissectResultBase;
-//}
-
 qint64 DissectResult::GetStreamIndex(){
     return qAbs(this->streamIndexPlusOne) - 1;
 }

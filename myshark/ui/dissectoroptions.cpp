@@ -37,10 +37,12 @@ void DissectorOptions::setupWidget(){
     this->frame = new Frame(this->dissectorOptions->value("frame"));
     this->ether = new Ether(this->dissectorOptions->value("ether"));
     this->arp = new Arp;
+    this->ipv4 = new Ipv4(this->dissectorOptions->value("ipv4"));
 
     this->Vlayout->addWidget(frame);
     this->Vlayout->addWidget(ether);
     this->Vlayout->addWidget(arp);
+    this->Vlayout->addWidget(ipv4);
 
     this->clearWidget();
     this->frame->show();
@@ -62,6 +64,8 @@ void DissectorOptions::on_listWidget_itemClicked(QListWidgetItem *item)
 //        *(this->dissectorOptions->find("tcp")) = 600;
     }else if( item->text() == "arp" ){
         this->arp->show();
+    }else if( item->text() == "ipv4" ){
+        this->ipv4->show();
     }
 }
 
@@ -69,7 +73,7 @@ void DissectorOptions::on_pushButton_ok_clicked()
 {
     (*dissectorOptions->find("frame")) = this->frame->Result();
     (*dissectorOptions->find("ether")) = this->ether->Result();
-
+    (*dissectorOptions->find("ipv4")) = this->ipv4->Result();
     this->accept();
 }
 

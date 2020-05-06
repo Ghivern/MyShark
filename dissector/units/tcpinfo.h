@@ -28,6 +28,8 @@ public:
     qint32 dupack_frame;
     qint32 dupack_num;
 
+    qint32 streamPlusOne;
+
 };
 
 #endif // TCPINFO_H

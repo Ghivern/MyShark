@@ -9,7 +9,6 @@ public:
     DissectResult(DissectResultBase *dissectResultBase);
     void SetStremIndexPlusOne(qint64 streamIndexPlusOne);
     void SetNextLayer(void *nextlayer = nullptr);
-//    void SetDissectResultBase(DissectResultBase *dissectResultBase);
 
     qint64 GetStreamIndex();
     qint64 GetStreamIndexPlusOne();

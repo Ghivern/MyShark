@@ -2,6 +2,7 @@
 
 
 ProTreeMaker::ProTreeMaker(qint32 datalink,DissectResultFrame *dissectRestltFrame,void *reserves){
+    reserves = (void*)dissectRestltFrame;
     this->proTree = new ProTree();
     switch (datalink) {
     case DissectResultFrame::TCP_IP_PROTOCOL_FAMILY:

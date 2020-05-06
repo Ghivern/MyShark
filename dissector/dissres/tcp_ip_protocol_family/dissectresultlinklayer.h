@@ -6,12 +6,10 @@
 #include <QTextStream>
 #include <arpa/inet.h>
 
-#include "../../units/converter.h"
-
-#include "../dissectresultcommonstream.h"
+#include "../dissectresultbase.h"
 
 #include "../dissectresult.h"
-#include "../dissectresultbase.h"
+
 #include "dissectresultipv4.h"
 #include "dissectresultipv6.h"
 #include "dissectresultarp.h"

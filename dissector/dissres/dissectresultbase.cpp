@@ -8,20 +8,20 @@ QHash<QString,quint64>* DissectResultBase::dissectorOptions = new QHash<QString,
             },
 
             {"ether",
-
-            0},
+                0
+            },
 
             {"arp",
-
-            6},
+                0
+            },
 
             {"ipv4",
-
-            7},
+                IPV4_VALIDATE_CHECKSUM
+            },
 
             {"tcp",
-
-            100}
+                0
+            }
       };
 
 qint32 DissectResultBase::interfaceId = -1;
@@ -73,6 +73,13 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
 void DissectResultBase::SetSummery(QString summery){
     this->summery.clear();
     this->summery.append(summery);
+}
+
+void DissectResultBase::AppendSummery(QString field){
+    if( this->summery.isEmpty() )
+        this->summery.append(field);
+    else
+        this->summery.append(" " + field);
 }
 
 bool DissectResultBase::ContainProtocol(QString proName){
@@ -169,18 +176,18 @@ QString DissectResultBase::GetSummery(){
 }
 
 /*保留字段的操作*/
-void DissectResultBase::ClearReserve(){
-    this->reserve_ptr.clear();
-    this->reserve_val.clear();
-}
+//void DissectResultBase::ClearReserve(){
+//    this->reserve_ptr.clear();
+//    this->reserve_val.clear();
+//}
 
-void DissectResultBase::ClearReserveVal(){
-    this->reserve_val.clear();
-}
+//void DissectResultBase::ClearReserveVal(){
+//    this->reserve_val.clear();
+//}
 
-void DissectResultBase::ClearReservePtr(){
-    this->reserve_ptr.clear();
-}
+//void DissectResultBase::ClearReservePtr(){
+//    this->reserve_ptr.clear();
+//}
 
 void DissectResultBase::AddAdditional(QString name, qint64 val){
     this->reserve_val.insert(name,val);
@@ -201,26 +208,26 @@ void DissectResultBase::AddAdditional(QString name, qint64 val, void *ptr, qint3
     this->reserve_val.insert(name,val);
 }
 
-void DissectResultBase::RemoveAdditional(QString name){
-    this->reserve_ptr.remove(name);
-    this->reserve_val.remove(name);
-}
+//void DissectResultBase::RemoveAdditional(QString name){
+//    this->reserve_ptr.remove(name);
+//    this->reserve_val.remove(name);
+//}
 
-void DissectResultBase::OrToAddition(QString name, qint64 val){
-    if( !this->reserve_val.contains(name) ){
-        this->reserve_val.insert(name,val);
-    }else{
-        (*this->reserve_val.find(name)) = this->reserve_val.value(name) | val;
-    }
-}
+//void DissectResultBase::OrToAddition(QString name, qint64 val){
+//    if( !this->reserve_val.contains(name) ){
+//        this->reserve_val.insert(name,val);
+//    }else{
+//        (*this->reserve_val.find(name)) = this->reserve_val.value(name) | val;
+//    }
+//}
 
-void DissectResultBase::RemoveAdditionalVal(QString name){
-    this->reserve_val.remove(name);
-}
+//void DissectResultBase::RemoveAdditionalVal(QString name){
+//    this->reserve_val.remove(name);
+//}
 
-void DissectResultBase::RemoveAdditionalPtr(QString name){
-    this->reserve_ptr.remove(name);
-}
+//void DissectResultBase::RemoveAdditionalPtr(QString name){
+//    this->reserve_ptr.remove(name);
+//}
 
 qint64 DissectResultBase::GetAdditionalVal(QString name){
     if(!this->reserve_val.contains(name))
@@ -236,17 +243,17 @@ void* DissectResultBase::GetAdditionalPtr(QString name, qint32 *len){
     return this->reserve_ptr.value(name).ptr;
 }
 
-bool DissectResultBase::ReserveTcpContain(QString name){
-    return this->reserve_tcp.contains(name);
-}
+//bool DissectResultBase::ReserveTcpContain(QString name){
+//    return this->reserve_tcp.contains(name);
+//}
 
-void DissectResultBase::AddAdditional(QString name, TcpInfo &tcpInfo){
-    this->reserve_tcp.insert(name,tcpInfo);
-}
+//void DissectResultBase::AddAdditional(QString name, TcpInfo &tcpInfo){
+//    this->reserve_tcp.insert(name,tcpInfo);
+//}
 
-TcpInfo& DissectResultBase::GetAdditional(QString name){
-    return *this->reserve_tcp.find(name);
-}
+//TcpInfo& DissectResultBase::GetAdditional(QString name){
+//    return *this->reserve_tcp.find(name);
+//}
 
 
 void DissectResultBase::SetInterfaceInfo(qint32 interfaceId, QString interfaceName, qint32 linklayer, QString linklayerName){

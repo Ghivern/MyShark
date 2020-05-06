@@ -1,9 +1,10 @@
 #ifndef DISSECTRESULTIPV6_H
 #define DISSECTRESULTIPV6_H
 
-#include "../dissectresult.h"
 #include "../dissectresultbase.h"
-#include "dissectresulttcp.h"
+
+#include "../dissectresult.h"
+
 #include "dissectresulttcp.h"
 
 /*0              |    1          |        2      |             3 |

@@ -5,6 +5,8 @@
 #include <QMutex>
 #include "../../dissector/dissres/dissectresutltframe.h"
 
+#include "../../dissector/units/tcpinfo.h"
+
 class DisplayFilter
 {
 public:

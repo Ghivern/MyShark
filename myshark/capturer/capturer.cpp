@@ -1,9 +1,5 @@
 #include "capturer.h"
-#include "../ui/dialogs/saveorclosefiledialog.h"
-#include "../ui/dialogs/stopwithoutanypacket.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
 
 
 Capturer::Capturer(){
