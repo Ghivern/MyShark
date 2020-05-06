@@ -51,7 +51,6 @@ quint16 Checksum2::getCalculateChecksum(const quint8 *data,qint32 dataLen,qint32
     start = (quint16*)data;;
     for(index = 0; index < dataLen/2; index++){
         if(index != checksumPosition){
-            qDebug() << Converter::ConvertQuint8ArrayToHexStr((quint8*)(start + index),2);
             this->getInverseSum(&checksum,start[index]);
         }
     }

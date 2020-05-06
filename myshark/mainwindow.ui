@@ -148,7 +148,7 @@
         <enum>Qt::NoPen</enum>
        </property>
        <property name="sortingEnabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -160,6 +160,9 @@
         <bool>true</bool>
        </attribute>
        <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderStretchLastSection">
         <bool>false</bool>
        </attribute>
        <column>

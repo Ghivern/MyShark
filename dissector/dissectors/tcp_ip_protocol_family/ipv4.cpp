@@ -191,4 +191,7 @@ Ipv4::Ipv4(ProTree *proTree,tcp_ip_protocol_family::DissectResultIpv4 *dissectRe
                                  ,&start
                                  ,tcp_ip_protocol_family::DissectResultIpv4::NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR
                                  ,true);
+
+    // Summery
+    proTree->Pop();
 }

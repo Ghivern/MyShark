@@ -34,6 +34,7 @@ SOURCES += \
     ui/widgets/ether.cpp \
     ui/widgets/frame.cpp \
     ui/widgets/ipv4.cpp \
+    ui/widgets/tcp.cpp \
     units/caphandle.cpp \
     units/displayfilter.cpp \
     units/dumper.cpp
@@ -55,6 +56,7 @@ HEADERS += \
     ui/widgets/ether.h \
     ui/widgets/frame.h \
     ui/widgets/ipv4.h \
+    ui/widgets/tcp.h \
     units/caphandle.h \ \
     units/displayfilter.h \
     units/dumper.h
@@ -71,7 +73,8 @@ FORMS += \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \
     ui/widgets/frame.ui \
-    ui/widgets/ipv4.ui
+    ui/widgets/ipv4.ui \
+    ui/widgets/tcp.ui
 
 LIBS += -lpcap
 LIBS += -L../lib -ldissector

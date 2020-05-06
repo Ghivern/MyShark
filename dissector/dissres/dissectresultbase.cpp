@@ -20,7 +20,7 @@ QHash<QString,quint64>* DissectResultBase::dissectorOptions = new QHash<QString,
             },
 
             {"tcp",
-                0
+                TCP_ANALYZE_TCP_SEQUENCE_NUMBER | TCP_RELATIVE_SEQUENCE_NUMBER
             }
       };
 
@@ -237,8 +237,8 @@ qint64 DissectResultBase::GetAdditionalVal(QString name){
 
 void* DissectResultBase::GetAdditionalPtr(QString name, qint32 *len){
     if(!this->reserve_ptr.contains(name))
-        return NULL;
-    if(len!=NULL)
+        return nullptr;
+    if( len != nullptr )
         *len = this->reserve_ptr.value(name).len;
     return this->reserve_ptr.value(name).ptr;
 }

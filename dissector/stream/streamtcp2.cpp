@@ -309,10 +309,13 @@ qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *sr
 
 quint32 StreamTcp2::GetBaseSeq(qint64 streamIndexPlusOne){
     if( !this->allWindow.contains(streamIndexPlusOne) )
-        qDebug() << "哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈和哈哈哈哈哈哈哈哈";
+        return 0;
     return this->allWindow.value(streamIndexPlusOne).baseSeq;
 }
 
 quint32 StreamTcp2::GetWindowMultiplier(qint64 streamIndexPlusOne){
+    if( this->allWindow.value(streamIndexPlusOne).windowScale == -1){
+        return 1;
+    }
     return qPow(2,this->allWindow.value(streamIndexPlusOne).windowScale);
 }

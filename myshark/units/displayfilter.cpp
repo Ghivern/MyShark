@@ -8,41 +8,34 @@ DisplayFilter::DisplayFilter()
 
 bool DisplayFilter::SetFilter(QString filterStr){
     this->mutex.tryLock();
-    this->filterStr = filterStr;
+    this->filterStr.clear();
+    this->filterStr.append(filterStr);
     this->displayedCount = 0;
     this->mutex.unlock();
     return true;
 }
 
 bool DisplayFilter::FilterIsValied(QString filterStr){
-    bool allNumber = true;
+   // bool allNumber = true;
     if( filterStr.isEmpty() )
         return true;
     for( qint32 index = 0; index < filterStr.length(); index++){
         if( filterStr.at(index).isNumber() ){
             continue;
         }else{
-            allNumber = false;
-            break;
+            //allNumber = false;
+            return false;
         }
     }
-    if( allNumber ){
-        this->mutex.tryLock();
-        this->filterStr = filterStr;
-        this->displayedCount = 0;
-        this->mutex.unlock();
-        return true;
-    }else{
-        return false;
-    }
+    return true;
 }
 
 bool DisplayFilter::Filte(DissectResultFrame *frame){
-    TcpInfo &tcpInfo = *(TcpInfo*)frame->GetDissectResultBase()->GetAdditionalVal(TCP_INFO_PTR);
+    TcpInfo *tcpInfo = (TcpInfo*)frame->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR);
     this->mutex.tryLock();
     if( !this->filterStr.isEmpty() ){
         if( frame->GetDissectResultBase()->ContainProtocol("tcp")
-                && qAbs(tcpInfo.streamPlusOne) - 1 == this->filterStr.toInt()){
+                && qAbs(tcpInfo->streamPlusOne) - 1 == this->filterStr.toInt()){
             this->displayedCount++;
             this->mutex.unlock();
             return true;

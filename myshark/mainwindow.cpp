@@ -273,7 +273,7 @@ void MainWindow::on_lineEdit_textChanged(const QString &arg1)
             this->ui->pushButton_filter->setEnabled(true);
         }else{
            this->ui->lineEdit->setStyleSheet("background-color:red");
-            this->ui->pushButton_filter->setEnabled(false);
+           this->ui->pushButton_filter->setEnabled(false);
         }
     }
 }

@@ -256,9 +256,6 @@ private:
 
     //记录存在的Tcp选项
     QHash<qint32,struct option_dsc_t> options_dsc;
-
-//    DissectResultBase *dissectResultBase;
-//    void *protocol_family_application_layer;
 };
 
 }

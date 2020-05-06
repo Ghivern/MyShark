@@ -13,9 +13,7 @@ DisplayTable::DisplayTable(QWidget *parent) : QTableWidget(parent)
     this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    //this->verticalHeader()->setMinimumSectionSize(0);
-    //this->verticalHeader()->setDefaultSectionSize(fontMetrics.height());
-    //this->setColumnWidth(7,1000);
+
     this->scrollToLastRow = false;
 
     this->displayFilter = new DisplayFilter;

@@ -9,6 +9,7 @@
 #include "./widgets/ether.h"
 #include "./widgets/arp.h"
 #include "./widgets/ipv4.h"
+#include "./widgets/tcp.h"
 
 //#include "../../dissector/units/dissectorDefaultOptions.h"
 
@@ -40,6 +41,7 @@ private:
     Ether *ether;
     Arp *arp;
     Ipv4 *ipv4;
+    Tcp *tcp;
 
 
 
