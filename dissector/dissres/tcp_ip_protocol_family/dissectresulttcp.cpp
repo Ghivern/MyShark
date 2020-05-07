@@ -88,10 +88,13 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
     dissectResultBase->AppendSummery(QString("len=%1").arg(this->GetPayloadLen()));
     dissectResultBase->AppendSummery(QString("win=%1").arg(this->GetCalculatedWindow()));
 
-    if( this->GetOptionTimestampValue() != 0){
+    if( this->GetOptionTimestampValue() != 0 && !(options & TCP_IGNORE_TIMESTAMPS_IN_SUMMERY)){
         dissectResultBase->AppendSummery(QString("TSval=%1").arg(this->GetOptionTimestampValue()));
         dissectResultBase->AppendSummery(QString("TSecr=%1").arg(this->GetOptionTimestampEchoReply()));
     }
+
+    if( tcpInfo_ptr->badChecksum && (options & TCP_VALIDATE_CHECKSUM))
+        dissectResultBase->AppendSummery("[Bad Checksum]");
 
     if(header != nullptr)
         this->addNextLayer(dissectResultBase,reserves);
