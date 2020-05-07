@@ -7,6 +7,17 @@ using namespace tcp_ip_protocol_family;
 
 StreamTcp2 DissectResultTcp::stream2;
 
+QHash<qint32,QString> DissectResultTcp::tcp_option_val =
+{
+    {TCP_OPTION_END_OF_OPTION,""}
+    ,{TCP_OPTION_NO_OPERATION,"No-operation"}
+    ,{TCP_OPTION_MAXIMUM_SEGMENT_SIZE,"Maximum segment size"}
+    ,{TCP_OPTION_WINDOW_SCALE_OPTION,"Window scale"}
+    ,{TCP_OPTION_SACK_PERMITTED_OPTION,"Sack permitted"}
+    ,{TCP_OPTION_SACK_OPTION_FORMAT,"SACK"}
+    ,{TCP_OPTION_TIMESTAMPS_OPTION,"Timestamps"}
+};
+
 DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *reserves):DissectResult(dissectResultBase)
 {
     Q_UNUSED(reserves)
@@ -325,14 +336,14 @@ quint16 DissectResultTcp::GetUrgentPoint(){
  * Tcp options
  * 返回-1表示没有使用
  */
-qint32 DissectResultTcp::GetOptionPtrByIndex(quint8 *kind,quint8 *length, const quint8 **ptr, qint32 index){
-    if(this->options_dsc.isEmpty() || !this->options_dsc.contains(index))
-        return -1;
-    *kind = this->options_dsc.value(index).kind;
-    *length = this->options_dsc.value(index).length;
-    *ptr = this->options_dsc.value(index).ptr;
-    return 1;
-}
+//qint32 DissectResultTcp::GetOptionPtrByIndex(quint8 *kind,quint8 *length, const quint8 **ptr, qint32 index){
+//    if(this->options_dsc.isEmpty() || !this->options_dsc.contains(index))
+//        return -1;
+//    *kind = this->options_dsc.value(index).kind;
+//    *length = this->options_dsc.value(index).length;
+//    *ptr = this->options_dsc.value(index).ptr;
+//    return 1;
+//}
 
 qint32 DissectResultTcp::GetOptionMaximumSegmentSize(){
     qint32 index = this->getOptionIndex(TCP_OPTION_MAXIMUM_SEGMENT_SIZE);
@@ -383,7 +394,7 @@ QList<quint32> DissectResultTcp::GetOptionSacks(){
         quint8 length = this->options_dsc.value(index).length;
         const quint32 *ptr = (quint32*)this->options_dsc.value(index).ptr;
         for(quint8 i = 0; i < (length -2)/4; i++)
-            sacks.append(ptr[i]);
+            sacks.append(ntohl(ptr[i]));
     }
     return sacks;
 }
@@ -395,11 +406,43 @@ QList<quint32> DissectResultTcp::GetOptionRelativeSacks(){
         quint8 length = this->options_dsc.value(index).length;
         const quint32 *ptr = (quint32*)this->options_dsc.value(index).ptr;
         for(quint8 i = 0; i < (length -2)/4; i++)
-            sacks.append(ptr[i] - stream2.GetBaseSeq(this->GetStreamIndexPlusOne()));
+            sacks.append(ntohl(ptr[i]) - stream2.GetBaseSeq(-this->GetStreamIndexPlusOne()));
     }
     return sacks;
 }
 
+qint32 DissectResultTcp::GetOptionsCount(){
+    return this->options_dsc.keys().length();
+}
+
+qint32 DissectResultTcp::GetOptionTypeByIndex(qint32 index){
+    return this->options_dsc.value(index).kind;
+}
+
+qint32 DissectResultTcp::GetOptionLenByIndex(qint32 index){
+    return this->options_dsc.value(index).length;
+}
+
+qint32 DissectResultTcp::GetOptionsLen(){
+    qint32 len = 0;
+    for( qint32 index = 0; index < this->GetOptionsCount(); index++ ){
+        if( this->GetOptionTypeByIndex(index) != TCP_OPTION_END_OF_OPTION )
+            len += this->GetOptionLenByIndex(index);
+    }
+    return len;
+}
+
+QString DissectResultTcp::GetOptionsSummery(){
+    QString summery;
+    for( qint32 index = 0; index < this->GetOptionsCount(); index++ ){
+        if( this->GetOptionTypeByIndex(index) != TCP_OPTION_END_OF_OPTION )
+            summery.append(DissectResultTcp::tcp_option_val.value(this->GetOptionTypeByIndex(index)) + ", ");
+    }
+    if( !summery.isEmpty() )
+        return summery.remove(summery.length() -2,2);
+    else
+        return summery;
+}
 /*
 * 从DissectResultBase的保留字段获取数据，
 */
@@ -498,6 +541,15 @@ void DissectResultTcp::addNextLayer(DissectResultBase *dissectResultBase,void *r
 
 /*Tcp Options*/
 void DissectResultTcp::dealTcpOptions(){
+    if( this->GetOffset() * 4 == TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH ){
+        struct option_dsc_t option_dsc;
+        option_dsc.length = 1;
+        option_dsc.kind = TCP_OPTION_END_OF_OPTION;
+        option_dsc.ptr = nullptr;
+        this->options_dsc.insert(0,option_dsc);
+        return;
+    }
+
     const quint8 *startPtr = this->GetDissectResultBase()->GetProtocolHeaderStartPtrByName("tcp") + TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH;
     qint32 index = 0;
     qint32 headLen = this->GetOffset() * 4;
@@ -521,7 +573,7 @@ void DissectResultTcp::dealTcpOptions(){
     }
 }
 
-qint32 DissectResultTcp::getOptionIndex(enum TCP_OPTION option){
+qint32 DissectResultTcp::getOptionIndex(qint32 option){
     for(int i = 0; i < this->options_dsc.keys().length(); i++)
         if(this->options_dsc.value(i).kind == option)
             return i;

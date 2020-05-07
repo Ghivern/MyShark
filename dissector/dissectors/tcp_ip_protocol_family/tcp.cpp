@@ -228,5 +228,230 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
                                  ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_URGENTPOINT
                                  ,true);
 
+    //Summery - Options
+    if( dissectResultTcp->GetOptionsCount() > 1 ){
+        qint32 type = 0;
+        QString typeName;
+        qint32 len = 0;
+        proTree->AddItem("tcp"
+                         ,QString("Options: (%1 bytes), %2")
+                         .arg(dissectResultTcp->GetOptionsLen())
+                         .arg(dissectResultTcp->GetOptionsSummery())
+                         ,start
+                         ,dissectResultTcp->GetDissectResultBase()->GetProtocolHeaderEndPositionByName("tcp") - 1
+                         ,ProTree::level::CURRENT);
+        tempStart = start;
+        for( qint32 index = 0; index < dissectResultTcp->GetOptionsCount(); index++ ){
+            type = dissectResultTcp->GetOptionTypeByIndex(index);
+            typeName.clear();
+            typeName.append(tcp_ip_protocol_family::DissectResultTcp::tcp_option_val.value(type));
+            len = dissectResultTcp->GetOptionLenByIndex(index);
+            switch (type) {
+            case TCP_OPTION_NO_OPERATION:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1")
+                                 .arg(typeName)
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,len
+                                          ,true);
+                proTree->Pop();
+                break;
+            }
+            case TCP_OPTION_MAXIMUM_SEGMENT_SIZE:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1 : %2 bytes")
+                                 .arg(typeName)
+                                 .arg(dissectResultTcp->GetOptionMaximumSegmentSize())
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,1
+                                          ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Length: %1")
+                                             .arg(len)
+                                             ,&tempStart
+                                             ,1
+                                             ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("MSS Value: %1")
+                                             .arg(dissectResultTcp->GetOptionMaximumSegmentSize())
+                                             ,&tempStart
+                                             ,len - 2
+                                             ,true);
+                proTree->Pop();
+
+                break;
+            }
+            case TCP_OPTION_WINDOW_SCALE_OPTION:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1 : %2 (multiply by %3)")
+                                 .arg(typeName)
+                                 .arg(dissectResultTcp->GetOptionWindowScale())
+                                 .arg(dissectResultTcp->GetOptionWindowMultiplier())
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,1
+                                          ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                          ,QString("Length: %1")
+                                          .arg(len)
+                                          ,&tempStart
+                                          ,1
+                                          ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Shift count: %1")
+                                             .arg(dissectResultTcp->GetOptionWindowScale())
+                                             ,&tempStart
+                                             ,len - 2
+                                             ,false);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Multiply count: %1")
+                                             .arg(dissectResultTcp->GetOptionWindowMultiplier())
+                                             ,&tempStart
+                                             ,len - 2
+                                             ,true);
+                proTree->Pop();
+                break;
+            }
+            case TCP_OPTION_SACK_PERMITTED_OPTION:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1")
+                                 .arg(typeName)
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,1
+                                          ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("length: %1")
+                                             .arg(len)
+                                             ,&tempStart
+                                             ,1
+                                             ,true);
+                proTree->Pop();
+                break;
+            }
+            case TCP_OPTION_SACK_OPTION_FORMAT:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1")
+                                 .arg(typeName)
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,1);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Length: %1")
+                                             .arg(len)
+                                             ,&tempStart
+                                             ,1
+                                             ,true);
+                for(qint32 index = 0; index < dissectResultTcp->GetOptionSacks().length() - 1; ){
+                    proTree->AddCurrentLayerItem("tcp"
+                                                 ,QString("left edge = %1 %2")
+                                                 .arg(rSeq ? dissectResultTcp->GetOptionRelativeSacks().at(index) : dissectResultTcp->GetOptionSacks().at(index))
+                                                 .arg(rSeq ? "(relative)" : "")
+                                                 ,&tempStart
+                                                 ,4
+                                                 ,true
+                                                 );
+                    proTree->AddCurrentLayerItem("tcp"
+                                                 ,QString("right edge = %1 %2")
+                                                 .arg(rSeq ? dissectResultTcp->GetOptionRelativeSacks().at(index + 1) : dissectResultTcp->GetOptionSacks().at(index + 1))
+                                                 .arg(rSeq ? "(relative)" : "")
+                                                 ,&tempStart
+                                                 ,4
+                                                 ,true
+                                                 );
+                    index += 2;
+                }
+                proTree->AddItem("tcp"
+                                ,QString("[TCP SACK Count: %1]")
+                                .arg(dissectResultTcp->GetOptionSacks().length()/2)
+                                ,ProTree::level::CURRENT);
+                proTree->Pop();
+                break;
+            }
+            case TCP_OPTION_TIMESTAMPS_OPTION:
+            {
+                proTree->AddItem("tcp"
+                                 ,QString("Tcp option - %1: TSval %2, TSecr %3")
+                                 .arg(typeName)
+                                 .arg(dissectResultTcp->GetOptionTimestampValue())
+                                 .arg(dissectResultTcp->GetOptionTimestampEchoReply())
+                                 ,tempStart
+                                 ,tempStart + len - 1
+                                 ,index == 0 ? ProTree::NEW : ProTree::CURRENT);
+                proTree->AddNextLayerItem("tcp"
+                                          ,QString("Kind: %1 (%2)")
+                                          .arg(typeName)
+                                          .arg(type)
+                                          ,&tempStart
+                                          ,1
+                                          ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Length: %1")
+                                             .arg(len)
+                                             ,&tempStart
+                                             ,1
+                                             ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Timestamp value: %1")
+                                             .arg(dissectResultTcp->GetOptionTimestampValue())
+                                             ,&tempStart
+                                             ,(len - 2)/2
+                                             ,true);
+                proTree->AddCurrentLayerItem("tcp"
+                                             ,QString("Timestamp echo reply: %1")
+                                             .arg(dissectResultTcp->GetOptionTimestampEchoReply())
+                                             ,&tempStart
+                                             ,(len - 2)/2
+                                             ,true);
+                proTree->Pop();
+                break;
+            }
+            default:
+                continue;
+            }
+
+        }
+        proTree->Pop();
+    }
+
+
+    proTree->Pop();
 
 }

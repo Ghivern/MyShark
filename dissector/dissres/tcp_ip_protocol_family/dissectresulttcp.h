@@ -89,11 +89,22 @@
  *----------------------------------------------------------------
  *
  */
+#define TCP_OPTION_END_OF_OPTION 0x00
+#define TCP_OPTION_NO_OPERATION 0x01
+#define TCP_OPTION_MAXIMUM_SEGMENT_SIZE 0x02
+#define TCP_OPTION_WINDOW_SCALE_OPTION 0x03
+#define TCP_OPTION_SACK_PERMITTED_OPTION 0x04
+#define TCP_OPTION_SACK_OPTION_FORMAT 0x05
+#define TCP_OPTION_TIMESTAMPS_OPTION 0x08
+
+
 namespace tcp_ip_protocol_family {
 
 class DissectResultTcp:public DissectResult
 {
 public:
+    static QHash<qint32,QString> tcp_option_val;
+
     enum TRANSPORTLAYER_TCP_FIELD_LENGTH{
         TRANSPORTLAYER_TCP_FIELD_LENGTH_SOURCE_PORT = 2,
         TRANSPORTLAYER_TCP_FIELD_LENGTH_DESTINATION_PORT = 2,
@@ -107,15 +118,26 @@ public:
         TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 20
     };
 
-    enum TCP_OPTION{
-        TCP_OPTION_END_OF_OPTION = 0,
-        TCP_OPTION_NO_OPERATION = 1,
-        TCP_OPTION_MAXIMUM_SEGMENT_SIZE = 2,
-        TCP_OPTION_WINDOW_SCALE_OPTION = 3,
-        TCP_OPTION_SACK_PERMITTED_OPTION = 4,
-        TCP_OPTION_SACK_OPTION_FORMAT = 5,
-        TCP_OPTION_TIMESTAMPS_OPTION = 8
-    };
+//    enum TCP_OPTION{
+//        TCP_OPTION_END_OF_OPTION = 0,
+//        TCP_OPTION_NO_OPERATION = 1,
+//        TCP_OPTION_MAXIMUM_SEGMENT_SIZE = 2,
+//        TCP_OPTION_WINDOW_SCALE_OPTION = 3,
+//        TCP_OPTION_SACK_PERMITTED_OPTION = 4,
+//        TCP_OPTION_SACK_OPTION_FORMAT = 5,
+//        TCP_OPTION_TIMESTAMPS_OPTION = 8
+//    };
+
+//    QHash<qint32,QString> tcp_option_val =
+//    {
+//        {TCP_OPTION_END_OF_OPTION,""}
+//        ,{TCP_OPTION_NO_OPERATION,"No-operation"}
+//        ,{TCP_OPTION_MAXIMUM_SEGMENT_SIZE,"Maximum segment size"}
+//        ,{TCP_OPTION_WINDOW_SCALE_OPTION,"Window scale"}
+//        ,{TCP_OPTION_SACK_PERMITTED_OPTION,"Sack permitted"}
+//        ,{TCP_OPTION_SACK_OPTION_FORMAT,"SACK"}
+//        ,{TCP_OPTION_TIMESTAMPS_OPTION,"Timestamps"}
+//    };
 
     enum TRANSPORTLAYER_TCP_SERV{
         HTTP = 80
@@ -188,7 +210,7 @@ public:
     /*
      *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
      */
-    qint32 GetOptionPtrByIndex(quint8 *kind,quint8 *length,const quint8 **ptr,qint32 index);
+//    qint32 GetOptionPtrByIndex(quint8 *kind,quint8 *length,const quint8 **ptr,qint32 index);
     qint32 GetOptionMaximumSegmentSize();
     qint16 GetOptionWindowScale(); //Window scale最大为14
     qint16 GetOptionWindowMultiplier();
@@ -197,6 +219,21 @@ public:
     qint8 GetOptionSackPermitted();
     QList<quint32> GetOptionSacks();
     QList<quint32> GetOptionRelativeSacks();
+
+    qint32 GetOptionsCount();
+    qint32 GetOptionTypeByIndex(qint32 index);
+    qint32 GetOptionLenByIndex(qint32 index);
+    qint32 GetOptionsLen();
+    QString GetOptionsSummery();
+
+
+//    TCP_OPTION_END_OF_OPTION = 0,
+//    TCP_OPTION_NO_OPERATION = 1,
+//    TCP_OPTION_MAXIMUM_SEGMENT_SIZE = 2,
+//    TCP_OPTION_WINDOW_SCALE_OPTION = 3,
+//    TCP_OPTION_SACK_PERMITTED_OPTION = 4,
+//    TCP_OPTION_SACK_OPTION_FORMAT = 5,
+//    TCP_OPTION_TIMESTAMPS_OPTION = 8
 
     /*分析Seq/Ack*/
     QString GetSegmentStatusStr();
@@ -259,7 +296,7 @@ private:
      *  QHash<qint32,struct {quint8 kind,quint8* startPtr}>
      */
     void dealTcpOptions();
-    qint32 getOptionIndex(enum TCP_OPTION option);
+    qint32 getOptionIndex(qint32 option);
 
 
     //static StreamTcp stream;
