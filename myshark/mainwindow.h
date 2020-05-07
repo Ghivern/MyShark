@@ -116,10 +116,12 @@ private slots:
 
     /*统计结果显示面板*/
     void on_actionCapture_file_properitys_triggered();
+    void on_actionConversations_triggered();
 
     //public slots:
     //    void Print(qint64 index);
     //    void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
+
 
 };
 #endif // MAINWINDOW_H

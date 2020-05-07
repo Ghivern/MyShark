@@ -10,6 +10,9 @@ StreamTcp2 DissectResultTcp::stream2;
 DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *reserves):DissectResult(dissectResultBase)
 {
     Q_UNUSED(reserves)
+    quint64 options = DissectResultBase::GetDissectorOptionPtr()->value("tcp");
+    TcpInfo *tcpInfo_ptr = new TcpInfo;
+    dissectResultBase->AddAdditional(TCP_INFO_PTR,(void*)tcpInfo_ptr);
 
     dissectResultBase->PushToProtocolList("tcp",TRANSPORTLAYER_TCP_FIELD_LENGTH_TEMP_HEADER_LENGTH);
     this->header = (struct header_t*)dissectResultBase->GetProtocolHeaderStartPtrByName("tcp");
@@ -18,7 +21,7 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
 
     this->dealTcpOptions();
 
-    TcpInfo *tcpInfo_ptr = new TcpInfo;
+
     tcpInfo_ptr->SYN = this->SYN();
     tcpInfo_ptr->FIN = this->FIN();
     tcpInfo_ptr->RST = this->RST();
@@ -26,13 +29,14 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
     tcpInfo_ptr->ack = this->GetAck();
     tcpInfo_ptr->seq = this->GetSeq();
     tcpInfo_ptr->segLen = this->GetPayloadLen();
+    tcpInfo_ptr->totalLen = this->GetTotalLen();
     tcpInfo_ptr->windowVal = this->GetWindow();
     tcpInfo_ptr->windowSclae = this->GetOptionWindowScale();
     tcpInfo_ptr->time.tv_sec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_sec;
     tcpInfo_ptr->time.tv_usec = this->GetDissectResultBase()->GetPkthdr()->ts.tv_usec;
     tcpInfo_ptr->echoReplayTime.tv_sec = (__time_t)this->GetOptionTimestampEchoReply();
     tcpInfo_ptr->echoReplayTime.tv_usec = 0;
-    dissectResultBase->AddAdditional(TCP_INFO_PTR,(void*)tcpInfo_ptr);
+
 
 
     if( this->GetDissectResultBase()->ContainProtocol("ipv4") ){
@@ -51,6 +55,13 @@ DissectResultTcp::DissectResultTcp(DissectResultBase *dissectResultBase,void *re
 
 
     tcpInfo_ptr->streamPlusOne = this->GetStreamIndexPlusOne();
+
+    if( options & TCP_VALIDATE_CHECKSUM ){
+        Checksum2 checksum(this->GetDissectResultBase(),"tcp");
+        this->calculatedChecksumStr.append(checksum.GetCalculateChecksumStr());
+        if( this->calculatedChecksumStr != this->GetChecksumStr() )
+            tcpInfo_ptr->badChecksum = true;
+    }
 
     /*设置Summery*/
     QString status = this->GetSegmentStatusStr();
@@ -137,10 +148,18 @@ QString DissectResultTcp::GetOffsetDotStr(){
 }
 
 quint32 DissectResultTcp::GetPayloadLen(){
-//    TcpInfo *tcpInfo = (TcpInfo*)this->GetDissectResultBase()->GetAdditionalPtr()
     if( this->GetDissectResultBase()->ContainProtocol("ipv4")){
         Ipv4Info *ipv4Info = (Ipv4Info*)this->GetDissectResultBase()->GetAdditionalPtr(IPV4_INFO_PTR);
         return ipv4Info->payloadLen - this->GetOffset() * 4;
+    }else{
+        return 0;
+    }
+}
+
+quint32 DissectResultTcp::GetTotalLen(){
+    if( this->GetDissectResultBase()->ContainProtocol("ipv4")){
+        Ipv4Info *ipv4Info = (Ipv4Info*)this->GetDissectResultBase()->GetAdditionalPtr(IPV4_INFO_PTR);
+        return ipv4Info->payloadLen;
     }else{
         return 0;
     }
@@ -288,6 +307,10 @@ quint32 DissectResultTcp::GetCalculatedWindow(){
 /*Checksum*/
 QString DissectResultTcp::GetChecksumStr(){
     return Converter::ConvertQuint8ArrayToHexStr(this->header->checksum,TRANSPORTLAYER_TCP_FIELD_LENGTH_CHECKSUM);
+}
+
+QString DissectResultTcp::GetCalculatedChecksumStr(){
+    return this->calculatedChecksumStr;
 }
 
 /*Urgent Point*/

@@ -16,7 +16,7 @@ QHash<QString,quint64>* DissectResultBase::dissectorOptions = new QHash<QString,
             },
 
             {"ipv4",
-                IPV4_VALIDATE_CHECKSUM
+                0//IPV4_VALIDATE_CHECKSUM
             },
 
             {"tcp",

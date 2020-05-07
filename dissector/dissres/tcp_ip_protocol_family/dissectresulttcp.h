@@ -4,6 +4,8 @@
 #include <QtMath>
 #include "arpa/inet.h"
 
+#include "../../units/checksum2.h"
+
 #include "../../stream/streamtcp2.h"
 
 #include "../dissectresultbase.h"
@@ -45,7 +47,7 @@
  * ---------------------------------------------------------------
  *
  *
- * Pseudo Header for Ipv4 Format as follow
+ * Pseudo Header for Ipv6 Format as follow
  * --------------|---------------|---------------|----------------
  * Source Address                                                >
  *                                                               >
@@ -151,6 +153,7 @@ public:
     quint8 GetOffset();
     QString GetOffsetDotStr();
     quint32 GetPayloadLen();
+    quint32 GetTotalLen();
 
     /*Flags*/
     quint8 GetReserved();
@@ -176,6 +179,7 @@ public:
 
     /*Checksum*/
     QString GetChecksumStr();
+    QString GetCalculatedChecksumStr();
 
     /*Urgent Point*/
     quint16 GetUrgentPoint();
@@ -259,6 +263,8 @@ private:
 
 
     //static StreamTcp stream;
+
+    QString calculatedChecksumStr;
 
     static StreamTcp2 stream2;
 

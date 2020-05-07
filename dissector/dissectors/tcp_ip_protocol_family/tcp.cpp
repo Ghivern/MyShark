@@ -10,6 +10,7 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
 
     qint32 start = dissectResultTcp->GetDissectResultBase()->GetProtocolHeaderStartPositionByName("tcp");
     qint32 tempStart;
+    TcpInfo *tcpInfo = (TcpInfo*)dissectResultTcp->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR);
 
     // Summery
     proTree->AddItem("tcp"
@@ -94,7 +95,6 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
                                  ,&start
                                  ,1
                                  ,false);
-
 
     // Summery - Flags
     tempStart = start;
@@ -199,5 +199,34 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
                                  ,&start
                                  ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_WINDOW
                                  ,true);
+
+    //Summery - Checksum
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Checksum: %1")
+                                 .arg(dissectResultTcp->GetChecksumStr())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_CHECKSUM
+                                 ,true);
+
+    //Summery - Calculated Checksum
+    if( option & TCP_VALIDATE_CHECKSUM ){
+        proTree->AddItem("tcp"
+                         ,QString("[Checksum Status: %1]")
+                         .arg(tcpInfo->badChecksum ? "Bad" : "Good")
+                         ,ProTree::level::CURRENT);
+        proTree->AddItem("tcp"
+                         ,QString("[Calculated Checksum: %1]")
+                         .arg(dissectResultTcp->GetCalculatedChecksumStr())
+                         ,ProTree::level::CURRENT);
+    }
+
+    //Summery - Urgent point
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Urgent point: %1")
+                                 .arg(dissectResultTcp->GetUrgentPoint())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_URGENTPOINT
+                                 ,true);
+
 
 }

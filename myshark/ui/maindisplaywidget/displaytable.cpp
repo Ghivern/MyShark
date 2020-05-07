@@ -163,7 +163,7 @@ qint32 DisplayTable::addToTable(DissectResultFrame *frame){
 void DisplayTable::addStatusColor(DissectResultFrame *frame,qint32 row){
     if( frame->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR) ){
         TcpInfo *tcpInfo = (TcpInfo*)frame->GetDissectResultBase()->GetAdditionalPtr(TCP_INFO_PTR);
-        if( tcpInfo->status ){
+        if( tcpInfo->status != 0 || tcpInfo->badChecksum){
             this->setTableWidgetColor(row,0x3C3C3C,0xff00cc);
         }else if( tcpInfo->SYN || tcpInfo->FIN ){
             this->setTableWidgetColor(row,0xAAAAAA);

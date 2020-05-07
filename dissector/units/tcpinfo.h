@@ -11,6 +11,7 @@ public:
     quint32 seq;
     quint32 ack;
     quint32 segLen;
+    quint32 totalLen;
 
     bool ACK;
     bool SYN;
@@ -24,6 +25,7 @@ public:
     timeval echoReplayTime;
 
     qint32 status;
+    bool badChecksum;
 
     qint32 dupack_frame;
     qint32 dupack_num;

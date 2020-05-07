@@ -111,7 +111,9 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionSave_As->setEnabled(false);
 
         this->ui->actionDissector_options->setEnabled(false);
+
         this->ui->actionCapture_file_properitys->setEnabled(true);
+        this->ui->actionConversations->setEnabled(true);
 
         this->showDisplayProportion->SetDefaultInfo();
         break;
@@ -127,7 +129,9 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionSave_As->setEnabled(true);
 
         this->ui->actionDissector_options->setEnabled(false);
+
         this->ui->actionCapture_file_properitys->setEnabled(true);
+        this->ui->actionConversations->setEnabled(true);
         break;
     }
     case STATUS_FILE:
@@ -141,7 +145,9 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionSave_As->setEnabled(true);
 
         this->ui->actionDissector_options->setEnabled(false);
+
         this->ui->actionCapture_file_properitys->setEnabled(true);
+        this->ui->actionConversations->setEnabled(true);
 
         this->showDisplayProportion->SetDefaultInfo();
         break;
@@ -157,7 +163,9 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionSave_As->setEnabled(false);
 
         this->ui->actionDissector_options->setEnabled(true);
+
         this->ui->actionCapture_file_properitys->setEnabled(false);
+        this->ui->actionConversations->setEnabled(false);
 
         this->showDisplayProportion->SetDefaultInfo();
     }
@@ -253,6 +261,9 @@ void MainWindow::on_actionClose_triggered(){
     if( this->capturer->GetCapHandle() != nullptr ){
         if( this->capturer->slot_clearThread(2) ){
             this->setActionsStatus(STATUS_NONE);
+            this->ui->tableWidget->Clear();
+            this->ui->treeWidget->Clear();
+            this->ui->rawDataPanel->Clear();
         }
     }
 }
@@ -374,7 +385,10 @@ void MainWindow::on_actionCapture_file_properitys_triggered()
     cfp->show();
 }
 
-
+void MainWindow::on_actionConversations_triggered()
+{
+    qDebug() <<"stream1 包量:" << tcp_ip_protocol_family::DissectResultLinkLayer::GetStreamRecorder().GetPacketsIndexListByStream(1).length();
+}
 
 
 
@@ -433,6 +447,8 @@ void MainWindow::on_actionCapture_file_properitys_triggered()
 //        //qDebug() << "未处理的网络层协议，协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr();
 //    }
 //}
+
+
 
 
 

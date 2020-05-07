@@ -64,6 +64,7 @@ SOURCES += \
     units/checksum.cpp \
     units/checksum2.cpp \
     units/converter.cpp \
+    units/copy.cpp \
     units/device.cpp \
     units/ipv4info.cpp \
     units/tcpinfo.cpp
@@ -117,6 +118,7 @@ HEADERS += \
     units/checksum.h \
     units/checksum2.h \
     units/converter.h \
+    units/copy.h \
     units/device.h \
     units/ipv4info.h \
     units/keys.h \

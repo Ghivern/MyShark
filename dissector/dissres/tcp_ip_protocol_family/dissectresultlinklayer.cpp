@@ -243,6 +243,9 @@ QString DissectResultLinkLayer::GetCalculatedFCSStr(){
     return Converter::ConvertQuint8ArrayToHexStr((quint8*)&calculatedFCS,LINKLAYER_FIELD_LENGTH_FCS);
 }
 
+Stream& DissectResultLinkLayer::GetStreamRecorder(){
+    return DissectResultLinkLayer::stream;
+}
 
 QString DissectResultLinkLayer::getAddressOriginalStr(quint8 *address){
     return Converter::ConvertQuint8ArrayToHexStr(address,LINKLAYER_FIELD_LENGTH_SRC_ADDR,":","");

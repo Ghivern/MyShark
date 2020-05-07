@@ -104,6 +104,9 @@ public:
     quint32 GetCalculatedFCS();
     QString GetCalculatedFCSStr();
 
+    /*获取流记录器*/
+    static Stream& GetStreamRecorder();
+
 private:
     struct header_t{
         quint8 dst[LINKLAYER_FIELD_LENGTH_DES_ADDR];
