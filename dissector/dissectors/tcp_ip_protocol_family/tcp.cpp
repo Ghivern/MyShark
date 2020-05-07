@@ -9,6 +9,7 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
     bool rSeq = (option & TCP_ANALYZE_TCP_SEQUENCE_NUMBER) || (option & TCP_RELATIVE_SEQUENCE_NUMBER);
 
     qint32 start = dissectResultTcp->GetDissectResultBase()->GetProtocolHeaderStartPositionByName("tcp");
+    qint32 tempStart;
 
     // Summery
     proTree->AddItem("tcp"
@@ -43,7 +44,160 @@ Tcp::Tcp(ProTree *proTree,tcp_ip_protocol_family::DissectResultTcp *dissectResul
         proTree->AddItem("tcp"
                          ,QString("[Stream Index: %1]")
                          .arg(dissectResultTcp->GetStreamIndex())
-                         ,ProTree::level::CURRENT);
+                         ,ProTree::level::CURRENT
+                         );
     }
+
+    // Summery - Tcp Segment Len
+    tempStart = start
+                + tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_SEQ
+                + tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_ACK;
+    proTree->AddItem("tcp"
+                     ,QString("[TCP segment Len: %1]")
+                     .arg(dissectResultTcp->GetPayloadLen())
+                     ,tempStart
+                     ,tempStart
+                     ,ProTree::level::CURRENT
+                     );
+
+    // Summery - Sequence number
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Sequence number: %1 %2")
+                                 .arg(rSeq ? dissectResultTcp->GetRelativeSeq() : dissectResultTcp->GetSeq())
+                                 .arg(rSeq ? "(relative sequence number)" : "")
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_SEQ
+                                 ,true);
+
+    // Summery - Next Sequence number
+    proTree->AddItem("tcp"
+                    ,QString("[Next Sequence number: %1 %2]")
+                    .arg((rSeq ? dissectResultTcp->GetRelativeSeq() : dissectResultTcp->GetSeq()) + dissectResultTcp->GetPayloadLen())
+                    .arg(rSeq ? "(relative sequence number)" : "")
+                    );
+
+    // Summery - Acknowledgment number
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Acknowledgment number: %1 %2")
+                                 .arg( rSeq ? dissectResultTcp->GetRelativeAck() : dissectResultTcp->GetAck() )
+                                 .arg( rSeq && dissectResultTcp->ACK() ? "(relative ack number)" : "" )
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_ACK
+                                 ,true);
+
+    // Summery - Header length
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("%1 = Header length: %2 bytes (%3)")
+                                 .arg(dissectResultTcp->GetOffsetDotStr())
+                                 .arg(dissectResultTcp->GetOffset() * 4)
+                                 .arg(dissectResultTcp->GetOffset())
+                                 ,&start
+                                 ,1
+                                 ,false);
+
+
+    // Summery - Flags
+    tempStart = start;
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Flags: %1 (%2)")
+                                 .arg(dissectResultTcp->GetFlagsStr())
+                                 .arg(dissectResultTcp->GetFlagMeanings())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_DATAOFFSET_RESERVED_FLAGS
+                                 ,false);
+    proTree->AddNextLayerItem("tcp"
+                              ,QString("%1. .... .... = Reserved: %2")
+                              .arg(dissectResultTcp->GetReservedStr())
+                              .arg(dissectResultTcp->GetReserved() ? "Set" : "Not Set")
+                              ,&start
+                              ,1
+                              ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("...%1 .... .... = Nonce: %2")
+                                 .arg(dissectResultTcp->NONCE() ? 1 : 0)
+                                 .arg(dissectResultTcp->NONCE() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,true);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... %1... .... = Congestion Window Reduced(CWR): %2")
+                                 .arg(dissectResultTcp->CWR() ? 1 : 0)
+                                 .arg(dissectResultTcp->CWR() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... .%1.. .... = ECN-Echo: %2")
+                                 .arg(dissectResultTcp->ECN_ECHO() ? 1 : 0)
+                                 .arg(dissectResultTcp->ECN_ECHO() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... ..%1. .... = Urgent: %2")
+                                 .arg(dissectResultTcp->URG() ? 1 : 0)
+                                 .arg(dissectResultTcp->URG() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... ...%1 .... = Acknowledgement: %2")
+                                 .arg(dissectResultTcp->ACK() ? 1 : 0)
+                                 .arg(dissectResultTcp->ACK() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... .... %1... = Push: %2")
+                                 .arg(dissectResultTcp->PSH() ? 1 : 0)
+                                 .arg(dissectResultTcp->PSH() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... .... .%1.. = Reset: %2")
+                                 .arg(dissectResultTcp->RST() ? 1 : 0)
+                                 .arg(dissectResultTcp->RST() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... .... ..%1. = Syn: %2")
+                                 .arg(dissectResultTcp->SYN() ? 1 : 0)
+                                 .arg(dissectResultTcp->SYN() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,false);
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString(".... .... ...%1 = Fin: %2")
+                                 .arg(dissectResultTcp->FIN() ? 1 : 0)
+                                 .arg(dissectResultTcp->FIN() ? "Set" : "Not Set")
+                                 ,&start
+                                 ,1
+                                 ,true);
+    proTree->AddItem("tcp"
+                     ,QString("[TCP Flags: %1")
+                     .arg(dissectResultTcp->GetFlagDotMeanings())
+                     ,tempStart
+                     ,tempStart + 1
+                     ,ProTree::level::CURRENT);
+
+    //Summery - Window Size Value
+    proTree->Pop();
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("Window size value: %1")
+                                 .arg(dissectResultTcp->GetWindow())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_WINDOW
+                                 ,false);
+
+    //Summery - Calculated window size
+    proTree->AddCurrentLayerItem("tcp"
+                                 ,QString("[Calculated window size: %1]")
+                                 .arg(dissectResultTcp->GetCalculatedWindow())
+                                 ,&start
+                                 ,tcp_ip_protocol_family::DissectResultTcp::TRANSPORTLAYER_TCP_FIELD_LENGTH_WINDOW
+                                 ,true);
 
 }

@@ -122,12 +122,18 @@ quint32 DissectResultTcp::GetAck(){
 }
 
 quint32 DissectResultTcp::GetRelativeAck(){
+    if( this->SYN() && !this->ACK() )
+        return this->GetAck();
     return this->GetAck() - DissectResultTcp::stream2.GetBaseSeq(-this->GetStreamIndexPlusOne());
 }
 
 /*处理首部长度和负载长度*/
 quint8 DissectResultTcp::GetOffset(){
     return (this->header->offset_reserved_flags[0] & 0xf0) >> 4;
+}
+
+QString DissectResultTcp::GetOffsetDotStr(){
+    return Bit::GetDotStrFormOctetPtr(this->header->offset_reserved_flags,4,7);
 }
 
 quint32 DissectResultTcp::GetPayloadLen(){
@@ -148,8 +154,62 @@ quint32 DissectResultTcp::GetPayloadLen(){
 *       |           |G|K|H|T|N|N|                               |
 * ---------------------------------------------------------------
 */
+quint8 DissectResultTcp::GetReserved(){
+    return (*this->header->offset_reserved_flags & 0x0e) >> 1;
+}
+
+QString DissectResultTcp::GetReservedStr(){
+    return QString("%1%2%3")
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,3))
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,2))
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,1));
+}
+
+bool DissectResultTcp::RESERVED(){
+    if( this->GetReserved() )
+        return true;
+    return false;
+}
+
+bool DissectResultTcp::NONCE(){
+    if( Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,0) )
+        return true;
+    return false;
+}
+
+bool DissectResultTcp::CWR(){  //Congestion Window Resuced
+    if( Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags + 1,7) )
+        return true;
+    return false;
+}
+
+bool DissectResultTcp::ECN_ECHO(){
+    if( Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags + 1,6) )
+        return true;
+    return false;
+}
+
+bool DissectResultTcp::URG(){
+    if( Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags + 1,5) )
+        return true;
+    return false;
+}
+
 bool DissectResultTcp::ACK(){
-    if(((this->header->offset_reserved_flags[1] & 0x10) >> 4) == 1)
+    if( ((this->header->offset_reserved_flags[1] & 0x10) >> 4) == 1 )
+        return true;
+    else
+        return false;
+}
+
+bool DissectResultTcp::PSH(){
+    if( Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags + 1,3) )
+        return true;
+    return false;
+}
+
+bool DissectResultTcp::RST(){
+    if(((this->header->offset_reserved_flags[1] & 0x04) >> 2) == 1)
         return true;
     else
         return false;
@@ -162,18 +222,54 @@ bool DissectResultTcp::SYN(){
         return false;
 }
 
-bool DissectResultTcp::RST(){
-    if(((this->header->offset_reserved_flags[1] & 0x04) >> 2) == 1)
-        return true;
-    else
-        return false;
-}
-
 bool DissectResultTcp::FIN(){
     if(((this->header->offset_reserved_flags[1] & 0x01) >> 0) == 1)
         return true;
     else
         return false;
+}
+
+QString DissectResultTcp::GetFlagsStr(){
+    return Converter::ConvertQuint8ArrayToHexStr(this->header->offset_reserved_flags,2).remove(2,1);
+}
+
+QString DissectResultTcp::GetFlagMeanings(){
+    QString meanings;
+    if( this->SYN() )
+        meanings.append("SYN, ");
+    if( this->ACK() )
+        meanings.append("ACK, ");
+    if( this->RST() )
+        meanings.append("RST, ");
+    if( this->FIN() )
+        meanings.append("FIN, ");
+    if( this->URG() )
+        meanings.append("URG, ");
+    if( this->PSH() )
+        meanings.append("PSH, ");
+    if( this->NONCE() )
+        meanings.append("Nonce, ");
+    if( this->CWR() )
+        meanings.append("CED, ");
+    if( this->ECN_ECHO() )
+        meanings.append("ECN-ECHO, ");
+    return meanings.remove(meanings.length() -2,2);
+}
+
+QString DissectResultTcp::GetFlagDotMeanings(){
+    return QString("%1%2%3%4%5%6%7%8%9%10%11%12")
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,3) ? "R" : ".")
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,2) ? "R" : ".")
+            .arg(Bit::GetBitFromOctetPtr(this->header->offset_reserved_flags,1) ? "R" : ".")
+            .arg(this->NONCE() ? "N" : ".")
+            .arg(this->CWR() ? "C" : ".")
+            .arg(this->ECN_ECHO() ? "E" : ".")
+            .arg(this->URG() ? "U" : ".")
+            .arg(this->ACK() ? "A" : ".")
+            .arg(this->PSH() ? "P" : ".")
+            .arg(this->RST() ? "R" : ".")
+            .arg(this->SYN() ? "S" : ".")
+            .arg(this->FIN() ? "F" : ".");
 }
 
 /*Window*/

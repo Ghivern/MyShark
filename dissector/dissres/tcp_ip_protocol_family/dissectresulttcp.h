@@ -149,15 +149,25 @@ public:
 
     /*实际就是获取首部长度，单位为四字节*/
     quint8 GetOffset();
+    QString GetOffsetDotStr();
     quint32 GetPayloadLen();
 
     /*Flags*/
+    quint8 GetReserved();
+    QString GetReservedStr();
+    bool RESERVED();
+    bool NONCE();
+    bool CWR();
+    bool ECN_ECHO();
     bool URG();
     bool ACK();
     bool PSH();
     bool RST();
     bool SYN();
     bool FIN();
+    QString GetFlagsStr();
+    QString GetFlagMeanings();
+    QString GetFlagDotMeanings();
 
     /*Window*/
     quint8* GetWindowPtr();
