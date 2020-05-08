@@ -31,6 +31,10 @@ qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 
         QByteArray conversedMd5 = hash.result();
         struct indexes_streamIndex new_index_streamIndex;
         new_index_streamIndex.indexes.append(dissectResultBase->GetIndex());
+        new_index_streamIndex.srcAddr.append(Converter::ConvertQuint8ArrayToDecStr(srcAddr,addr_size,"."));
+        new_index_streamIndex.srcPort = (srcPort == nullptr ? 0 : ntohs(*(quint16*)srcPort));
+        new_index_streamIndex.dstAddr.append(Converter::ConvertQuint8ArrayToDecStr(dstAddr,addr_size,"."));
+        new_index_streamIndex.dstPort = (dstPort == nullptr ? 0 : ntohs(*(quint16*)dstPort));
         if(this->streamHash.contains(conversedMd5))
             new_index_streamIndex.streamIndexPlusOne = -this->streamHash.value(conversedMd5).streamIndexPlusOne;
         else
@@ -41,6 +45,14 @@ qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 
     }
 }
 
+qint32 Stream::GetStreamCount(){
+    return qCeil(this->md5Hash.keys().length() * 1.0 / 2);
+}
+
+bool Stream::Contain(qint64 streamIndexPlusOne){
+    return this->md5Hash.contains(streamIndexPlusOne);
+}
+
 QList<quint64> Stream::GetPacketsIndexListByStream(qint64 streamIndexPlusOne){
     if(!this->md5Hash.contains(streamIndexPlusOne)){
         QList<quint64> emptyList;
@@ -48,6 +60,22 @@ QList<quint64> Stream::GetPacketsIndexListByStream(qint64 streamIndexPlusOne){
     }else{
         return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).indexes;
     }
+}
+
+QString Stream::GetSourceAddress(qint64 streamIndexPlusOne){
+    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).srcAddr;
+}
+
+quint16 Stream::GetSourcePort(qint64 streamIndexPlusOne){
+    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).srcPort;
+}
+
+QString Stream::GetDestinationAddress(qint64 streamIndexPlusOne){
+    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).dstAddr;
+}
+
+quint16 Stream::GetDestinationPort(qint64 streamIndexPlusOne){
+    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).dstPort;
 }
 
 void Stream::ClearStream(){

@@ -31,6 +31,7 @@
 
 //Statistics
 #include "./ui/statistics/capturefileproperties.h"
+#include "./ui/statistics/conversations.h"
 
 //display filter
 #include "./units/displayfilter.h"

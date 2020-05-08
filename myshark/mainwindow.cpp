@@ -387,6 +387,8 @@ void MainWindow::on_actionCapture_file_properitys_triggered()
 
 void MainWindow::on_actionConversations_triggered()
 {
+    Conversations *conversations = new Conversations;
+    conversations->show();
     qDebug() <<"stream1 包量:" << tcp_ip_protocol_family::DissectResultLinkLayer::GetStreamRecorder().GetPacketsIndexListByStream(1).length();
 }
 

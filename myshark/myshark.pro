@@ -29,6 +29,7 @@ SOURCES += \
     ui/maindisplaywidget/displaytable.cpp \
     ui/maindisplaywidget/displaytree.cpp \
     ui/statistics/capturefileproperties.cpp \
+    ui/statistics/conversations.cpp \
     ui/statusbar/displayproportion.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     ui/maindisplaywidget/displaytable.h \
     ui/maindisplaywidget/displaytree.h \
     ui/statistics/capturefileproperties.h \
+    ui/statistics/conversations.h \
     ui/statusbar/displayproportion.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
@@ -69,6 +71,7 @@ FORMS += \
     ui/dialogs/stopwithoutanypacket.ui \
     ui/dissectoroptions.ui \
     ui/statistics/capturefileproperties.ui \
+    ui/statistics/conversations.ui \
     ui/statusbar/displayproportion.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \
