@@ -12,7 +12,7 @@ QHash<QString,QString> DissectResultLinkLayer::ethernet_address_modify_hash;
 QFile DissectResultLinkLayer::file_ethernet_address(ethernet_address_file_path);
 QFile DissectResultLinkLayer::file_ethernet_well_know_address(ethernet_well_know_address_file_path);
 
-Stream DissectResultLinkLayer::stream;
+Stream DissectResultLinkLayer::stream(LINKLAYER_FIELD_LENGTH_SRC_ADDR);
 
 DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultBase,void *reserves):DissectResult(dissectResultBase)
 {
@@ -28,7 +28,7 @@ DissectResultLinkLayer::DissectResultLinkLayer(DissectResultBase *dissectResultB
     /*处理流记录器*/
     this->SetStremIndexPlusOne(
             DissectResultLinkLayer::stream
-            .Add(dissectResultBase,header->src,header->dst,LINKLAYER_FIELD_LENGTH_SRC_ADDR)
+            .Add(dissectResultBase,header->src,header->dst)
     );
 
     /*传递高层协议需要的数据,必须在AddNextLayer之前调用*/
@@ -245,6 +245,12 @@ QString DissectResultLinkLayer::GetCalculatedFCSStr(){
 
 Stream& DissectResultLinkLayer::GetStreamRecorder(){
     return DissectResultLinkLayer::stream;
+}
+
+void DissectResultLinkLayer::Clear(){
+    DissectResultLinkLayer::stream.ClearStream();
+    DissectResultIpv4::GetStreamRecorder().ClearStream();
+    DissectResultTcp::GetStreamTcp2Recorder().Clear();
 }
 
 QString DissectResultLinkLayer::getAddressOriginalStr(quint8 *address){

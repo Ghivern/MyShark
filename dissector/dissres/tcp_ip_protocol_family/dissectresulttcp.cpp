@@ -512,7 +512,13 @@ qint64 DissectResultTcp::GetPrevious(){
     return 0;
 }
 
+Stream& DissectResultTcp::GetStreamRecorder(){
+    return DissectResultTcp::stream2;
+}
 
+StreamTcp2& DissectResultTcp::GetStreamTcp2Recorder(){
+    return DissectResultTcp::stream2;
+}
 
 /*Private*/
 

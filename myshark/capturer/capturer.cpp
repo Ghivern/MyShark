@@ -83,6 +83,7 @@ void Capturer::run(){
                                         ,this->capHandle->GetDeviceName()
                                         ,this->capHandle->GetLinkType()
                                         ,this->capHandle->GetLinkTypeName());
+    DissectResultFrame::Clear();
     while(true){
         if((res = pcap_next_ex(this->capHandle->GetPcapHandle(),&pkthdr,&raw)) == 1){
             switch (this->capHandle->GetLinkType()) {

@@ -244,6 +244,9 @@ public:
     */
     qint64 GetPrevious();
 
+    static Stream& GetStreamRecorder();
+    static StreamTcp2& GetStreamTcp2Recorder();
+
 
 private:
     /*0                   1          |        2                   3

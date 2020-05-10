@@ -112,6 +112,9 @@ tcp_ip_protocol_family::DissectResultLinkLayer* DissectResultFrame::GetTcpIpProt
     return (tcp_ip_protocol_family::DissectResultLinkLayer*)this->protocol_family_base_layer;
 }
 
+void DissectResultFrame::Clear(){
+    tcp_ip_protocol_family::DissectResultLinkLayer::Clear();
+}
 
 //QString DissectResultFrame::GetSummery(){
 //    return this->dissectResultBase->GetSummery();

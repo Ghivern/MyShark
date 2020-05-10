@@ -1,20 +1,28 @@
 #include "stream.h"
 
-Stream::Stream()
+Stream::Stream(qint32 addrSize,qint32 portSize)
 {
     this->maxStreamIndexPlusOne = 1;
+    this->addrSize = addrSize;
+    this->portSize = portSize;
 }
 
-qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 *dstAddr, qint32 addr_size, quint8 *srcPort, quint8 *dstPort, qint32 port_size){
+qint64 Stream::Add(DissectResultBase *dissectResultBase, quint8 *srcAddr, quint8 *dstAddr, qint32 addr_size, quint8 *srcPort, quint8 *dstPort, qint32 port_size){
+    this->addrSize = addr_size;
+    this->portSize = port_size;
+    return this->Add(dissectResultBase,srcAddr,dstAddr,srcPort,dstPort);
+}
+
+qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 *dstAddr, quint8 *srcPort, quint8 *dstPort){
     if( dissectResultBase->GetIndex() == 0 && this->streamHash.count() > 0){
         this->ClearStream();
     }
     QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData((char*)srcAddr,addr_size);
-    hash.addData((char*)dstAddr,addr_size);
-    if(srcPort != NULL && dstPort != NULL){
-        hash.addData((char*)srcPort,port_size);
-        hash.addData((char*)dstPort,port_size);
+    hash.addData((char*)srcAddr,this->addrSize);
+    hash.addData((char*)dstAddr,this->addrSize);
+    if(srcPort != nullptr && dstPort != nullptr && this->portSize != 0){
+        hash.addData((char*)srcPort,this->portSize);
+        hash.addData((char*)dstPort,this->portSize);
     }
     QByteArray md5 = hash.result();
     if(this->streamHash.contains(md5)){
@@ -22,18 +30,23 @@ qint64 Stream::Add(DissectResultBase *dissectResultBase,quint8 *srcAddr, quint8 
         return this->streamHash.value(md5).streamIndexPlusOne;
     }else{
         hash.reset();
-        hash.addData((char*)dstAddr,addr_size);
-        hash.addData((char*)srcAddr,addr_size);
-        if(srcPort != NULL && dstPort != NULL){
-            hash.addData((char*)dstPort,port_size);
-            hash.addData((char*)srcPort,port_size);
+        hash.addData((char*)dstAddr,this->addrSize);
+        hash.addData((char*)srcAddr,this->addrSize);
+        if(srcPort != nullptr && dstPort != nullptr && this->portSize != 0){
+            hash.addData((char*)dstPort,this->portSize);
+            hash.addData((char*)srcPort,this->portSize);
         }
         QByteArray conversedMd5 = hash.result();
         struct indexes_streamIndex new_index_streamIndex;
         new_index_streamIndex.indexes.append(dissectResultBase->GetIndex());
-        new_index_streamIndex.srcAddr.append(Converter::ConvertQuint8ArrayToDecStr(srcAddr,addr_size,"."));
+//        if( this->addrSize == 6 ){
+//            new_index_streamIndex.srcAddr.append(Converter::ConvertQuint8ArrayToHexStr(srcAddr,this->addrSize,":",""));
+//            new_index_streamIndex.dstAddr.append(Converter::ConvertQuint8ArrayToHexStr(dstAddr,this->addrSize,":",""));
+//        }else{
+//            new_index_streamIndex.srcAddr.append(Converter::ConvertQuint8ArrayToDecStr(srcAddr,this->addrSize,"."));
+//            new_index_streamIndex.dstAddr.append(Converter::ConvertQuint8ArrayToDecStr(dstAddr,this->addrSize,"."));
+//        }
         new_index_streamIndex.srcPort = (srcPort == nullptr ? 0 : ntohs(*(quint16*)srcPort));
-        new_index_streamIndex.dstAddr.append(Converter::ConvertQuint8ArrayToDecStr(dstAddr,addr_size,"."));
         new_index_streamIndex.dstPort = (dstPort == nullptr ? 0 : ntohs(*(quint16*)dstPort));
         if(this->streamHash.contains(conversedMd5))
             new_index_streamIndex.streamIndexPlusOne = -this->streamHash.value(conversedMd5).streamIndexPlusOne;
@@ -62,17 +75,17 @@ QList<quint64> Stream::GetPacketsIndexListByStream(qint64 streamIndexPlusOne){
     }
 }
 
-QString Stream::GetSourceAddress(qint64 streamIndexPlusOne){
-    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).srcAddr;
-}
+//QString Stream::GetSourceAddress(qint64 streamIndexPlusOne){
+//    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).srcAddr;
+//}
 
 quint16 Stream::GetSourcePort(qint64 streamIndexPlusOne){
     return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).srcPort;
 }
 
-QString Stream::GetDestinationAddress(qint64 streamIndexPlusOne){
-    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).dstAddr;
-}
+//QString Stream::GetDestinationAddress(qint64 streamIndexPlusOne){
+//    return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).dstAddr;
+//}
 
 quint16 Stream::GetDestinationPort(qint64 streamIndexPlusOne){
     return this->streamHash.value(this->md5Hash.value(streamIndexPlusOne)).dstPort;
@@ -83,3 +96,10 @@ void Stream::ClearStream(){
     this->streamHash.clear();
     this->maxStreamIndexPlusOne = 1;
 }
+
+bool Stream::HavePort(){
+    if( this->portSize == 0 )
+        return false;
+    return true;
+}
+

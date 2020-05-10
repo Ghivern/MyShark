@@ -106,6 +106,7 @@ public:
 
     /*获取流记录器*/
     static Stream& GetStreamRecorder();
+    static void Clear();
 
 private:
     struct header_t{

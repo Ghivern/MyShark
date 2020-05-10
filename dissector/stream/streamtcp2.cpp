@@ -2,6 +2,7 @@
 #include <QtDebug>
 
 StreamTcp2::StreamTcp2()
+    :Stream(4,2)
 {
 
 }
@@ -31,7 +32,7 @@ void StreamTcp2::ClearWindow(qint64 streamIndexPlusOne){
     (*this->allWindow.find(streamIndexPlusOne)).dupAckNum = 0;
 }
 
-qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase,quint8 *srcAddr,quint8 *dstAddr,qint32 addr_size,quint8 *srcPort,quint8 *dstPort,qint32 port_size){
+qint64 StreamTcp2::AddWithWindow(DissectResultBase *dissectResultBase, quint8 *srcAddr, quint8 *dstAddr, qint32 addr_size, quint8 *srcPort, quint8 *dstPort, qint32 port_size){
     if(dissectResultBase->GetIndex() == 0 && this->allWindow.count() > 0){
         this->allWindow.clear();
         this->ClearStream();
@@ -318,4 +319,9 @@ quint32 StreamTcp2::GetWindowMultiplier(qint64 streamIndexPlusOne){
         return 1;
     }
     return qPow(2,this->allWindow.value(streamIndexPlusOne).windowScale);
+}
+
+void StreamTcp2::Clear(){
+    this->ClearStream();
+    this->allWindow.clear();
 }

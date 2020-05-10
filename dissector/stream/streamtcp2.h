@@ -59,6 +59,8 @@ public:
      quint32 GetBaseSeq(qint64 streamIndexPlusOne);
      quint32 GetWindowMultiplier(qint64 streamIndexPlusOne);
 
+     void Clear();
+
      class Window{
      public:
          Window(){
@@ -108,7 +110,6 @@ public:
      };
 
 private:
-
 
      QHash<qint64,Window> allWindow;
 };

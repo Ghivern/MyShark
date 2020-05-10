@@ -45,6 +45,8 @@ public:
     /*定制化方法，获得特定类型协议族的数据链路层解析结果指针*/
     tcp_ip_protocol_family::DissectResultLinkLayer* GetTcpIpProtocolFamilyBaseLayer();
 
+    static void Clear();
+
 //    QString GetSummery();
 //    qint32 GetProtocolListLength();
 //    QString GetProtocolNameByIndex(qint32 index);

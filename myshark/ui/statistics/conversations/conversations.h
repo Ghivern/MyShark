@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "conversationtablewidget.h"
+
 namespace Ui {
 class Conversations;
 }
@@ -12,7 +14,7 @@ class Conversations : public QWidget
     Q_OBJECT
 
 public:
-    explicit Conversations(QWidget *parent = nullptr);
+    explicit Conversations(Capturer *capturer,QWidget *parent = nullptr);
     ~Conversations();
 
 private:

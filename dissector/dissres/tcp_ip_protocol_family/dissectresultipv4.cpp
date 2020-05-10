@@ -2,7 +2,7 @@
 
 using namespace tcp_ip_protocol_family;
 
-Stream DissectResultIpv4::stream;
+Stream DissectResultIpv4::stream(NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR);
 
 DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *reserves)
         :DissectResult(dissectResultBase)
@@ -36,8 +36,7 @@ DissectResultIpv4::DissectResultIpv4(DissectResultBase *dissectResultBase,void *
         }
 
         this->SetStremIndexPlusOne( DissectResultIpv4::stream
-                                    .Add(dissectResultBase,header->srcaddr,header->dstaddr
-                                    ,NETWORKLAYER_IPV4_FIELD_LENGTH_SRCADDR));
+                                    .Add(dissectResultBase,header->srcaddr,header->dstaddr));
 
         this->addNextLayer(dissectResultBase,(NETWORKLAYER_IPV4_PROTOCOL_TYPE)*header->type,reserves);
     }
@@ -273,6 +272,10 @@ const quint8* DissectResultIpv4::GetDestinationAddressPtr(){
 
 QString DissectResultIpv4::GetDestinationAddressStr(){
     return Converter::ConvertQuint8ArrayToDecStr(this->header->dstaddr,NETWORKLAYER_IPV4_FIELD_LENGTH_DSTADDR,".","");
+}
+
+Stream& DissectResultIpv4::GetStreamRecorder(){
+    return DissectResultIpv4::stream;
 }
 
 /*Private*/

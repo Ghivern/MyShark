@@ -229,6 +229,8 @@ public:
     const quint8* GetDestinationAddressPtr();
     QString GetDestinationAddressStr();
 
+    static Stream& GetStreamRecorder();
+
 private:
     struct header_t{
         quint8 version_hdrLen[NETWORKLAYER_IPV4_FIELD_LENGTH_VERSION_HDRLEN];

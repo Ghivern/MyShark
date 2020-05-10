@@ -16,6 +16,7 @@ public:
     void* GetNextLayer();
     DissectResultBase* GetDissectResultBase();
 
+
 private:
     qint64 streamIndexPlusOne;
     void *nextLayer;
