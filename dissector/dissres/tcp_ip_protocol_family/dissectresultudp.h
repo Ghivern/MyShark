@@ -1,6 +1,8 @@
 #ifndef DISSECTRESULTUDP_H
 #define DISSECTRESULTUDP_H
 
+#include "../../stream/stream.h"
+
 #include "../dissectresultbase.h"
 
 #include "../dissectresult.h"
@@ -40,7 +42,35 @@ namespace tcp_ip_protocol_family {
 class DissectResultUdp:public DissectResult
 {
 public:
+    enum TRANSPORTLAYER_UDP_FIELD_LENGTH{
+        TRANSPORTLAYER_UDP_FIELD_LENGTH_SOURCE_PORT = 2,
+        TRANSPORTLAYER_UDP_FIELD_LENGTH_DESTINATION_PORT = 2,
+        TRANSPORTLAYER_UDP_FIELD_LENGTH_LENGTH = 2,
+        TRANSPORTLAYER_UDP_FIELD_LENGTH_CHECKSUM = 2,
+
+        TRANSPORTLAYER_UDP_FIELD_LENGTH_TEMP_HEADER_LENGTH = 8,
+    };
+
     DissectResultUdp(DissectResultBase *dissectResultBase,void *reserves = nullptr);
+
+    quint8* GetSourcePortPtr();
+    quint8* GetDestinationPortPtr();
+
+    static Stream& GetStreamRecorder();
+
+private:
+    void addNextLayer(DissectResultBase *dissectResultBase,void *reserves = nullptr);
+
+    struct header_t{
+        quint8 srcPort[2];
+        quint8 dstPort[2];
+        quint8 length[2];
+        quint8 checksum[2];
+    };
+
+    struct header_t *header;
+
+    static Stream stream;
 };
 
 }

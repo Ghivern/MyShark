@@ -21,6 +21,10 @@ QHash<QString,quint64>* DissectResultBase::dissectorOptions = new QHash<QString,
 
             {"tcp",
                 TCP_ANALYZE_TCP_SEQUENCE_NUMBER | TCP_RELATIVE_SEQUENCE_NUMBER
+            },
+
+            {"udp",
+                0
             }
       };
 

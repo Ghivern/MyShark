@@ -10,6 +10,7 @@
 #include "./widgets/arp.h"
 #include "./widgets/ipv4.h"
 #include "./widgets/tcp.h"
+#include "./widgets/udp.h"
 
 //#include "../../dissector/units/dissectorDefaultOptions.h"
 
@@ -42,6 +43,7 @@ private:
     Arp *arp;
     Ipv4 *ipv4;
     Tcp *tcp;
+    Udp *udp;
 
 
 
