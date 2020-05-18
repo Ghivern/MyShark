@@ -174,9 +174,13 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
     if( status == STATUS_NONE ){
         this->ui->splitter->hide();
         this->ui->widget_deviceList->show();
+        this->ui->lineEdit->setEnabled(false);
+        this->ui->pushButton_filter->setEnabled(false);
     }else{
         this->ui->splitter->show();
         this->ui->widget_deviceList->hide();
+        this->ui->lineEdit->setEnabled(true);
+        this->ui->pushButton_filter->setEnabled(false);
     }
 }
 
@@ -294,6 +298,7 @@ void MainWindow::on_pushButton_filter_clicked()
     QString filterStr = this->ui->lineEdit->text();
     if( this->ui->tableWidget->GetDisplayFilter()->FilterIsValied(filterStr)){
         this->ui->tableWidget->SetFilter(filterStr);
+        this->ui->pushButton_filter->setEnabled(false);
     }
 }
 
