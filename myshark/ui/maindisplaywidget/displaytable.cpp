@@ -36,7 +36,13 @@ bool DisplayTable::SetFilter(QString filterStr){
     if( this->displayFilter->SetFilter(filterStr) ){
         qint32 rowCount = this->rowCount();
         for(qint32 row = 0; row < rowCount ; row++){
-            if( !this->displayFilter->Filte( (DissectResultFrame*)this
+//            if( !this->displayFilter->Filte( (DissectResultFrame*)this
+//                                            ->item(row,COL_NO)->data(Qt::UserRole).value<void*>()) ){
+//                this->hideRow(row);
+//            }else{
+//                this->showRow(row);
+//            }
+            if( !this->displayFilter->FilteWithoutLogicOperator((DissectResultFrame*)this
                                             ->item(row,COL_NO)->data(Qt::UserRole).value<void*>()) ){
                 this->hideRow(row);
             }else{
@@ -93,7 +99,9 @@ qint32 DisplayTable::addToTable(DissectResultFrame *frame){
 
     this->insertRow(row);
 
-    if( !this->displayFilter->Filte(frame) )
+//    if( !this->displayFilter->Filte(frame) )
+//        this->hideRow(row);
+    if( !this->displayFilter->FilteWithoutLogicOperator(frame) )
         this->hideRow(row);
 
     emit showItemsCountChange(this->displayFilter->GetDisplayedCount(),this->rowCount());

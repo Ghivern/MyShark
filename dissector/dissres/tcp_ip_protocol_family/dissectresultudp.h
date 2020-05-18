@@ -55,6 +55,9 @@ public:
 
     quint8* GetSourcePortPtr();
     quint8* GetDestinationPortPtr();
+    quint16 GetSourcePort();
+    quint16 GetDestinationPort();
+
 
     static Stream& GetStreamRecorder();
 

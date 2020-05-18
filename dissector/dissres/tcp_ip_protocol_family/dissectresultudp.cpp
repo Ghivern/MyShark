@@ -43,6 +43,14 @@ quint8* DissectResultUdp::GetDestinationPortPtr(){
     return this->header->dstPort;
 }
 
+quint16 DissectResultUdp::GetSourcePort(){
+    return ntohs(*(quint16*)this->header->srcPort);
+}
+
+quint16 DissectResultUdp::GetDestinationPort(){
+    return ntohs(*(quint16*)this->header->dstPort);
+}
+
 Stream& DissectResultUdp::GetStreamRecorder(){
     return DissectResultUdp::stream;
 }
