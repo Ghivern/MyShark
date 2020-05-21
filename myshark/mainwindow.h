@@ -32,6 +32,7 @@
 //Statistics
 #include "./ui/statistics/capturefileproperties.h"
 #include "./ui/statistics/conversations/conversations.h"
+#include "./ui/statistics/endpoints/endpoints.h"
 
 //display filter
 #include "./units/displayfilter.h"
@@ -124,5 +125,6 @@ private slots:
     //    void PrintProTree(ProTreeNode *proTreeNode,qint32 level = 1);
 
 
+    void on_actionactionEndpoints_triggered();
 };
 #endif // MAINWINDOW_H

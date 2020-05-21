@@ -296,6 +296,7 @@
     </property>
     <addaction name="actionCapture_file_properitys"/>
     <addaction name="actionConversations"/>
+    <addaction name="actionactionEndpoints"/>
    </widget>
    <addaction name="menuStatistics"/>
    <addaction name="menuDissect"/>
@@ -485,6 +486,11 @@
   <action name="actionConversations">
    <property name="text">
     <string>Conversations</string>
+   </property>
+  </action>
+  <action name="actionactionEndpoints">
+   <property name="text">
+    <string>Endpoints</string>
    </property>
   </action>
  </widget>
