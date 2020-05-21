@@ -91,8 +91,7 @@ bool DisplayFilter::FilteWithoutLogicOperator(DissectResultFrame *frame){
     if( !this->filterStr.isEmpty() ){
         if( frame->GetDissectResultBase()->ContainProtocol(ev.first().split(".").first().trimmed()) ){
             if( ev.length() == 1 ){
-                this->mutex.unlock();
-                return true;
+                goto display_dissect_result;
             }
             if( ev.length() == 2){ // ev.length == 2
                 if( frame->GetDissectResultBase()->ContainProtocol("ipv4") ){
@@ -101,27 +100,15 @@ bool DisplayFilter::FilteWithoutLogicOperator(DissectResultFrame *frame){
                     if( ev.first().split(".").first() == "ipv4" ){
                         if( ev.first() == "ipv4.saddr" ){
                                 if( ipv4->GetSourceAddressStr() == ev.last() ){
-                                    this->mutex.unlock();
-                                    return true;
-                                }else{
-                                    this->mutex.unlock();
-                                    return false;
+                                    goto display_dissect_result;
                                 }
                         }else if( ev.first() == "ipv4.daddr" ){
                              if( ipv4->GetDestinationAddressStr() == ev.last() ){
-                                this->mutex.unlock();
-                                return true;
-                            }else{
-                                this->mutex.unlock();
-                                return false;
+                                goto display_dissect_result;
                             }
                         }else{
                             if( ipv4->GetSourceAddressStr() == ev.last() || ipv4->GetDestinationAddressStr() == ev.last() ){
-                                this->mutex.unlock();
-                                return true;
-                            }else{
-                                this->mutex.unlock();
-                                return false;
+                                goto display_dissect_result;
                             }
                         }
                     }
@@ -132,23 +119,19 @@ bool DisplayFilter::FilteWithoutLogicOperator(DissectResultFrame *frame){
                     if( ev.first().contains("tcp") ){
                         if( ev.first() == "tcp.stream"){
                             if( ev.last().toInt() == tcp->GetStreamIndex()){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else if( ev.first() == "tcp.sport" ){
                             if( ev.last().toInt() == tcp->GetSourcePort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else if( ev.first() == "tcp.dport" ){
                             if( ev.last().toInt() == tcp->GetDestinationPort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else{
                             if( ev.last().toInt() == tcp->GetSourcePort() || ev.last().toInt() == tcp->GetDestinationPort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }
                     }
@@ -159,23 +142,19 @@ bool DisplayFilter::FilteWithoutLogicOperator(DissectResultFrame *frame){
                     if( ev.first().contains("udp") ){
                         if( ev.first() == "udp.stream"){
                             if( ev.last().toInt() == udp->GetStreamIndex() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else if( ev.first() == "udp.sport" ){
                             if( ev.last().toInt() == udp->GetSourcePort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else if( ev.first() == "udp.dport" ){
                             if( ev.last().toInt() == udp->GetDestinationPort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }else{
                             if( ev.last().toInt() == udp->GetSourcePort() || ev.last().toInt() == udp->GetDestinationPort() ){
-                                this->mutex.unlock();
-                                return true;
+                                goto display_dissect_result;
                             }
                         }
                     }
@@ -183,13 +162,16 @@ bool DisplayFilter::FilteWithoutLogicOperator(DissectResultFrame *frame){
             }
         }
     }else{
-        this->displayedCount++;
-        this->mutex.unlock();
-        return true;
+        goto display_dissect_result;
     }
 
     this->mutex.unlock();
     return false;
+
+    display_dissect_result:
+    this->displayedCount++;
+    this->mutex.unlock();
+    return true;
 }
 
 
