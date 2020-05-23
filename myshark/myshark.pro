@@ -28,6 +28,9 @@ SOURCES += \
     ui/maindisplaywidget/displayrawdata.cpp \
     ui/maindisplaywidget/displaytable.cpp \
     ui/maindisplaywidget/displaytree.cpp \
+    ui/statistics/ProtocolHierarchy/hierarchynode.cpp \
+    ui/statistics/ProtocolHierarchy/hierarchytree.cpp \
+    ui/statistics/ProtocolHierarchy/protocolhierarchy.cpp \
     ui/statistics/capturefileproperties.cpp \
     ui/statistics/conversations/conversations.cpp \
     ui/statistics/conversations/conversationtablewidget.cpp \
@@ -56,6 +59,9 @@ HEADERS += \
     ui/maindisplaywidget/displayrawdata.h \
     ui/maindisplaywidget/displaytable.h \
     ui/maindisplaywidget/displaytree.h \
+    ui/statistics/ProtocolHierarchy/hierarchynode.h \
+    ui/statistics/ProtocolHierarchy/hierarchytree.h \
+    ui/statistics/ProtocolHierarchy/protocolhierarchy.h \
     ui/statistics/capturefileproperties.h \
     ui/statistics/conversations/conversations.h \
     ui/statistics/conversations/conversationtablewidget.h \
@@ -80,6 +86,7 @@ FORMS += \
     ui/dialogs/saveorclosefiledialog.ui \
     ui/dialogs/stopwithoutanypacket.ui \
     ui/dissectoroptions.ui \
+    ui/statistics/ProtocolHierarchy/protocolhierarchy.ui \
     ui/statistics/capturefileproperties.ui \
     ui/statistics/conversations/conversations.ui \
     ui/statistics/endpoints/endpoints.ui \

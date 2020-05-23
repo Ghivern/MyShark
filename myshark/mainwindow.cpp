@@ -418,7 +418,11 @@ void MainWindow::on_actionPacketLengths_triggered()
     packetLength->show();
 }
 
-
+void MainWindow::on_actionProtocolHierarchy_triggered()
+{
+    ProtocolHierarchy *protocolHierarchy = new ProtocolHierarchy(this->capturer);
+    protocolHierarchy->show();
+}
 
 
 ///*用于测试的，暂时性的*/
@@ -471,6 +475,8 @@ void MainWindow::on_actionPacketLengths_triggered()
 //        //qDebug() << "未处理的网络层协议，协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr();
 //    }
 //}
+
+
 
 
 

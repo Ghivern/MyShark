@@ -34,6 +34,7 @@
 #include "./ui/statistics/conversations/conversations.h"
 #include "./ui/statistics/endpoints/endpoints.h"
 #include "./ui/statistics/packetlengths/packetlength.h"
+#include "./ui/statistics/ProtocolHierarchy/protocolhierarchy.h"
 
 //display filter
 #include "./units/displayfilter.h"
@@ -128,5 +129,6 @@ private slots:
 
     void on_actionactionEndpoints_triggered();
     void on_actionPacketLengths_triggered();
+    void on_actionProtocolHierarchy_triggered();
 };
 #endif // MAINWINDOW_H
