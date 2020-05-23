@@ -33,6 +33,7 @@
 #include "./ui/statistics/capturefileproperties.h"
 #include "./ui/statistics/conversations/conversations.h"
 #include "./ui/statistics/endpoints/endpoints.h"
+#include "./ui/statistics/packetlengths/packetlength.h"
 
 //display filter
 #include "./units/displayfilter.h"
@@ -126,5 +127,6 @@ private slots:
 
 
     void on_actionactionEndpoints_triggered();
+    void on_actionPacketLengths_triggered();
 };
 #endif // MAINWINDOW_H

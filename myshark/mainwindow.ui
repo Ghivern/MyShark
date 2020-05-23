@@ -297,6 +297,7 @@
     <addaction name="actionCapture_file_properitys"/>
     <addaction name="actionConversations"/>
     <addaction name="actionactionEndpoints"/>
+    <addaction name="actionPacketLengths"/>
    </widget>
    <addaction name="menuStatistics"/>
    <addaction name="menuDissect"/>
@@ -491,6 +492,11 @@
   <action name="actionactionEndpoints">
    <property name="text">
     <string>Endpoints</string>
+   </property>
+  </action>
+  <action name="actionPacketLengths">
+   <property name="text">
+    <string>PacketLengths</string>
    </property>
   </action>
  </widget>

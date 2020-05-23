@@ -33,6 +33,7 @@ SOURCES += \
     ui/statistics/conversations/conversationtablewidget.cpp \
     ui/statistics/endpoints/endpoints.cpp \
     ui/statistics/endpoints/endpointstablewidget.cpp \
+    ui/statistics/packetlengths/packetlength.cpp \
     ui/statusbar/displayproportion.cpp \
     ui/widgets/arp.cpp \
     ui/widgets/ether.cpp \
@@ -60,6 +61,7 @@ HEADERS += \
     ui/statistics/conversations/conversationtablewidget.h \
     ui/statistics/endpoints/endpoints.h \
     ui/statistics/endpoints/endpointstablewidget.h \
+    ui/statistics/packetlengths/packetlength.h \
     ui/statusbar/displayproportion.h \
     ui/widgets/arp.h \
     ui/widgets/ether.h \
@@ -81,6 +83,7 @@ FORMS += \
     ui/statistics/capturefileproperties.ui \
     ui/statistics/conversations/conversations.ui \
     ui/statistics/endpoints/endpoints.ui \
+    ui/statistics/packetlengths/packetlength.ui \
     ui/statusbar/displayproportion.ui \
     ui/widgets/arp.ui \
     ui/widgets/ether.ui \
