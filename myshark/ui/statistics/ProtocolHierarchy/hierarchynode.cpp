@@ -1,7 +1,8 @@
 #include "hierarchynode.h"
 
-HierarchyNode::HierarchyNode(QString name):name(name)
+HierarchyNode::HierarchyNode(QString name)
 {
+    this->name.append(name);
     this->packets = 0;
     this->bytes = 0;
 }

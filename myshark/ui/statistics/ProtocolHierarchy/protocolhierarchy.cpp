@@ -3,22 +3,17 @@
 
 ProtocolHierarchy::ProtocolHierarchy(Capturer *capturer, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ProtocolHierarchy),
-    capturer(capturer)
+    ui(new Ui::ProtocolHierarchy)
 {
     ui->setupUi(this);
 
-    this->allPackets = capturer->GetCount();
-    this->allTime = capturer->GetDissectResultFrameByIndex(allPackets - 1)->GetRelativeTimeSinceFirstPacket();
-    for( qint32 index = 0; index < allPackets; index++ )
-        this->allBytes += capturer->GetDissectResultFrameByIndex(index)->GetCapLen();
-
-    this->ui->treeWidget->setColumnCount(headers.length());
-    this->ui->treeWidget->setHeaderLabels(headers);
-
+    this->capturer = capturer;
+    qDebug() << "new HierarchyTree之前";
     this->tree = new HierarchyTree();
-    for( qint32 index = 0; index < capturer->GetCount(); index++ )
-        this->tree->UpdateTree(capturer->GetDissectResultFrameByIndex(index));
+    //this->tree = nullptr;
+    qDebug() << "new HierarchyTree之后";
+    this->ui->treeWidget->setColumnCount(this->headers.length());
+    this->ui->treeWidget->setHeaderLabels(this->headers);
 
     this->addToTree();
 }
@@ -29,13 +24,27 @@ ProtocolHierarchy::~ProtocolHierarchy()
 }
 
 void ProtocolHierarchy::addToTree(){
-    HierarchyNode *root = this->tree->GetHeader();
 
-    QTreeWidgetItem *item = new QTreeWidgetItem();
-    this->addToTreeItem(item,root);
-    this->ui->treeWidget->addTopLevelItem(item);
+    this->allBytes = 0;
+    this->allTime = 0;
+    this->allPackets = 0;
+    this->allPackets = capturer->GetCount();
+    if( this->capturer->GetCount() > 0 ){
 
-    this->addToTreeLoop(item,root);
+        this->allTime = this->capturer->GetDissectResultFrameByIndex(allPackets - 1)->GetRelativeTimeSinceFirstPacket();
+        for( qint32 index = 0; index < allPackets; index++ ){
+            this->allBytes += capturer->GetDissectResultFrameByIndex(index)->GetCapLen();
+            this->tree->UpdateTree(capturer->GetDissectResultFrameByIndex(index));
+        }
+
+        HierarchyNode *root = this->tree->GetHeader();
+
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        this->addToTreeItem(item,root);
+        this->ui->treeWidget->addTopLevelItem(item);
+
+        this->addToTreeLoop(item,root);
+    }
 }
 
 void ProtocolHierarchy::addToTreeLoop(QTreeWidgetItem *parentItem,HierarchyNode *parentNode){

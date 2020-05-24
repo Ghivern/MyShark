@@ -408,7 +408,6 @@ void MainWindow::on_actionConversations_triggered()
 void MainWindow::on_actionactionEndpoints_triggered()
 {
     Endpoints *endpoints = new Endpoints(this->capturer);
-    //qDebug() << this->capturer->GetCount();
     endpoints->show();
 }
 
@@ -421,6 +420,7 @@ void MainWindow::on_actionPacketLengths_triggered()
 void MainWindow::on_actionProtocolHierarchy_triggered()
 {
     ProtocolHierarchy *protocolHierarchy = new ProtocolHierarchy(this->capturer);
+    qDebug() << "new ProtocolHierarchy成功";
     protocolHierarchy->show();
 }
 

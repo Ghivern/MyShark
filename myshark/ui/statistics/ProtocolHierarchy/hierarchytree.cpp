@@ -14,16 +14,23 @@ void HierarchyTree::UpdateTree(DissectResultFrame *frame){
     qint32 protocolNum = frame->GetDissectResultBase()->GetProtocolListLength();
     QString name;
     node->UpdateData(frame->GetCapLen());
-    for( qint32 index = 1; index < protocolNum; index++ ){
+    QString protocolName;
+    //qDebug() << frame->GetDissectResultBase()->GetProtocolNameByIndex(0);
+    for( qint32 index = 0; index < protocolNum; index++ ){
         name.clear();
         name.append(frame->GetDissectResultBase()->GetProtocolNameByIndex(index));
-        if( !node->ContainsChild(name) ){
-            node->AppendChild(new HierarchyNode(name));
-        }
-        node = node->GetChildByName(name);
+        protocolName.append(name + "->");
 
+        if( !node->ContainsChild(name) ){
+            HierarchyNode *tempNode = new HierarchyNode(name);
+            node->AppendChild(tempNode);
+            node = tempNode;
+        }else{
+            node = node->GetChildByName(name);
+        }
         node->UpdateData(frame->GetCapLen());
     }
+    //qDebug() << protocolName;
 }
 
 

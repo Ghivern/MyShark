@@ -125,7 +125,7 @@ bool Capturer::updateCaptureThread(QString interfaceOrFile, bool fromFile){
         if( !fromFile )
             tempHandle->ActivateHandleWithParas();
 
-        if( this->clearCaptureThread(fromFile ? 1 : 0)){
+        if( this->clearCaptureThread(fromFile ? true : false)){
             this->capHandle = tempHandle;
         }else{
             tempHandle->Close();
