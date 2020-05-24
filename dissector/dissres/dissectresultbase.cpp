@@ -71,7 +71,6 @@ void DissectResultBase::UpdateProtocolList(QString protocolName, qint32 newProto
         this->protocolPositionHash.remove(this->GetProtocolNameByIndex(i));
         this->protocolPositionHash.insert(this->GetProtocolNameByIndex(i),position);
     }
-
 }
 
 void DissectResultBase::SetSummery(QString summery){
@@ -287,4 +286,14 @@ QString DissectResultBase::GetLinklayerTypeName(){
 
 QHash<QString,quint64>* DissectResultBase::GetDissectorOptionPtr(){
     return DissectResultBase::dissectorOptions;
+}
+
+qint32 DissectResultBase::GetProtocolLength(QString name){
+    if( this->protocolPositionHash.keys().contains(name) )
+        if( this->GetTopProtocolName() != name)
+            return this->protocolPositionHash.value(name).end - this->protocolPositionHash.value(name).start;
+        else
+            return this->GetPkthdr()->caplen - this->protocolPositionHash.value(name).start;
+    else
+        return 0;
 }

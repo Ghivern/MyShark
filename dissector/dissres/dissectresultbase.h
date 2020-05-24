@@ -77,7 +77,8 @@ public:
     static QString GetLinklayerTypeName();
     static QHash<QString,quint64>* GetDissectorOptionPtr();
 
-
+    /*若非顶层协议，返回头长度，否个，返回包含数据的长度*/
+    qint32 GetProtocolLength(QString name);
 
 private:
     static QHash<QString,quint64>* dissectorOptions;
