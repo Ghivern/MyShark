@@ -35,6 +35,7 @@
 #include "./ui/statistics/endpoints/endpoints.h"
 #include "./ui/statistics/packetlengths/packetlength.h"
 #include "./ui/statistics/ProtocolHierarchy/protocolhierarchy.h"
+#include "./ui/statistics/iograph/iographchart.h"
 
 //display filter
 #include "./units/displayfilter.h"
@@ -130,5 +131,6 @@ private slots:
     void on_actionactionEndpoints_triggered();
     void on_actionPacketLengths_triggered();
     void on_actionProtocolHierarchy_triggered();
+    void on_actionIOGraph_triggered();
 };
 #endif // MAINWINDOW_H

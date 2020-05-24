@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,6 +36,7 @@ SOURCES += \
     ui/statistics/conversations/conversationtablewidget.cpp \
     ui/statistics/endpoints/endpoints.cpp \
     ui/statistics/endpoints/endpointstablewidget.cpp \
+    ui/statistics/iograph/iographchart.cpp \
     ui/statistics/packetlengths/packetlength.cpp \
     ui/statusbar/displayproportion.cpp \
     ui/widgets/arp.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
     ui/statistics/conversations/conversationtablewidget.h \
     ui/statistics/endpoints/endpoints.h \
     ui/statistics/endpoints/endpointstablewidget.h \
+    ui/statistics/iograph/iographchart.h \
     ui/statistics/packetlengths/packetlength.h \
     ui/statusbar/displayproportion.h \
     ui/widgets/arp.h \

@@ -116,6 +116,8 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionConversations->setEnabled(true);
         this->ui->actionactionEndpoints->setEnabled(true);
         this->ui->actionPacketLengths->setEnabled(true);
+        this->ui->actionProtocolHierarchy->setEnabled(true);
+        this->ui->actionIOGraph->setEnabled(true);
 
         this->showDisplayProportion->SetDefaultInfo();
         break;
@@ -136,6 +138,8 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionConversations->setEnabled(true);
         this->ui->actionactionEndpoints->setEnabled(true);
         this->ui->actionPacketLengths->setEnabled(true);
+        this->ui->actionProtocolHierarchy->setEnabled(true);
+        this->ui->actionIOGraph->setEnabled(true);
         break;
     }
     case STATUS_FILE:
@@ -154,6 +158,8 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionConversations->setEnabled(true);
         this->ui->actionactionEndpoints->setEnabled(true);
         this->ui->actionPacketLengths->setEnabled(true);
+        this->ui->actionProtocolHierarchy->setEnabled(true);
+        this->ui->actionIOGraph->setEnabled(true);
 
         this->showDisplayProportion->SetDefaultInfo();
         break;
@@ -174,6 +180,8 @@ void MainWindow::setActionsStatus(enum WINDOW_STATUS status){
         this->ui->actionConversations->setEnabled(false);
         this->ui->actionactionEndpoints->setEnabled(false);
         this->ui->actionPacketLengths->setEnabled(false);
+        this->ui->actionProtocolHierarchy->setEnabled(false);
+        this->ui->actionIOGraph->setEnabled(false);
 
         this->showDisplayProportion->SetDefaultInfo();
     }
@@ -424,6 +432,17 @@ void MainWindow::on_actionProtocolHierarchy_triggered()
     protocolHierarchy->show();
 }
 
+void MainWindow::on_actionIOGraph_triggered()
+{
+    QVBoxLayout *vLayout = new QVBoxLayout();
+    IOGraphChart *chart = new IOGraphChart(this->capturer);
+    vLayout->addWidget(chart);
+    QLabel *label = new QLabel("Test");
+    vLayout->addWidget(label);
+    QWidget *widget = new QWidget();
+    widget->setLayout(vLayout);
+    widget->show();
+}
 
 ///*用于测试的，暂时性的*/
 //void MainWindow::PrintProTree(ProTreeNode *proTreeNode, qint32 level){
@@ -475,6 +494,8 @@ void MainWindow::on_actionProtocolHierarchy_triggered()
 //        //qDebug() << "未处理的网络层协议，协议号为" << frame->GetTcpIpProtocolFamilyBaseLayer()->GetTypeStr();
 //    }
 //}
+
+
 
 
 

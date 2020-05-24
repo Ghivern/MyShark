@@ -299,6 +299,7 @@
     <addaction name="actionactionEndpoints"/>
     <addaction name="actionProtocolHierarchy"/>
     <addaction name="actionPacketLengths"/>
+    <addaction name="actionIOGraph"/>
    </widget>
    <addaction name="menuStatistics"/>
    <addaction name="menuDissect"/>
@@ -503,6 +504,11 @@
   <action name="actionProtocolHierarchy">
    <property name="text">
     <string>Protocol Hierarchy</string>
+   </property>
+  </action>
+  <action name="actionIOGraph">
+   <property name="text">
+    <string>IO Graph</string>
    </property>
   </action>
  </widget>
