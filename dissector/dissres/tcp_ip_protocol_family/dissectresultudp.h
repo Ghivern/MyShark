@@ -1,6 +1,8 @@
 #ifndef DISSECTRESULTUDP_H
 #define DISSECTRESULTUDP_H
 
+#include "../../units/checksum2.h"
+
 #include "../../stream/stream.h"
 
 #include "../dissectresultbase.h"
@@ -58,6 +60,12 @@ public:
     quint16 GetSourcePort();
     quint16 GetDestinationPort();
 
+    quint16 GetLength();
+    qint32 GetTotalLen();
+    quint8* GetChecksumPtr();
+    QString GetChecksumStr();
+    QString GetCalculatedChecksum();
+
 
     static Stream& GetStreamRecorder();
 
@@ -72,6 +80,8 @@ private:
     };
 
     struct header_t *header;
+
+    QString calculatedChecksumStr;
 
     static Stream stream;
 };

@@ -67,7 +67,8 @@ SOURCES += \
     units/copy.cpp \
     units/device.cpp \
     units/ipv4info.cpp \
-    units/tcpinfo.cpp
+    units/tcpinfo.cpp \
+    units/udpinfo.cpp
 
 HEADERS += \
     dissector_global.h \
@@ -122,7 +123,8 @@ HEADERS += \
     units/device.h \
     units/ipv4info.h \
     units/keys.h \
-    units/tcpinfo.h
+    units/tcpinfo.h \
+    units/udpinfo.h
 
 LIBS += -lpcap
 

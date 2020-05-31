@@ -7,7 +7,7 @@ Udp::Udp(quint64 options,QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->ui->checkBox_validate_checksum->setChecked(options & TCP_VALIDATE_CHECKSUM ? true : false);
+    this->ui->checkBox_validate_checksum->setChecked(options & UDP_VALIDATE_CHECKSUM ? true : false);
 
 }
 

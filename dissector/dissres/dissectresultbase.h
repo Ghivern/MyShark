@@ -11,6 +11,7 @@
 #include "../units/keys.h"
 #include "../units/ipv4info.h"
 #include "../units/tcpinfo.h"
+#include "../units/udpinfo.h"
 
 
 #define FRAME_GENERATE_EPOCH_TIME 0x0001

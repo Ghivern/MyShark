@@ -18,6 +18,9 @@ const QString TCP_INFO_PTR = "tcp_info_ptr";
 //const QString IPV4_INFO;
 const QString IPV4_INFO_PTR;
 
+/*For UDP*/
+const QString UDP_INFO_PTR = "udp_info_ptr";
+
 //const QString TCP_SEQ_VAL = "tcp_seq_val";
 //const QString TCP_ACK_VAL = "tcp_ack_val";
 //const QString TCP_PAYLOAD_LEN = "tcp_payload_len";
